@@ -12,11 +12,6 @@ function App() {
       <Routes>
         {/* Public routes */}
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-
-        {/* Fallback – unknown path */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
