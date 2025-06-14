@@ -5,6 +5,7 @@ import Login from "./components/Login.js";
 import ResetPassword from "./components/ResetPassword.js";
 import ChangePassword from "./components/ChangePassword.js";
 import WelcomePage from "./components/WelcomePage";
+import ProfileCard from "./components/ProfileCard.js";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/profile" element={<ProfileCard /> } />
 
         {/* Fallback – unknown path */}
         <Route path="*" element={<Navigate to="/" />} />
