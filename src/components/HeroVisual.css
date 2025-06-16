@@ -1,11 +1,13 @@
 .hero-visual {
   position: relative;
-  width: 440px;
-  height: 440px;
-  flex-shrink: 0;
+  width: 100%;
+  max-width: 440px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  flex-shrink: 1;
 }
 
-/* SHAPE BASE */
+/* SHAPES */
 .shape {
   position: absolute;
   width: 100%;
@@ -29,7 +31,6 @@
   z-index: 2;
 }
 
-/* GIRL IMAGE FIXED */
 .girl-image {
   position: absolute;
   width: 100%;
@@ -48,7 +49,6 @@
 }
 
 
-
 /* SPEECH BUBBLES */
 .speech-bubble {
   position: absolute;
@@ -59,44 +59,44 @@
   font-weight: 600;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 4;
+  max-width: 240px;
 }
 
 .top-left {
-  top: 51px;
-  left: -97px;
+  top: 50px;
+  left: -70px;
 }
 
 .bottom-right {
-  bottom: -24px;
+  bottom: -20px;
   right: -20px;
   text-align: center;
 }
+
+/* ✅ MOBILE */
 @media (max-width: 768px) {
   .hero-visual {
-    width: 100%;
-    max-width: 300px;
-    margin: 20px auto;
+    max-width: 320px;
     aspect-ratio: 1;
+    margin: 20px auto;
   }
 
   .girl-image img {
-    height: 105%;           /* a bit smaller */
-    transform: translateY(56px) rotate(-5deg);
+    max-height: 100%;
+    transform: translateY(36px) rotate(-4deg);
   }
 
   .speech-bubble.top-left {
-  top: 71px;
-  left: -47px;
-    transform: translate(-10%, -50%);
-    max-width: 90%;
-    font-size: 12px;
+    top: 45px;
+    left: -40px;
+    font-size: 11px;
+    transform: translate(0);
   }
 
   .speech-bubble.bottom-right {
-    bottom: 0;
-    right: 0;
-    transform: translate(10%, 50%);
-    max-width: 90%;
-    font-size: 12px;
+    bottom: -15px;
+    right: -15px;
+    font-size: 11px;
+    transform: translate(0);
   }
 }

@@ -1,0 +1,24 @@
+.second-section {
+  text-align: center;
+  padding: 80px 20px;
+  background-color: white;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.main-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 50px;
+}
+
+.info-cards-container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
