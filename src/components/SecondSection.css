@@ -1,5 +1,4 @@
 .second-section {
-  text-align: center;
   padding: 80px 20px;
   background-color: white;
 }
@@ -8,10 +7,14 @@
   color: #888;
   font-size: 16px;
   margin-bottom: 8px;
+    margin-left: 3%;
+
 }
 
 .main-title {
   font-size: 32px;
+    margin-left: 3%;
+
   font-weight: bold;
   margin-bottom: 50px;
 }
