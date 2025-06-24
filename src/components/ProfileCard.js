@@ -62,7 +62,7 @@ const ProfileCard = () => {
       alert("Profile picture removed successfully!");
       setUserInfo((prev) => ({
         ...prev,
-        profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.jpg",
+        profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
       }));
     } else {
       alert(data.message || "Failed to delete profile picture");
