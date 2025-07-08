@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import SignUp from "./components/SignUp.js";
-import Login from "./components/Login.js";
-import ResetPassword from "./components/ResetPassword.js";
-import ChangePassword from "./components/ChangePassword.js";
+import Signup from "./components/Signup"; // ✅ Your version
+import Login from "./components/Login";
+//import ResetPassword from "./components/ResetPassword.js";
+//import ChangePassword from "./components/ChangePassword.js";
 import WelcomePage from "./components/WelcomePage";
 import ProfileCard from "./components/ProfileCard.js";
 
@@ -12,11 +12,11 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes */}
-      
-        <Route path="/signup" element={<SignUp />} />
+        <Route path="/" element={<WelcomePage />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<ProfileCard /> } />
+  <Route path="/" element={<WelcomePage />} />
   <Route path="/" element={<WelcomePage />} />
         {/* Fallback – unknown path */}
         <Route path="*" element={<Navigate to="/" />} />

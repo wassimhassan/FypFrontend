@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Background gradient for full page */
+.signup-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #012549, #89a9d5, #f2c94c);
+    gap: 40px;
+    padding: 20px;
+    flex-wrap: wrap;
+    position: relative; /* enable positioning if needed later */
+}
+
+/* Form box */
+.signup-form-box {
+    background:#D9D9D91A;
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 400px;
+    color: #fff;
+}
+
+.signup-form-box h1 {
+    margin-right: 55px;
+    font-size: 36px;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #000000, #1F4291);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.signup-form-box form {
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+}
+
+.signup-form-box input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #000000;
+    margin-bottom: 20px;
+    padding: 8px 4px;
+    color: #fff;
+}
+
+.signup-form-box input::placeholder {
+    background: linear-gradient(to bottom, #000000, #1F4291);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+.signup-form-box button {
+    background: linear-gradient(to right, #001f4d, #003366);
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.signup-form-box p {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 15px;
+    margin-right: 55px;
+    text-decoration: underline;
+}
+
+/* Logo box - bigger and overlapping */
+.signup-logo-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 10px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: -100px; /* overlap by 100px — adjust as needed */
+    z-index: 1; /* ensure it's layered above form box if overlapping */
+}
+
+.signup-logo-box img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
