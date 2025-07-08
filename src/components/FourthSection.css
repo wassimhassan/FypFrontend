@@ -1,0 +1,53 @@
+.fourth-section {
+  padding: 80px 20px;
+  text-align: left;
+}
+
+.fourth-section .subtitle {
+  font-size: 17px;
+  color: #888;
+  margin-bottom: 8px;
+  margin-left: 3%;
+}
+
+.fourth-section .title {
+  font-size: 38px;
+  font-weight: bold;
+  margin-bottom: 48px;
+  margin-left: 3%;
+}
+
+.review-cards {
+  display: flex;
+  justify-content: center;
+  gap: 160px;
+  flex-wrap: wrap;
+}
+
+.write-review-btn {
+  display: block;
+  margin: 40px auto 0;
+  padding: 12px 24px;
+  border: none;
+  background-color: #1f318f;
+  color: white;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .review-cards {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .fourth-section {
+    text-align: center;
+  }
+
+  .fourth-section .subtitle,
+  .fourth-section .title {
+    margin-left: 0;
+  }
+}

@@ -1,0 +1,28 @@
+.info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 320px;
+  text-align: center;
+  margin: auto;
+}
+
+.info-card-image img {
+  width: 200px;
+  height: 200px;
+  border-radius: 20px;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.info-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.info-card-description {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+}

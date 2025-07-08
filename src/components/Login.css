@@ -1,0 +1,109 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Background gradient for full page */
+.Login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(to right, #012549, #89a9d5, #f2c94c);
+    gap: 40px;
+    padding: 20px;
+    flex-wrap: wrap;
+    position: relative;
+}
+
+/* Logo box */
+.Login-logo-box {
+    background: #fff;
+    border-radius: 20px;
+    padding: 10px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2; /* Higher z-index to appear above form box */
+}
+
+.Login-logo-box img {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Form box */
+.Login-form-box {
+    background: #D9D9D91A;
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    width: 400px;
+    color: #fff;
+    margin-left: -100px; /* overlap the logo box */
+    position: relative;
+    z-index: 1; /* Lower z-index so logo appears above it */
+}
+
+.Login-form-box h1 {
+    margin-right: -25px;
+    font-size: 36px;
+    font-weight: bold;
+    background: linear-gradient(to bottom, #000000, #1F4291);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    text-align: center;
+}
+
+.Login-form-box form {
+    display: flex;
+    flex-direction: column;
+    width: 350px;
+    margin-left: 40px;
+}
+
+.Login-form-box input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #000000;
+    margin-bottom: 20px;
+    padding: 8px 4px;
+    color: #fff;
+}
+
+.Login-form-box input::placeholder {
+    background: linear-gradient(to bottom, #000000, #1F4291);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}
+
+.Login-form-box button {
+    background: linear-gradient(to right, #001f4d, #003366);
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.Login-data {
+    display: flex;
+    justify-content: space-around;
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 15px;
+    margin-right: -35px;
+    text-decoration: underline;
+    color: #162f67;
+}
