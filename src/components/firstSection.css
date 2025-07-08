@@ -1,0 +1,41 @@
+.first-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 60px;
+  background-color: #fef5dd;
+  border-radius: 28px;
+  font-family: 'Arial', sans-serif;
+  gap: 60px;
+  flex-wrap: wrap;
+  width: 91%;
+  max-width: 1700px;
+  margin: 60px auto;
+  box-sizing: border-box;
+    overflow: visible;
+
+}
+
+.hero-visual {
+  position: relative;
+  width: 100%;
+  max-width: 360px;   /* adjustable max size */
+  aspect-ratio: 1;
+  flex-shrink: 1;
+}
+
+
+
+@media (max-width: 768px) {
+  .first-section {
+    flex-direction: column;
+    padding: 40px 24px;         /* content padding */
+    margin: 40px auto;          /* center the box */
+    width: 100%;
+    max-width: 95vw;            /* ✅ makes yellow box not touch the edge */
+    box-sizing: border-box;
+    text-align: center;
+    border-radius: 28px;
+    background-color: #fef5dd;
+  }
+}

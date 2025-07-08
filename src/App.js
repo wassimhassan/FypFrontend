@@ -12,12 +12,12 @@ function App() {
     <Router>
       <Routes>
         {/* Public routes */}
-        <Route path="/" element={<WelcomePage />} />
+      
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<ProfileCard /> } />
-
+  <Route path="/" element={<WelcomePage />} />
         {/* Fallback – unknown path */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
