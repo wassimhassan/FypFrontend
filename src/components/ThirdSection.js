@@ -1,6 +1,6 @@
 import React from "react";
 import "./ThirdSection.css";
-import ProfileCard from "./ProfileCard"; // reuse the card from earlier
+import ProfileCardWelcomepage from "./ProfileCardWelcomepage"; // reuse the card from earlier
 
 const ThirdSection = () => {
   return (
@@ -9,17 +9,17 @@ const ThirdSection = () => {
       <h2 className="title">Meet our Teachers</h2>
 
       <div className="profile-card-container">
-        <ProfileCard
+        <ProfileCardWelcomepage
           icon="/FekraLogo.png"
           name="John Doe"
           description="Description hello thats me writing to inform you that im testing"
         />
-        <ProfileCard
+        <ProfileCardWelcomepage
           icon="/FekraLogo.png"
           name="John Doe"
           description="Description hello thats me writing to inform you that im testing"
         />
-        <ProfileCard
+        <ProfileCardWelcomepage
           icon="/FekraLogo.png"
           name="John Doe"
           description="Description hello thats me writing to inform you that im testing"
