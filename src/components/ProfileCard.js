@@ -26,7 +26,7 @@ const ProfileCard = () => {
     const formData = new FormData();
     formData.append("profilePicture", file);
 
-    const res  = await fetch(`${API_BASE_URL}/auth/upload-profile-picture`, {
+    const res  = await fetch(`${API_BASE_URL}/profile/upload-profile-picture`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -52,7 +52,7 @@ const ProfileCard = () => {
       return;
     }
 
-    const res  = await fetch(`${API_BASE_URL}/auth/remove-profile-picture`, {
+    const res  = await fetch(`${API_BASE_URL}/profile/remove-profile-picture`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -85,7 +85,7 @@ const ProfileCard = () => {
         const token = localStorage.getItem("token");
         if (!token) return setLoading(false);
 
-        const res = await fetch(`${API_BASE_URL}/auth/profile`, {
+        const res = await fetch(`${API_BASE_URL}/profile/profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
@@ -100,7 +100,7 @@ const ProfileCard = () => {
           console.error(data.message);
         }
 
-        const picRes = await fetch(`${API_BASE_URL}/auth/profile-picture`, {
+        const picRes = await fetch(`${API_BASE_URL}/profile/profile-picture`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const picData = await picRes.json();
@@ -121,7 +121,7 @@ const ProfileCard = () => {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const res = await fetch(`${API_BASE_URL}/auth/profile`, {
+      const res = await fetch(`${API_BASE_URL}/profile/profile`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
