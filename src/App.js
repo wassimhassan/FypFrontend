@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Signup from "./components/Signup"; // ✅ Your version
+import Signup from "./components/Signup.js"; // ✅ Your version
 import Login from "./components/Login";
 //import ResetPassword from "./components/ResetPassword.js";
 //import ChangePassword from "./components/ChangePassword.js";

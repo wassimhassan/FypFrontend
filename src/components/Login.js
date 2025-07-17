@@ -159,10 +159,9 @@ export default function Login({ setIsLoggingIn = () => {} }) {
               {loading ? 'Sending…' : 'Send reset link'}
             </button>
             <button onClick={() => setShowForgot(false)}>Close</button>
-          </div>
+</div>
         </div>
-      </div>
+      )}
     </div>
   );
-}
 }
