@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Signup.css';
 
-export default function SignUp() {
+export default function Signup() {
   const navigate = useNavigate();
 
   // ── form state ───────────────────────────────────────────────
