@@ -6,12 +6,14 @@ import ResetPassword from "./components/ResetPassword.js";
 import ChangePassword from "./components/ChangePassword.js";
 import WelcomePage from "./components/WelcomePage";
 import ProfileCard from "./components/ProfileCard.js";
+import HomePage from './components/HomePage.js';
 
 function App() {
   return (
     <Router>
       <Routes>
         {/* Public routes */}
+        <Route path="/HomePage" element={<HomePage />} />
         <Route path="/" element={<WelcomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
