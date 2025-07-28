@@ -1,12 +1,15 @@
-import React from "react";
-import InfoCard from "./InfoCard";
-import "./SecondSection.css";
+import InfoCard from "./InfoCard"
+import "./SecondSection.css"
 
 const SecondSection = () => {
   return (
     <section className="second-section">
-      <p className="subtitle">Why Choose us</p>
+      <p className="subtitle">Why Choose Us</p>
       <h2 className="main-title">Our Values</h2>
+      <p className="section-description">
+        Discover what makes our platform unique and how we're committed to empowering students with the best educational
+        opportunities and resources.
+      </p>
 
       <div className="info-cards-container">
         <InfoCard
@@ -17,7 +20,7 @@ const SecondSection = () => {
         <InfoCard
           image="/logo2.png"
           title="Student-Centered Content"
-          description="Every feature is designed to support students’ growth — from SAT prep to career guidance — with curated, high-quality material."
+          description="Every feature is designed to support students' growth — from SAT prep to career guidance — with curated, high-quality material."
         />
         <InfoCard
           image="/logo3.png"
@@ -26,7 +29,7 @@ const SecondSection = () => {
         />
       </div>
     </section>
-  );
-};
+  )
+}
 
-export default SecondSection;
+export default SecondSection
