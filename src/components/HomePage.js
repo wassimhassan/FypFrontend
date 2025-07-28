@@ -5,7 +5,8 @@ import "./HomePage.css";
 import { FaGraduationCap, FaBriefcase, FaUniversity, FaLaptopCode} from "react-icons/fa";
 import { FiCalendar, FiUsers } from 'react-icons/fi';
 import ScholarshipsTab from './ScholarshipsTab';
-
+import Footer from './Footer';
+import NavBar from './NavBar';
 
 
 
@@ -23,18 +24,7 @@ export default function HomePage() {
     return (
         <div className="home-container">
             {/* Navbar */}
-            <nav className="navbar">
-                <div className="navbar-left">
-                    <img src="/logo-removebg-preview.png" alt="Logo" className="navbar-logo" />
-                </div>
-                <div className="nav-links">
-                    <a href="#">About</a>
-                    <a href="#">Resources</a>
-                    <a href="#">Support</a>
-                    <button className="btn-outline" onClick={() => navigate('/login')}>Sign In</button> {/* <-- Navigate on click */}
-                    <button className="btn-primary">Get Started</button>
-                </div>
-            </nav>
+      <NavBar />
 
             {/* Hero Section */}
             <section className="hero">
@@ -93,43 +83,7 @@ export default function HomePage() {
                 </div>
             </section>
 
-            {/* Footer */}
-            <footer className="footer">
-                <div className="footer-grid">
-                    <div>
-                        <h4>FEKRA</h4>
-                        <p>Your gateway to educational excellence and career success.</p>
-                    </div>
-                    <div>
-                        <h4>Resources</h4>
-                        <ul>
-                            <li>Scholarship Guide</li>
-                            <li>Career Advice</li>
-                            <li>University Rankings</li>
-                            <li>Course Catalog</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Support</h4>
-                        <ul>
-                            <li>Help Center</li>
-                            <li>Contact Us</li>
-                            <li>Privacy Policy</li>
-                            <li>Terms of Service</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4>Connect</h4>
-                        <ul>
-                            <li>Newsletter</li>
-                            <li>Blog</li>
-                            <li>Social Media</li>
-                            <li>Community</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="footer-copy">© 2025 FEKRA. All rights reserved.</div>
-            </footer>
+           <Footer/> 
         </div>
     );
 }

@@ -3,12 +3,12 @@ import "./ProfileCard.css";
 
 const ProfileCardWelcomepage = ({ icon, name, description }) => {
   return (
-    <div className="profile-card">
-      <div className="icon-box">
+    <div className="profile-cardd">
+      <div className="icon-boxx">
         <img src={icon} alt={name} />
       </div>
-      <h4 className="profile-name">{name}</h4>
-      <p className="profile-description">{description}</p>
+      <h4 className="profile-namee">{name}</h4>
+      <p className="profile-descriptionn">{description}</p>
     </div>
   );
 };
