@@ -1,11 +1,12 @@
-
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import background from '../assets/background.png';
 import "./HomePage.css";
 import { FaGraduationCap, FaBriefcase, FaUniversity, FaLaptopCode} from "react-icons/fa";
 import { FiCalendar, FiUsers } from 'react-icons/fi';
+import ScholarshipsTab from './ScholarshipsTab';
+
+
 
 
 const tabs = [
@@ -69,55 +70,7 @@ export default function HomePage() {
 
 
                 {/* Tab Content */}
-                {activeTab === "Scholarships" && (
-                    <div className="tab-content">
-                        <h2>Scholarship Opportunities</h2>
-                        <p>
-                            Find and apply for scholarships that match your academic achievements and career goals.
-                        </p>
-                        <div className="card-grid">
-                            <div className="card">
-                                <div className="card-header">
-                                    <div className="badge">Full Tuition</div>
-                                    <div className="amount">$25,000</div>
-                                </div>
-                                <h3>Merit Excellence Scholarship</h3>
-                                <p>Outstanding academic performance and leadership potential</p>
-                                <div className="card-icons">
-                                    <span><FiCalendar /></span>
-                                    <span><FiUsers /></span>
-                                </div>
-                                <button className="btn-primary">Apply Now</button>
-                            </div>
-                            <div className="card">
-                                <div className="card-header">
-                                    <div className="badge">Renewable</div>
-                                    <div className="amount">$15,000</div>
-                                </div>
-                                <h3>STEM Innovation Grant</h3>
-                                <p>Supporting students pursuing Science, Technology, Engineering, and Mathematics</p>
-                                <div className="card-icons">
-                                    <span><FiCalendar /></span>
-                                    <span><FiUsers /></span>
-                                </div>
-                                <button className="btn-primary">Apply Now</button>
-                            </div>
-                            <div className="card">
-                                <div className="card-header">
-                                    <div className="badge">Need-Based</div>
-                                    <div className="amount">$10,000</div>
-                                </div>
-                                <h3>Community Leader Award</h3>
-                                <p>Recognizing students who have made significant community impact</p>
-                                <div className="card-icons">
-                                    <span><FiCalendar /></span>
-                                    <span><FiUsers /></span>
-                                </div>
-                                <button className="btn-primary">Apply Now</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                {activeTab === "Scholarships" && <ScholarshipsTab />}
             </section>
 
             {/* Stats Section */}
