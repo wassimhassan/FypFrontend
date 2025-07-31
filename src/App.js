@@ -15,6 +15,7 @@ function App() {
         {/* Public routes */}
         <Route path="/HomePage" element={<HomePage />} />
         <Route path="/" element={<WelcomePage />} />
+        <Route path="/WelcomePage" element={<WelcomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/profile" element={<ProfileCard /> } />
