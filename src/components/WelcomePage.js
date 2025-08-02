@@ -9,6 +9,7 @@ const WelcomePage = () => {
   const navigate = useNavigate();
   return (
     <>
+    
       <FirstSection />
       <SecondSection />
       <ThirdSection />
