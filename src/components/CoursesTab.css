@@ -1,0 +1,82 @@
+.card-row {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 10px;
+  max-width: 1100px;
+  margin: 0 auto;
+  scroll-behavior: smooth;
+}
+
+.card-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.card-row::-webkit-scrollbar-thumb {
+  background-color: #20438E;
+  border-radius: 4px;
+}
+
+.card {
+  flex: 0 0 250px; /* same width */
+  background-color: #fff;
+  padding: 20px 25px; /* slightly less padding for less height */
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 6px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: bold;
+  color: #20438E;
+  background: #FED78433;
+  padding: 4px 8px;
+  border: #FED784 solid 1px;
+  border-radius: 12px;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 4px 0 10px 0;
+}
+
+.skill-badge {
+  background-color: #FED78433;
+  color: #20438E;
+  border: 1px solid #FED784;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.enroll-btn {
+  background-color: #20438E;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: auto; /* push button to bottom */
+}
+
+.enroll-btn:hover {
+  background-color: #18306a;
+}

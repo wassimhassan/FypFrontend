@@ -7,8 +7,9 @@ import { FiCalendar, FiUsers } from 'react-icons/fi';
 import ScholarshipsTab from './ScholarshipsTab';
 import Footer from './Footer';
 import NavBar from './NavBar';
-
-
+import CoursesTab from './CoursesTab';
+import CareersTab from './CareersTab';
+import UniversitiesTab from './UniversitiesTab';
 
 const tabs = [
     { name: "Scholarships", icon: <FaGraduationCap /> },
@@ -61,6 +62,9 @@ export default function HomePage() {
 
                 {/* Tab Content */}
                 {activeTab === "Scholarships" && <ScholarshipsTab />}
+                {activeTab === "Courses" && <CoursesTab />}
+                {activeTab === "Careers" && <CareersTab />}
+                {activeTab === "Universities" && <UniversitiesTab />}
             </section>
 
             {/* Stats Section */}

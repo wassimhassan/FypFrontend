@@ -1,0 +1,108 @@
+.card-row {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 10px;
+  max-width: 1100px;
+  margin: 0 auto;
+  scroll-behavior: smooth;
+}
+
+.card-row::-webkit-scrollbar {
+  height: 8px;
+}
+
+.card-row::-webkit-scrollbar-thumb {
+  background-color: #20438E;
+  border-radius: 4px;
+}
+
+.card {
+  flex: 0 0 320px;
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-icon {
+  font-size: 28px;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+}
+
+.card-header {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 8px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: bold;
+  color: #20438E;
+  background: #FED78433;
+  padding: 4px 8px;
+  border: #FED784 solid 1px;
+  border-radius: 12px;
+}
+
+.rank-badge {
+  background: #FED78433;
+  color: #20438E;
+  border: none;
+  padding: 6px 14px;
+  font-size: 14px;
+  border: #FED784 solid 1px;
+  border-radius: 25px;
+}
+
+.location {
+  font-style: italic;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.stat-item strong {
+  color: #20438E;
+}
+
+.tuition {
+  font-weight: 600;
+  color: #1f4291;
+  margin-bottom: 10px;
+}
+
+.learnmore-btn {
+  background-color: #20438E;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+}
+
+.learnmore-btn:hover {
+  background-color: #18306a;
+}

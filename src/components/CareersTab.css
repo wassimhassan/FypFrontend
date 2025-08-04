@@ -1,0 +1,117 @@
+.card-row {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: visible;   /* allow vertical overflow */
+  gap: 20px;
+  padding-bottom: 10px;
+  max-width: 1100px;
+  margin: 0 auto;
+  scroll-behavior: smooth;
+}
+
+.card-row::-webkit-scrollbar {
+  height: 6px;
+}
+
+.card-row::-webkit-scrollbar-thumb {
+  background-color: #20438E;
+  border-radius: 4px;
+}
+
+.card {
+  flex: 0 0 250px;
+  padding-top: 0px; 
+  background-color: #fff;
+    margin-top: 0;
+  padding: 0px 20px 20px 20px; /* Less top and bottom padding */
+  border-radius: 12px;
+  text-align: left;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #ddd;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.card h3 {
+  font-size: 20px;
+  margin-top: 0;
+  padding-top: 0;
+  margin-bottom: 4px;
+  color: #20438E;
+}
+
+.card h4 {
+  font-size: 16px;
+  margin-top: 0;       /* add this to remove extra top margin */
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.card p {
+  margin-top: 0;       /* remove extra top margin */
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.card ul {
+  padding-left: 20px;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.card li {
+  margin-bottom: 3px;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: bold;
+  color: #20438E;
+  background: #FED78433;
+  display: inline-block;
+  padding: 4px 8px;
+  border: #FED784 solid 1px;
+  border-radius: 12px;
+  margin-bottom: 5px;
+}
+
+.enroll-btn {
+  background-color: #20438E;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin-top: 15px;
+}
+
+.enroll-btn:hover {
+  background-color: #18306a;
+}
+.card-header {
+  margin: 0;
+  padding: 0;
+  line-height: 1;
+}
+
+.major-badge {
+  margin-top: 0;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 12px;
+  color: #20438E;
+  background: #FED78433;
+  border: 1px solid #FED784;
+  white-space: nowrap;
+  display: inline-block;
+  width: fit-content;
+  max-width: fit-content;
+  line-height: 1;
+  vertical-align: top;
+}
