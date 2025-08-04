@@ -1,66 +1,75 @@
 .left-first-section {
   width: 100%;
   max-width: 500px;
-  font-family: 'Arial', sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  text-align: left;
 }
 
 .logo img {
-  height: 111px;
-  margin-bottom: 10px;
+  height: 80px;
+  margin-bottom: 20px;
 }
 
 .left-first-section h1 {
-  font-size: 30px;
-  font-weight: bold;
-  color: #1a1a1a;
-  line-height: 1.4;
+  font-size: 48px;
+  font-weight: 700;
+  color: #1f4291;
+  line-height: 1.2;
+  margin-bottom: 20px;
 }
 
 .bold {
-  color: #3a3dff;
+  color: #20438e;
+  font-weight: 700;
 }
 
 .subtext {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #6b6b6b;
-  line-height: 1.5;
+  font-size: 18px;
+  color: #475569;
+  line-height: 1.6;
+  margin-bottom: 30px;
+  max-width: 400px;
 }
 
 .get-started-btn {
-  margin-top: 30px;
-  background-color: #1f318f;
+  background-color: #20438e;
   color: white;
   padding: 12px 28px;
   border: none;
-  border-radius: 20px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
   cursor: pointer;
-  box-shadow: 2px 2px 0 black;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 4px rgba(32, 67, 142, 0.2);
+}
+
+.get-started-btn:hover {
+  background-color: #1a3a7a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(32, 67, 142, 0.3);
 }
 
 @media (max-width: 768px) {
   .left-first-section {
-    width: 100%;
     text-align: center;
     padding: 0 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;         /* ✅ Ensures visual centering */
+    align-items: center; /* ✅ Ensures visual centering */
   }
 
   .left-first-section h1 {
-    font-size: 22px;
-    line-height: 1.4;
+    font-size: 36px;
+    line-height: 1.3;
     word-break: break-word;
-    max-width: 300px;            /* ✅ Keeps it visually balanced */
+    max-width: 300px; /* ✅ Keeps it visually balanced */
     margin: 0 auto;
   }
 
-  .left-first-section .subtext {
-    font-size: 13px;
-    max-width: 280px;
+  .subtext {
+    font-size: 16px;
+    max-width: 100%;
     margin: 0 auto;
   }
 }
-

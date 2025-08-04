@@ -1,26 +1,50 @@
 .third-section {
   padding: 80px 20px;
-  text-align: left; /* ✅ FIX: stop center alignment */
+  background-color: #f8fafc;
+  text-align: center;
 }
 
 .subtitle {
-  font-size: 17px;
-  color: #888;
+  font-size: 16px;
+  color: #475569;
   margin-bottom: 8px;
-  margin-left: 3%;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .title {
-  font-size: 38px;
-  font-weight: bold;
-  margin-bottom: 48px;
-    margin-left: 3%;
+  font-size: 42px;
+  font-weight: 700;
+  color: #20438e;
+  margin-bottom: 16px;
+}
 
+.section-description {
+  font-size: 18px;
+  color: #475569;
+  margin-bottom: 60px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.6;
 }
 
 .profile-card-container {
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 32px;
+  }
+
+  .profile-card-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
