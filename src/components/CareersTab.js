@@ -1,5 +1,6 @@
 import React from 'react';
 import './CareersTab.css';
+import CareerCard from '../components/CareerCard'; // adjust the path if needed
 
 const careers = [
   {
@@ -14,7 +15,6 @@ const careers = [
   {
     id: 2,
     major: 'Data Science',
-    // no badge here to avoid empty space
     jobTitle: 'Data Scientist',
     description: 'Extract insights from large datasets using analytics',
     salary: '$85,000 - $165,000',
@@ -57,7 +57,6 @@ const careers = [
     skills: ['SEO', 'Content Creation', 'Analytics'],
     industries: ['Advertising', 'Media', 'E-commerce'],
   },
-  // add more if you want
 ];
 
 export default function CareersTab() {
@@ -67,30 +66,16 @@ export default function CareersTab() {
       <p>Discover potential careers for each major.</p>
       <div className="card-row">
         {careers.map(career => (
-          <div key={career.id} className="card">
-            {/* Only render this div if badge exists */}
-            {career.badge && (
-              <div className="card-header">
-                <span className="badge">{career.badge}</span>
-              </div>
-            )}
-
-            <button className="major-badge">{career.major}</button>
-
-            <h4>{career.jobTitle}</h4>
-            <p>{career.description}</p>
-            <p><strong>Annual Salary:</strong> {career.salary}</p>
-
-            <strong>Key Skills:</strong>
-            <div className="skills-container">
-              {career.skills.map((skill, idx) => (
-                <span key={idx} className="skill-badge">{skill}</span>
-              ))}
-            </div>
-
-            <p><strong>Industries:</strong> {career.industries.join(', ')}</p>
-            <button className="enroll-btn">Learn More</button>
-          </div>
+          <CareerCard
+            key={career.id}
+            major={career.major}
+            jobTitle={career.jobTitle}
+            description={career.description}
+            salary={career.salary}
+            skills={career.skills}
+            industries={career.industries}
+            badge={career.badge} // optional
+          />
         ))}
       </div>
     </section>

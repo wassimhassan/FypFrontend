@@ -1,5 +1,6 @@
 import React from 'react';
 import './UniversitiesTab.css';
+import UniversityCard from '../components/UniversityCard'; // Adjust path if needed
 
 const universities = [
   {
@@ -55,36 +56,17 @@ export default function UniversitiesTab() {
       <p>Explore top universities and their key details.</p>
       <div className="card-row">
         {universities.map(uni => (
-          <div key={uni.id} className="card">
-            <div className="card-icon">{uni.icon}</div>
-
-            <div className="card-header">
-              <span className="badge rank-badge">{uni.rank}</span>
-            </div>
-
-            <h3>{uni.name}</h3>
-            <p className="location">{uni.location}</p>
-
-            <div className="stats-row">
-              <div className="stat-item">
-                <strong>Acceptance Rate:</strong> {uni.acceptanceRate}
-              </div>
-              <div className="stat-item">
-                <strong>Students:</strong> {uni.students}
-              </div>
-            </div>
-
-            <p className="tuition">
-              <strong>Annual Tuition:</strong> {uni.tuition}
-            </p>
-
-            <button
-              className="learnmore-btn"
-              onClick={() => window.open(uni.website, '_blank')}
-            >
-              Learn More
-            </button>
-          </div>
+          <UniversityCard
+            key={uni.id}
+            icon={uni.icon}
+            name={uni.name}
+            location={uni.location}
+            rank={uni.rank}
+            acceptanceRate={uni.acceptanceRate}
+            students={uni.students}
+            tuition={uni.tuition}
+            website={uni.website}
+          />
         ))}
       </div>
     </section>
