@@ -1,27 +1,24 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import ScholarshipCard from './ScholarshipCard';
+import axios from 'axios';
 
 const ScholarshipsTab = () => {
-  const scholarships = [
-    {
-      badge: 'Full Tuition',
-      amount: 25000,
-      title: 'Merit Excellence Scholarship',
-      description: 'Outstanding academic performance and leadership potential',
-    },
-    {
-      badge: 'Renewable',
-      amount: 15000,
-      title: 'STEM Innovation Grant',
-      description: 'Supporting students pursuing Science, Technology, Engineering, and Mathematics',
-    },
-    {
-      badge: 'Need-Based',
-      amount: 10000,
-      title: 'Community Leader Award',
-      description: 'Recognizing students who have made significant community impact',
-    },
-  ];
+  const [scholarships, setScholarships] = useState([]);
+
+  useEffect(() => {
+    const fetchScholarships = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/scholarships`);
+        console.log("Fetched scholarships:", response.data);
+        setScholarships(response.data);
+      } catch (error) {
+        console.error("Error fetching scholarships:", error);
+      }
+    };
+
+    fetchScholarships();
+  }, []);
 
   return (
     <div className="tab-content">
@@ -33,10 +30,10 @@ const ScholarshipsTab = () => {
         {scholarships.map((sch, index) => (
           <ScholarshipCard
             key={index}
-            badge={sch.badge}
-            amount={sch.amount}
-            title={sch.title}
-            description={sch.description}
+            badge={sch.scholarship_type}
+            amount={sch.scholarship_value}
+            title={sch.scholarship_title}
+            description={sch.scholarship_description}
           />
         ))}
       </div>

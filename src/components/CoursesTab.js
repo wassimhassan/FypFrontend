@@ -1,26 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './CoursesTab.css';
-import CourseCard from '../components/CourseCard'; // Adjust path if different
-
-const courses = [
-  { id: 1, title: 'SAT Course', description: 'Prepare for your SAT exam.', badge: 'free' },
-  { id: 2, title: 'Java Course', description: 'Learn Java programming.', badge: '15$' },
-  { id: 3, title: 'Python Basics', description: 'Start coding with Python.', badge: 'free' },
-  { id: 4, title: 'Web Development', description: 'Build websites from scratch.', badge: 'free' },
-];
+import CourseCard from '../components/CourseCard';
+import axios from 'axios';
 
 export default function CoursesTab() {
+  const [courses, setCourses] = useState([]);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/courses`);
+        setCourses(response.data);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    fetchCourses();
+  }, []);
+
   return (
     <section className="tab-content">
       <h2>Available Courses</h2>
       <p>Explore our featured courses to boost your skills.</p>
       <div className="card-row">
-        {courses.map(course => (
+        {courses.map((course, index) => (
           <CourseCard
-            key={course.id}
+            key={index}
             title={course.title}
             description={course.description}
-            badge={course.badge}
+            badge={course.price}
           />
         ))}
       </div>
