@@ -190,7 +190,6 @@ axios
     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
       <button className="close-button" onClick={() => setReviewToDelete(null)}>×</button>
       <h3>Are you sure you want to delete this review?</h3>
-      <p style={{ margin: "15px 0", color: "#475569" }}>{reviewToDelete.text}</p>
       <div className="modal-actions">
         <button
           onClick={() => {

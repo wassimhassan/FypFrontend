@@ -7,6 +7,7 @@ import ChangePassword from "./components/ChangePassword.js";
 import WelcomePage from "./components/WelcomePage";
 import ProfileCard from "./components/ProfileCard.js";
 import HomePage from './components/HomePage.js';
+import Admin from './components/Admin.js';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
         <Route path="/profile" element={<ProfileCard /> } />
         <Route path="/" element={<WelcomePage />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/admin" element={<Admin />} /> 
+
         {/* Fallback – unknown path */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

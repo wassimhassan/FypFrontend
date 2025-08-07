@@ -1,0 +1,125 @@
+.teacher-dashboard {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.teacher-data-table {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(32, 67, 142, 0.1) !important;
+}
+
+.teacher-data-table .MuiTableHead-root {
+  background: linear-gradient(135deg, #20438e, #1a3a7a) !important;
+}
+
+.teacher-data-table .MuiTableHead-root .MuiTableCell-root {
+  color: white !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.teacher-table-row:hover {
+  background-color: rgba(32, 67, 142, 0.04) !important;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.teacher-data-table .MuiTableCell-root {
+  border-bottom: 1px solid rgba(32, 67, 142, 0.1) !important;
+  padding: 16px !important;
+}
+
+.teacher-name {
+  transition: all 0.3s ease;
+}
+
+.teacher-table-row:hover .teacher-name {
+  color: #20438e !important;
+}
+
+.teacher-subject {
+  font-weight: 500;
+  color: #4caf50;
+}
+
+.teacher-students {
+  font-weight: 600;
+  color: #20438e;
+}
+
+.teacher-rating {
+  transition: all 0.3s ease;
+}
+
+.teacher-table-row:hover .teacher-rating {
+  transform: scale(1.1);
+}
+
+.teacher-experience {
+  font-style: italic;
+  color: #666;
+}
+
+.teacher-status-chip {
+  border-radius: 16px !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.teacher-status-chip:hover {
+  transform: scale(1.05);
+}
+
+.teacher-add-btn {
+  background: linear-gradient(135deg, #20438e, #1a3a7a) !important;
+  border-radius: 12px !important;
+  text-transform: none !important;
+  font-weight: 600 !important;
+  padding: 10px 24px !important;
+  box-shadow: 0 4px 16px rgba(32, 67, 142, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.teacher-add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(32, 67, 142, 0.4) !important;
+}
+
+.teacher-edit-btn {
+  border-color: #20438e !important;
+  color: #20438e !important;
+  border-radius: 8px !important;
+  text-transform: none !important;
+  font-weight: 500 !important;
+  transition: all 0.3s ease !important;
+}
+
+.teacher-edit-btn:hover {
+  background-color: rgba(32, 67, 142, 0.08) !important;
+  transform: translateY(-1px);
+}
+
+.teacher-dialog .MuiDialog-paper {
+  border-radius: 16px !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+.teacher-dialog .MuiDialogTitle-root {
+  background: linear-gradient(135deg, #20438e, #1a3a7a);
+  color: white !important;
+  font-weight: bold !important;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

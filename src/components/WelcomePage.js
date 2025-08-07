@@ -22,7 +22,7 @@ const WelcomePage = () => {
 
   return (
     <>
-    
+     <NavBar />
       <FirstSection />
       <SecondSection />
       <ThirdSection />
