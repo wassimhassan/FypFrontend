@@ -22,6 +22,8 @@ import {
   FormControl,
   InputLabel,
   Select,
+    CircularProgress,
+
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import "./TeacherDashboard.css"
@@ -35,6 +37,7 @@ const TeacherDashboard = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     username: "",
@@ -50,6 +53,8 @@ const TeacherDashboard = () => {
       setTeachers(data);
     } catch (err) {
       console.error("Error fetching teachers:", err.message);
+        } finally {
+      setLoading(false);
     }
   };
 
@@ -156,7 +161,11 @@ const TeacherDashboard = () => {
           Add Teacher
         </Button>
       </Box>
-
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
       <TableContainer component={Paper} className="teacher-data-table">
         <Table>
           <TableHead>
@@ -210,7 +219,7 @@ const TeacherDashboard = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
+      )}
       <Dialog open={editDialogOpen} onClose={() => setEditDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent>

@@ -21,6 +21,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+    CircularProgress,
+
 } from "@mui/material"
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,6 +37,7 @@ const UserDashboard = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const [form, setForm] = useState({
     username: "",
@@ -54,6 +57,9 @@ const UserDashboard = () => {
       } catch (err) {
         console.error("Error fetching users:", err)
       }
+           finally {
+      setLoading(false);
+    }
     }
 
     fetchUsers()
@@ -153,7 +159,11 @@ const handleDeleteUser = async () => {
           Add User
         </Button>
       </Box>
-
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
       <TableContainer component={Paper} className="user-data-table">
         <Table>
           <TableHead>
@@ -219,6 +229,7 @@ const handleDeleteUser = async () => {
           </TableBody>
         </Table>
       </TableContainer>
+            )}
 <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
   <DialogTitle>Confirm Deletion</DialogTitle>
   <DialogContent>

@@ -139,14 +139,6 @@ const Admin = () => {
             {menuItems.find((item) => item.key === selectedSection)?.text || "Dashboard"}
           </Typography>
           <IconButton color="inherit">
-            <Badge badgeContent={4} color="error">
-              <Notifications />
-            </Badge>
-          </IconButton>
-          <IconButton color="inherit">
-            <Settings />
-          </IconButton>
-          <IconButton color="inherit">
             <ExitToApp />
           </IconButton>
         </Toolbar>

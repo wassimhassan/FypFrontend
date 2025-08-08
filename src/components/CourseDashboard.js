@@ -22,6 +22,8 @@ import {
   Select,
   FormControl,
   InputLabel,
+    CircularProgress,
+
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import { toast, ToastContainer } from "react-toastify"
@@ -46,6 +48,7 @@ const CourseDashboard = () => {
   const [studentDialogOpen, setStudentDialogOpen] = useState(false);
   const [enrolledStudents, setEnrolledStudents] = useState([]);
   const [selectedCourseTitle, setSelectedCourseTitle] = useState("");
+  const [loading, setLoading] = useState(true);
 
   const fetchCourses = async () => {
     try {
@@ -66,8 +69,9 @@ const CourseDashboard = () => {
       setTeachers(data)
     } catch (err) {
       toast.error("Failed to fetch teachers")
-    }
-  }
+    } finally {
+      setLoading(false);
+    }  }
 
   useEffect(() => {
     fetchCourses()
@@ -175,7 +179,11 @@ const CourseDashboard = () => {
           Add Course
         </Button>
       </Box>
-
+      {loading ? (
+        <Box display="flex" justifyContent="center" mt={4}>
+          <CircularProgress />
+        </Box>
+      ) : (
       <TableContainer component={Paper} className="course-data-table">
         <Table>
           <TableHead>
@@ -229,7 +237,7 @@ const CourseDashboard = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
+      )}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Add New Course</DialogTitle>
         <DialogContent>
