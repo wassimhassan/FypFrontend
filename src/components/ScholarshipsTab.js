@@ -27,9 +27,9 @@ const ScholarshipsTab = () => {
         Find and apply for scholarships that match your academic achievements and career goals.
       </p>
       <div className="card-grid">
-        {scholarships.map((sch, index) => (
+        {scholarships.map((sch) => (
           <ScholarshipCard
-            key={index}
+            key={sch._id}
             badge={sch.scholarship_type}
             amount={sch.scholarship_value}
             title={sch.scholarship_title}

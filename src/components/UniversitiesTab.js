@@ -24,9 +24,9 @@ export default function UniversitiesTab() {
       <h2>Universities in Lebanon</h2>
       <p>Explore top universities and their key details.</p>
       <div className="card-row">
-        {universities.map((uni, index) => (
+        {universities.map((uni) => (
           <UniversityCard
-            key={index}
+            key={uni._id}
             icon="🏛️"
             name={uni.name}
             location={uni.location}
