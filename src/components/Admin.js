@@ -15,7 +15,6 @@ import {
   ListItemButton,
   ListItemIcon,
   ListItemText,
-  Badge,
 } from "@mui/material"
 import {
   Menu as MenuIcon,
@@ -25,57 +24,48 @@ import {
   Person as PersonIcon,
   RateReview as ReviewIcon,
   Book as BookIcon,
-  Notifications,
-  Settings,
   ExitToApp,
 } from "@mui/icons-material"
 
-// Import all dashboard components
-import DashboardOverview from "./DashboardOverview"
-import UserDashboard from "./UserDashboard"
-import ScholarshipDashboard from "./ScholarshipDashboard"
-import TeacherDashboard from "./TeacherDashboard"
-import CourseDashboard from "./CourseDashboard"
-import ReviewDashboard from "./ReviewDashboard"
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
 import "./Admin.css"
 
 const drawerWidth = 280
 
 const Admin = () => {
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [selectedSection, setSelectedSection] = useState("dashboard")
+  const { pathname } = useLocation()
+  const navigate = useNavigate()                 // ✅ init navigate
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
+  const handleDrawerToggle = () => setMobileOpen((p) => !p)
+
+  const handleExitClick = () => {
+    navigate("/admin")                           // ✅ go to /admin
   }
 
+  // Side menu items -> router paths under /admin/*
   const menuItems = [
-    { text: "Dashboard", icon: <DashboardIcon />, key: "dashboard" },
-    { text: "Users", icon: <PeopleIcon />, key: "users" },
-    { text: "Scholarships", icon: <SchoolIcon />, key: "scholarships" },
-    { text: "Teachers", icon: <PersonIcon />, key: "teachers" },
-    { text: "Courses", icon: <BookIcon />, key: "courses" },
-    { text: "Reviews", icon: <ReviewIcon />, key: "reviews" },
+    { text: "Dashboard", icon: <DashboardIcon />, path: "" },               // /admin
+    { text: "Users", icon: <PeopleIcon />, path: "user" },                  // /admin/user
+    { text: "Scholarships", icon: <SchoolIcon />, path: "scholarship" },    // /admin/scholarship
+    { text: "Teachers", icon: <PersonIcon />, path: "teacher" },            // /admin/teacher
+    { text: "Courses", icon: <BookIcon />, path: "course" },                // /admin/course
+    { text: "Reviews", icon: <ReviewIcon />, path: "review" },              // /admin/review
   ]
 
-  const renderContent = () => {
-    switch (selectedSection) {
-      case "dashboard":
-        return <DashboardOverview />
-      case "users":
-        return <UserDashboard />
-      case "scholarships":
-        return <ScholarshipDashboard />
-      case "teachers":
-        return <TeacherDashboard />
-      case "courses":
-        return <CourseDashboard />
-      case "reviews":
-        return <ReviewDashboard />
-      default:
-        return <DashboardOverview />
+  // Title from current path
+  const current = (() => {
+    const seg = pathname.split("/")[2] || ""
+    const map = {
+      "": "Dashboard",
+      user: "Users",
+      scholarship: "Scholarships",
+      teacher: "Teachers",
+      course: "Courses",
+      review: "Reviews",
     }
-  }
+    return map[seg] ?? "Dashboard"
+  })()
 
   const drawer = (
     <div>
@@ -89,25 +79,31 @@ const Admin = () => {
       </Toolbar>
       <Divider />
       <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.key} disablePadding>
-            <ListItemButton
-              selected={selectedSection === item.key}
-              onClick={() => setSelectedSection(item.key)}
-              sx={{
-                "&.Mui-selected": {
-                  backgroundColor: "#20438E15",
-                  borderRight: "3px solid #20438E",
-                  "& .MuiListItemIcon-root": { color: "#20438E" },
-                  "& .MuiListItemText-primary": { color: "#20438E", fontWeight: "bold" },
-                },
-              }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {menuItems.map((item) => {
+          const to = item.path ? `/admin/${item.path}` : "/admin"
+          return (
+            <ListItem key={item.text} disablePadding>
+              <ListItemButton
+                component={NavLink}
+                to={to}
+                end={!item.path} // only the dashboard (index) uses "end"
+                className={({ isActive }) => (isActive ? "active" : "")}
+                sx={{
+                  "&.active": {
+                    backgroundColor: "#20438E15",
+                    borderRight: "3px solid #20438E",
+                    "& .MuiListItemIcon-root": { color: "#20438E" },
+                    "& .MuiListItemText-primary": { color: "#20438E", fontWeight: "bold" },
+                  },
+                }}
+                onClick={() => setMobileOpen(false)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
       </List>
     </div>
   )
@@ -136,15 +132,19 @@ const Admin = () => {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            {menuItems.find((item) => item.key === selectedSection)?.text || "Dashboard"}
+            {current}
           </Typography>
-          <IconButton color="inherit">
-            <ExitToApp />
-          </IconButton>
+          {pathname !== "/admin" && (
+            <IconButton color="inherit" onClick={handleExitClick}>
+              <ExitToApp />
+            </IconButton>
+          )}
+
         </Toolbar>
       </AppBar>
 
       <Box component="nav" sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}>
+        {/* Mobile drawer */}
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -157,6 +157,8 @@ const Admin = () => {
         >
           {drawer}
         </Drawer>
+
+        {/* Desktop drawer */}
         <Drawer
           variant="permanent"
           sx={{
@@ -180,7 +182,8 @@ const Admin = () => {
         }}
       >
         <Toolbar />
-        {renderContent()}
+        {/* Nested routes render here */}
+        <Outlet />
       </Box>
     </Box>
   )
