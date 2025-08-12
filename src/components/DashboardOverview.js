@@ -1,54 +1,93 @@
+"use client"
+
 import { useEffect, useMemo, useState } from "react"
-import { Box, Typography, Card, CardContent, Grid, CircularProgress } from "@mui/material"
-import { Group, School as SchoolIcon, Person as PersonIcon, Star, TrendingUp } from "@mui/icons-material"
-import {
-  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area
-} from "recharts"
 import axios from "axios"
+import {
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  Chip,
+  Stack,
+  IconButton,
+  ToggleButtonGroup,
+  ToggleButton,
+  Tooltip as MuiTooltip,
+} from "@mui/material"
+import {
+  Group,
+  School as SchoolIcon,
+  Person as PersonIcon,
+  Star,
+  MenuBook,
+  Refresh as RefreshIcon,
+  TrendingUp,
+  TrendingDown,
+} from "@mui/icons-material"
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  Label,
+} from "recharts"
 import "./DashboardOverview.css"
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL // <- use your .env var only
+const API_BASE = process.env.REACT_APP_BACKEND_URL
+const palette = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4", "#84cc16"]
 
-const DashboardOverview = () => {
+export default function DashboardOverview() {
   const [loading, setLoading] = useState(true)
+  const [range, setRange] = useState("6")
   const [users, setUsers] = useState([])
   const [teachers, setTeachers] = useState([])
   const [courses, setCourses] = useState([])
   const [reviews, setReviews] = useState([])
   const [scholarships, setScholarships] = useState([])
 
-  useEffect(() => {
-    let mounted = true
-    const token = localStorage.getItem("token")
-    const headers = token ? { Authorization: `Bearer ${token}` } : {}
+  const fetchAll = async () => {
+    setLoading(true)
+    try {
+      const token = localStorage.getItem("token")
+      const headers = token ? { Authorization: `Bearer ${token}` } : {}
+      const get = (p, opts = {}) => axios.get(`${API_BASE}${p}`, opts).then(r => r.data)
 
-    const get = (path, opts = {}) =>
-      axios.get(`${API_BASE}${path}`, opts).then(r => r.data).catch(() => [])
+      const [u, t, c, r, s] = await Promise.all([
+        get("/api/users", { headers }).catch(() => []),
+        get("/api/users/teachers", { headers }).catch(() => []),
+        get("/api/courses").catch(() => []),
+        get("/api/reviews").catch(() => []),
+        get("/api/scholarships", { headers }).catch(() => []),
+      ])
 
-    Promise.all([
-      get("/api/users", { headers }),
-      get("/api/users/teachers", { headers }),
-      get("/api/courses"),
-      get("/api/reviews"),
-      get("/api/scholarships", { headers }),
-    ]).then(([u, t, c, r, s]) => {
-      if (!mounted) return
       setUsers(Array.isArray(u) ? u : [])
       setTeachers(Array.isArray(t) ? t : [])
       setCourses(Array.isArray(c) ? c : [])
       setReviews(Array.isArray(r) ? r : [])
       setScholarships(Array.isArray(s) ? s : [])
+    } finally {
       setLoading(false)
-    })
+    }
+  }
 
-    return () => { mounted = false }
+  useEffect(() => {
+    fetchAll()
   }, [])
 
   // helpers
-  const lastNMonths = (n = 6) => {
+  const lastNMonths = (n) => {
     const out = []
-    const d = new Date(); d.setDate(1)
+    const d = new Date()
+    d.setDate(1)
     for (let i = n - 1; i >= 0; i--) {
       const dt = new Date(d.getFullYear(), d.getMonth() - i, 1)
       out.push({
@@ -59,46 +98,76 @@ const DashboardOverview = () => {
     return out
   }
 
-  const groupByMonth = (arr, dateKey = "createdAt") => {
-    const buckets = {}
+  const groupByMonth = (arr, key = "createdAt") => {
+    const map = {}
     for (const it of arr || []) {
-      const t = it?.[dateKey] ? new Date(it[dateKey]) : null
+      const t = it?.[key] ? new Date(it[key]) : null
       if (!t || isNaN(t)) continue
       const k = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}`
-      buckets[k] = (buckets[k] || 0) + 1
+      map[k] = (map[k] || 0) + 1
     }
-    return buckets
+    return map
   }
 
-  const months = useMemo(() => lastNMonths(6), [])
+  const months = useMemo(() => lastNMonths(Number(range)), [range])
+
+  // by-month maps
   const usersByMonth = useMemo(() => groupByMonth(users), [users])
   const scholarshipsByMonth = useMemo(() => groupByMonth(scholarships), [scholarships])
+  const coursesByMonth = useMemo(() => groupByMonth(courses), [courses])
+  const teachersByMonth = useMemo(() => groupByMonth(teachers), [teachers])
+  const reviewsByMonth = useMemo(() => groupByMonth(reviews), [reviews])
 
-  const areaChartData = useMemo(() =>
-    months.map(m => ({
-      name: m.label,
-      users: usersByMonth[m.key] || 0,
-      scholarships: scholarshipsByMonth[m.key] || 0,
-    })), [months, usersByMonth, scholarshipsByMonth]
+  // area (users + scholarships)
+  const areaData = useMemo(
+    () =>
+      months.map((m) => ({
+        name: m.label,
+        users: usersByMonth[m.key] || 0,
+        scholarships: scholarshipsByMonth[m.key] || 0,
+      })),
+    [months, usersByMonth, scholarshipsByMonth]
   )
 
-  const barChartData = useMemo(() =>
-    months.map(m => ({ name: m.label, scholarships: scholarshipsByMonth[m.key] || 0 })),
+  // bars for each entity
+  const barsScholarships = useMemo(
+    () => months.map((m) => ({ name: m.label, value: scholarshipsByMonth[m.key] || 0 })),
     [months, scholarshipsByMonth]
   )
+  const barsUsers = useMemo(
+    () => months.map((m) => ({ name: m.label, value: usersByMonth[m.key] || 0 })),
+    [months, usersByMonth]
+  )
+  const barsCourses = useMemo(
+    () => months.map((m) => ({ name: m.label, value: coursesByMonth[m.key] || 0 })),
+    [months, coursesByMonth]
+  )
+  const barsTeachers = useMemo(
+    () => months.map((m) => ({ name: m.label, value: teachersByMonth[m.key] || 0 })),
+    [months, teachersByMonth]
+  )
+  const barsReviews = useMemo(
+    () => months.map((m) => ({ name: m.label, value: reviewsByMonth[m.key] || 0 })),
+    [months, reviewsByMonth]
+  )
 
-  const scholarshipTypeData = useMemo(() => {
+  // pie (type distribution)
+  const typeDistribution = useMemo(() => {
     const counts = {}
     for (const s of scholarships) {
       const type = s?.scholarship_type || "Other"
       counts[type] = (counts[type] || 0) + 1
     }
-    const palette = ["#20438E", "#FED784", "#4CAF50", "#FF6B6B", "#9C27B0", "#009688", "#795548"]
-    return Object.entries(counts).map(([name, value], i) => ({ name, value, color: palette[i % palette.length] }))
+    return Object.entries(counts).map(([name, value], i) => ({
+      name,
+      value,
+      color: palette[i % palette.length],
+    }))
   }, [scholarships])
 
-  const trendPct = (key) => {
-    const vals = areaChartData.map(d => d[key])
+  // trends for KPI
+  const trendPct = (seriesKey) => {
+    const vals = areaData.map((d) => d[seriesKey])
     if (vals.length < 2) return 0
     const prev = vals[vals.length - 2] || 0
     const curr = vals[vals.length - 1] || 0
@@ -106,125 +175,253 @@ const DashboardOverview = () => {
     return Math.round(((curr - prev) / prev) * 100)
   }
 
-  const StatCard = ({ title, value, icon, color, trend }) => (
-    <Card className="dashboard-stat-card" sx={{ background: `linear-gradient(135deg, ${color}15, ${color}05)`, border: `1px solid ${color}30` }}>
-      <CardContent>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
-            <Typography variant="h6" color="textSecondary" gutterBottom>{title}</Typography>
-            <Typography variant="h4" component="div" sx={{ color, fontWeight: "bold" }}>
-              {typeof value === "number" ? value.toLocaleString() : value}
-            </Typography>
-            {typeof trend === "number" && (
-              <Box display="flex" alignItems="center" mt={1}>
-                <TrendingUp sx={{ color: trend >= 0 ? "#4CAF50" : "#FF6B6B", fontSize: 16, mr: .5 }} />
-                <Typography variant="body2" sx={{ color: trend >= 0 ? "#4CAF50" : "#FF6B6B" }}>
-                  {trend >= 0 ? "+" : ""}{trend}% this month
-                </Typography>
-              </Box>
-            )}
-          </Box>
-          <Box className="dashboard-stat-icon" sx={{ backgroundColor: `${color}20`, color }}>{icon}</Box>
-        </Box>
+  // donut center label renderer
+  const renderCenterLabel = ({ viewBox }) => {
+    if (!viewBox || viewBox.cx == null || viewBox.cy == null) return null
+    const { cx, cy } = viewBox
+    return (
+      <>
+        <text x={cx} y={cy - 4} textAnchor="middle" className="donut-total">
+          {scholarships.length}
+        </text>
+        <text x={cx} y={cy + 16} textAnchor="middle" className="donut-sub">
+          Scholarships
+        </text>
+      </>
+    )
+  }
+
+  // small helper for repeated bar cards
+  const EntityBarCard = ({ title, data, gradId, color }) => (
+    <Card className="neo-card chart-card">
+      <CardContent className="chart-pad">
+        <Typography className="chart-title">{title}</Typography>
+        <ResponsiveContainer width="100%" height={240}>
+          <BarChart data={data}>
+            <defs>
+              <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.85} />
+                <stop offset="95%" stopColor={color} stopOpacity={0.25} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+            <YAxis allowDecimals={false} stroke="#64748b" fontSize={12} />
+            <Tooltip
+              content={({ active, label, payload }) => {
+                if (!active || !payload?.length) return null
+                return (
+                  <div className="chart-tooltip">
+                    <div className="tt-title">{label}</div>
+                    {payload.map((p, i) => (
+                      <div key={i} className="tt-row">
+                        <span className="dot" style={{ background: p.color || p.fill }} />
+                        <span>Created</span>
+                        <span className="tt-val">{p.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )
+              }}
+            />
+            <Bar dataKey="value" name="Created" fill={`url(#${gradId})`} radius={[8, 8, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   )
 
+  const StatCard = ({ title, value, icon, color, trend }) => {
+    const up = trend >= 0
+    return (
+      <Card className="neo-card kpi-card" sx={{ "--kpi-color": color }}>
+        <CardContent className="kpi-content">
+          <Box className="kpi-left">
+            <Typography className="kpi-title">{title}</Typography>
+            <Typography className="kpi-value">
+              {typeof value === "number" ? value.toLocaleString() : value}
+            </Typography>
+            {typeof trend === "number" && (
+              <Chip
+                className={`kpi-trend ${up ? "up" : "down"}`}
+                icon={up ? <TrendingUp /> : <TrendingDown />}
+                label={`${up ? "+" : ""}${trend}% this month`}
+                size="small"
+              />
+            )}
+          </Box>
+          <Box className="kpi-icon">{icon}</Box>
+        </CardContent>
+      </Card>
+    )
+  }
+
   if (loading) {
     return (
-      <Box className="dashboard-overview" display="flex" alignItems="center" justifyContent="center" minHeight="50vh">
-        <CircularProgress />
+      <Box className="dashboard-overview">
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <Typography className="loading-text">Loading dashboard data…</Typography>
+        </div>
       </Box>
     )
   }
 
   return (
     <Box className="dashboard-overview">
-      <Typography variant="h4" gutterBottom sx={{ color: "#20438E", fontWeight: "bold", mb: 3 }}>
-        Dashboard Overview
-      </Typography>
+      {/* Header */}
+      <Box className="dash-header">
+        <Box>
+          <Typography className="dash-eyebrow">Admin</Typography>
+          <Typography className="dash-title">Dashboard Overview</Typography>
+        </Box>
+        <Stack direction="row" alignItems="center" spacing={1.5}>
+          <MuiTooltip title="Refresh">
+            <IconButton className="ghost-btn" onClick={fetchAll}>
+              <RefreshIcon />
+            </IconButton>
+          </MuiTooltip>
+          <ToggleButtonGroup
+            exclusive
+            size="small"
+            value={range}
+            onChange={(_, v) => v && setRange(v)}
+            color="primary"
+            className="range-toggle"
+          >
+            <ToggleButton value="6">Last 6 mo</ToggleButton>
+            <ToggleButton value="12">Last 12 mo</ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Box>
 
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Total Users" value={users.length} icon={<Group />} color="#20438E" trend={trendPct("users")} />
+      {/* KPIs */}
+      <Grid container spacing={2.5} className="kpi-grid">
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <StatCard title="Total Users" value={users.length} icon={<Group />} color="#3b82f6" trend={trendPct("users")} />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Scholarships" value={scholarships.length} icon={<SchoolIcon />} color="#FED784" trend={trendPct("scholarships")} />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <StatCard title="Scholarships" value={scholarships.length} icon={<SchoolIcon />} color="#10b981" trend={trendPct("scholarships")} />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Teachers" value={teachers.length} icon={<PersonIcon />} color="#4CAF50" />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <StatCard title="Teachers" value={teachers.length} icon={<PersonIcon />} color="#8b5cf6" />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Reviews" value={reviews.length} icon={<Star />} color="#FF6B6B" />
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <StatCard title="Reviews" value={reviews.length} icon={<Star />} color="#f59e0b" />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
-          <StatCard title="Courses" value={courses.length} icon={<TrendingUp />} color="#9C27B0" />
-      </Grid>
+        <Grid item xs={12} sm={6} md={4} lg={3}>
+          <StatCard title="Courses" value={courses.length} icon={<MenuBook />} color="#ef4444" />
+        </Grid>
       </Grid>
 
-      <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} md={8}>
-          <Card className="dashboard-chart-card">
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: "#20438E", fontWeight: "bold" }}>
-                Users & Scholarships (Last 6 Months)
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={areaChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Area type="monotone" dataKey="users" stroke="#20438E" fill="#20438E" fillOpacity={0.6} />
-                  <Area type="monotone" dataKey="scholarships" stroke="#FED784" fill="#FED784" fillOpacity={0.6} />
+      {/* Charts row (area + donut) */}
+      <Grid container spacing={2.5} className="charts-row">
+        <Grid item xs={12} md={7} lg={8}>
+          <Card className="neo-card chart-card" sx={{ minWidth: { md: 580 } }}>
+            <CardContent className="chart-pad">
+              <Typography className="chart-title">Users & Scholarships</Typography>
+              <ResponsiveContainer width="100%" height={320}>
+                <AreaChart data={areaData}>
+                  <defs>
+                    <linearGradient id="gradUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="gradSch" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.35} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <XAxis dataKey="name" stroke="#64748b" fontSize={12} />
+                  <YAxis allowDecimals={false} stroke="#64748b" fontSize={12} />
+                  <Tooltip
+                    content={({ active, label, payload }) => {
+                      if (!active || !payload?.length) return null
+                      return (
+                        <div className="chart-tooltip">
+                          <div className="tt-title">{label}</div>
+                          {payload.map((p, i) => (
+                            <div key={i} className="tt-row">
+                              <span className="dot" style={{ background: p.color || p.fill }} />
+                              <span>{p.name}</span>
+                              <span className="tt-val">{p.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }}
+                  />
+                  <Area name="Users" type="monotone" dataKey="users" stroke="#3b82f6" fill="url(#gradUsers)" strokeWidth={2.5} dot={{ r: 2 }} activeDot={{ r: 4 }} />
+                  <Area name="Scholarships" type="monotone" dataKey="scholarships" stroke="#10b981" fill="url(#gradSch)" strokeWidth={2.5} dot={{ r: 2 }} activeDot={{ r: 4 }} />
                 </AreaChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={4}>
-          <Card className="dashboard-chart-card">
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: "#20438E", fontWeight: "bold" }}>
-                Scholarship Types
-              </Typography>
-              <ResponsiveContainer width="100%" height={300}>
+
+        <Grid item xs={12} md={5} lg={4}>
+          <Card className="neo-card chart-card">
+            <CardContent className="chart-pad">
+              <Typography className="chart-title">Scholarship Types</Typography>
+              <ResponsiveContainer width="100%" height={320}>
                 <PieChart>
-                  <Pie data={scholarshipTypeData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value">
-                    {scholarshipTypeData.map((e, i) => <Cell key={i} fill={e.color} />)}
+                  <Pie data={typeDistribution} cx="50%" cy="50%" innerRadius={64} outerRadius={100} paddingAngle={3} dataKey="value">
+                    {typeDistribution.map((s, i) => <Cell key={i} fill={s.color} />)}
+                    <Label content={renderCenterLabel} />
                   </Pie>
-                  <Tooltip />
+                  <Tooltip
+                    content={({ active, label, payload }) => {
+                      if (!active || !payload?.length) return null
+                      return (
+                        <div className="chart-tooltip">
+                          <div className="tt-title">{label}</div>
+                          {payload.map((p, i) => (
+                            <div key={i} className="tt-row">
+                              <span className="dot" style={{ background: p.color || p.fill }} />
+                              <span>{p.name}</span>
+                              <span className="tt-val">{p.value}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
+
+              <Box className="legend-grid">
+                {typeDistribution.map((d, i) => (
+                  <div key={i} className="legend-item">
+                    <span className="legend-dot" style={{ background: d.color }} />
+                    <span className="legend-name">{d.name}</span>
+                    <span className="legend-val">{d.value}</span>
+                  </div>
+                ))}
+              </Box>
             </CardContent>
           </Card>
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Card className="dashboard-chart-card">
-            <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: "#20438E", fontWeight: "bold" }}>
-                Scholarships Created per Month
-              </Typography>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={barChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis allowDecimals={false} />
-                  <Tooltip />
-                  <Bar dataKey="scholarships" fill="#20438E" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+      {/* NEW: 2x2 grid of bar charts */}
+      <Grid container spacing={2.5} mt={0.5}>
+        <Grid item xs={12} md={6}>
+          <EntityBarCard title="Users Created per Month" data={barsUsers} gradId="gradBarUsers" color="#3b82f6" />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <EntityBarCard title="Courses Created per Month" data={barsCourses} gradId="gradBarCourses" color="#ef4444" />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <EntityBarCard title="Teachers Created per Month" data={barsTeachers} gradId="gradBarTeachers" color="#8b5cf6" />
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <EntityBarCard title="Reviews Created per Month" data={barsReviews} gradId="gradBarReviews" color="#f59e0b" />
+        </Grid>
+          <Grid item xs={12} md={6}>
+          <EntityBarCard title="Scholarships Created per Month" data={barsScholarships} gradId="gradBarReviews" color="#10b981" />
         </Grid>
       </Grid>
-
-    
     </Box>
   )
 }
-
-export default DashboardOverview
