@@ -18,11 +18,8 @@ import {
   DialogContent,
   DialogActions,
   TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   CircularProgress,
+  Tooltip,
 } from "@mui/material"
 import { Add as AddIcon } from "@mui/icons-material"
 import { toast, ToastContainer } from "react-toastify"
@@ -42,12 +39,12 @@ const ScholarshipDashboard = () => {
 
   const [loading, setLoading] = useState(true)
 
-  // NEW: applicants dialog state
+  // Applicants dialog state
   const [applicantDialogOpen, setApplicantDialogOpen] = useState(false)
   const [applicants, setApplicants] = useState([])
   const [selectedScholarshipTitle, setSelectedScholarshipTitle] = useState("")
 
-  // include all fields needed by the backend schema
+  // Create form state
   const [newScholarship, setNewScholarship] = useState({
     scholarship_title: "",
     scholarship_value: "",
@@ -103,10 +100,10 @@ const ScholarshipDashboard = () => {
       const payload = {
         scholarship_title: scholarship_title.trim(),
         scholarship_value: Number(scholarship_value),
-        scholarship_type,
+        scholarship_type: scholarship_type.trim(),
         scholarship_CreatedBy: scholarship_CreatedBy.trim(),
         scholarship_description: scholarship_description.trim(),
-        scholarship_requirements: scholarship_requirements.trim(), // string per schema
+        scholarship_requirements: scholarship_requirements.trim(), // schema expects string
       }
 
       const res = await fetch(API_BASE, {
@@ -142,15 +139,18 @@ const ScholarshipDashboard = () => {
           "Content-Type": "application/json",
           ...authHeader,
         },
-        body: JSON.stringify(selectedScholarship),
+        body: JSON.stringify({
+          ...selectedScholarship,
+          scholarship_value: Number(selectedScholarship.scholarship_value),
+          scholarship_description: (selectedScholarship.scholarship_description || "").trim(),
+          scholarship_requirements: (selectedScholarship.scholarship_requirements || "").toString().trim(),
+        }),
       })
 
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || "Failed to update scholarship")
 
-      setScholarships((prev) =>
-        prev.map((s) => (s._id === selectedScholarship._id ? data : s))
-      )
+      setScholarships((prev) => prev.map((s) => (s._id === data._id ? data : s)))
       toast.success("Scholarship updated successfully")
       setEditDialogOpen(false)
       setSelectedScholarship(null)
@@ -178,22 +178,16 @@ const ScholarshipDashboard = () => {
     }
   }
 
-  // NEW: view applicants
+  // View applicants
   const handleViewApplicants = async (sch) => {
     try {
-      const token = localStorage.getItem("token")
       const res = await fetch(`${API_BASE}/${sch._id}/applicants`, {
-        headers: {
-          ...authHeader,
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { ...authHeader },
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.message || "Failed to fetch applicants")
 
-      // If API returns { applicants: [...] }, prefer that; otherwise assume it's already the array
       const list = Array.isArray(data?.applicants) ? data.applicants : data
-
       setApplicants(list || [])
       setSelectedScholarshipTitle(sch.scholarship_title)
       setApplicantDialogOpen(true)
@@ -201,6 +195,25 @@ const ScholarshipDashboard = () => {
       toast.error("Failed to load applicants")
     }
   }
+
+  // helper for clamped cell with tooltip
+  const ClampedCell = ({ text, lines = 2 }) => (
+    <Tooltip title={text || ""} arrow placement="top">
+      <span
+        style={{
+          display: "-webkit-box",
+          WebkitLineClamp: lines,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          lineHeight: "1.4em",
+          maxHeight: `${1.4 * lines}em`,
+        }}
+      >
+        {text || "-"}
+      </span>
+    </Tooltip>
+  )
 
   return (
     <Box className="scholarship-dashboard">
@@ -230,8 +243,10 @@ const ScholarshipDashboard = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Title</TableCell>
+                <TableCell>Description</TableCell>
                 <TableCell>Value</TableCell>
                 <TableCell>Type</TableCell>
+                <TableCell>Requirements</TableCell>
                 <TableCell>Applicants</TableCell>
                 <TableCell>Created By</TableCell>
                 <TableCell>Created At</TableCell>
@@ -240,78 +255,95 @@ const ScholarshipDashboard = () => {
             </TableHead>
 
             <TableBody>
-              {scholarships.map((sch) => (
-                <TableRow key={sch._id} hover className="scholarship-table-row">
-                  <TableCell>
-                    <Typography variant="body2" fontWeight="bold" className="scholarship-title">
-                      {sch.scholarship_title}
-                    </Typography>
-                  </TableCell>
+              {scholarships.map((sch) => {
+                const reqText = sch.scholarship_requirements || ""
+                return (
+                  <TableRow key={sch._id} hover className="scholarship-table-row">
+                    <TableCell>
+                      <Typography variant="body2" fontWeight="bold" className="scholarship-title">
+                        {sch.scholarship_title}
+                      </Typography>
+                    </TableCell>
 
-                  <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#4CAF50", fontWeight: "bold" }}
-                      className="scholarship-amount"
-                    >
-                      ${Number(sch.scholarship_value).toLocaleString()}
-                    </Typography>
-                  </TableCell>
+                    {/* NEW: Description (2 lines + tooltip) */}
+                    <TableCell sx={{ maxWidth: 350, p: 1 }}>
+                      <ClampedCell text={sch.scholarship_description} lines={2} />
+                    </TableCell>
 
-                  <TableCell>
-                    <Chip label={sch.scholarship_type} size="small" className="scholarship-category-chip" />
-                  </TableCell>
+                    <TableCell>
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "#4CAF50", fontWeight: "bold" }}
+                        className="scholarship-amount"
+                      >
+                        ${Number(sch.scholarship_value).toLocaleString()}
+                      </Typography>
+                    </TableCell>
 
-                  <TableCell
-                    sx={{
-                      maxWidth: 99,
-                      cursor: "pointer",           // clickable
-                      color: "#20438E",
-                      fontWeight: 600,
-                      backgroundColor: "#F5D677",
-                      textAlign: "center",
-                    }}
-                    onClick={() => handleViewApplicants(sch)}   // NEW
-                  >
-                    {sch.applicants?.length || 0}
-                  </TableCell>
+                    <TableCell>
+                      <Chip label={sch.scholarship_type} size="small" className="scholarship-category-chip" />
+                    </TableCell>
 
-                  <TableCell>{sch.scholarship_CreatedBy || "-"}</TableCell>
+                    {/* NEW: Requirements (clamped + tooltip) */}
+                    <TableCell sx={{ maxWidth: 280, p: 1 }}>
+                      <ClampedCell text={reqText} lines={2} />
+                    </TableCell>
 
-                  <TableCell className="scholarship-createdat">
-                    {sch.createdAt ? new Date(sch.createdAt).toLocaleDateString() : "-"}
-                  </TableCell>
-
-                  <TableCell>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      className="scholarship-edit-btn"
-                      onClick={() => {
-                        setSelectedScholarship({
-                          ...sch,
-                          scholarship_value: sch.scholarship_value ?? "",
-                        })
-                        setEditDialogOpen(true)
+                    <TableCell
+                      sx={{
+                        maxWidth: 99,
+                        cursor: "pointer",
+                        color: "#20438E",
+                        fontWeight: 600,
+                        backgroundColor: "#F5D677",
+                        textAlign: "center",
                       }}
+                      onClick={() => handleViewApplicants(sch)}
                     >
-                      Edit
-                    </Button>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      color="error"
-                      sx={{ ml: 1 }}
-                      onClick={() => {
-                        setScholarshipToDelete(sch)
-                        setDeleteDialogOpen(true)
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      {sch.applicants?.length || 0}
+                    </TableCell>
+
+                    <TableCell>{sch.scholarship_CreatedBy || "-"}</TableCell>
+
+                    <TableCell className="scholarship-createdat">
+                      {sch.createdAt ? new Date(sch.createdAt).toLocaleDateString() : "-"}
+                    </TableCell>
+
+                    <TableCell>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        className="scholarship-edit-btn"
+                        onClick={() => {
+                          // include description & requirements into edit state
+                          setSelectedScholarship({
+                            ...sch,
+                            scholarship_value: sch.scholarship_value ?? "",
+                            scholarship_type: sch.scholarship_type ?? "",
+                            scholarship_description: sch.scholarship_description ?? "",
+                            scholarship_requirements: sch.scholarship_requirements ?? "",
+                          })
+                          setEditDialogOpen(true)
+                        }}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="error"
+                        sx={{ ml: 1 }}
+                        onClick={() => {
+                          setScholarshipToDelete(sch)
+                          setDeleteDialogOpen(true)
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </TableContainer>
@@ -338,19 +370,14 @@ const ScholarshipDashboard = () => {
             onChange={(e) => setNewScholarship((p) => ({ ...p, scholarship_value: e.target.value }))}
             sx={{ mb: 2 }}
           />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Type</InputLabel>
-            <Select
-              label="Type"
-              value={newScholarship.scholarship_type}
-              onChange={(e) => setNewScholarship((p) => ({ ...p, scholarship_type: e.target.value }))}
-            >
-              <MenuItem value="Merit-Based">Merit-Based</MenuItem>
-              <MenuItem value="Need-Based">Need-Based</MenuItem>
-              <MenuItem value="STEM">STEM</MenuItem>
-              <MenuItem value="Leadership">Leadership</MenuItem>
-            </Select>
-          </FormControl>
+          <TextField
+            label="Type"
+            fullWidth
+            variant="outlined"
+            value={newScholarship.scholarship_type}
+            onChange={(e) => setNewScholarship((p) => ({ ...p, scholarship_type: e.target.value }))}
+            sx={{ mb: 2 }}
+          />
           <TextField
             label="Created By"
             fullWidth
@@ -419,35 +446,46 @@ const ScholarshipDashboard = () => {
             }
             sx={{ mb: 2 }}
           />
-          <FormControl fullWidth sx={{ mb: 2 }}>
-            <InputLabel>Type</InputLabel>
-            <Select
-              label="Type"
-              value={selectedScholarship?.scholarship_type || ""}
-              onChange={(e) =>
-                setSelectedScholarship((prev) => ({ ...prev, scholarship_type: e.target.value }))
-              }
-            >
-              <MenuItem value="Merit-Based">Merit-Based</MenuItem>
-              <MenuItem value="Need-Based">Need-Based</MenuItem>
-              <MenuItem value="STEM">STEM</MenuItem>
-              <MenuItem value="Leadership">Leadership</MenuItem>
-            </Select>
-          </FormControl>
           <TextField
-            label="Created By"
+            label="Type"
             fullWidth
             variant="outlined"
-            value={selectedScholarship?.scholarship_CreatedBy || ""}
+            value={selectedScholarship?.scholarship_type || ""}
             onChange={(e) =>
-              setSelectedScholarship((prev) => ({ ...prev, scholarship_CreatedBy: e.target.value }))
+              setSelectedScholarship((prev) => ({ ...prev, scholarship_type: e.target.value }))
+            }
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Description"
+            multiline
+            rows={3}
+            fullWidth
+            variant="outlined"
+            value={selectedScholarship?.scholarship_description || ""}
+            onChange={(e) =>
+              setSelectedScholarship((prev) => ({ ...prev, scholarship_description: e.target.value }))
+            }
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Requirements (comma or new line separated)"
+            multiline
+            rows={2}
+            fullWidth
+            variant="outlined"
+            value={selectedScholarship?.scholarship_requirements || ""}
+            onChange={(e) =>
+              setSelectedScholarship((prev) => ({ ...prev, scholarship_requirements: e.target.value }))
             }
             sx={{ mb: 2 }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleUpdateScholarship}>Save</Button>
+          <Button variant="contained" onClick={handleUpdateScholarship}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 
@@ -456,21 +494,20 @@ const ScholarshipDashboard = () => {
         <DialogTitle>Confirm Delete</DialogTitle>
         <DialogContent>
           <Typography>Are you sure you want to delete this scholarship?</Typography>
-          <Typography fontWeight="bold" mt={1}>{scholarshipToDelete?.scholarship_title}</Typography>
+          <Typography fontWeight="bold" mt={1}>
+            {scholarshipToDelete?.scholarship_title}
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={handleDeleteScholarship}>Delete</Button>
+          <Button variant="contained" color="error" onClick={handleDeleteScholarship}>
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
 
-      {/* NEW: Applicants dialog */}
-      <Dialog
-        open={applicantDialogOpen}
-        onClose={() => setApplicantDialogOpen(false)}
-        maxWidth="sm"
-        fullWidth
-      >
+      {/* Applicants dialog */}
+      <Dialog open={applicantDialogOpen} onClose={() => setApplicantDialogOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Applicants – {selectedScholarshipTitle}</DialogTitle>
         <DialogContent dividers>
           {applicants?.length > 0 ? (
