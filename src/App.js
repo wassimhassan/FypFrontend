@@ -15,6 +15,7 @@ import UserDashboard from "./components/UserDashboard.js";
 import CourseDashboard from "./components/CourseDashboard.js";
 import ScholarshipDashboard from "./components/ScholarshipDashboard.js";
 import DashboardOverview from "./components/DashboardOverview.js";
+import UniversityDashboard from "./components/UniversityDashboard.js";
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
           <Route path="user" element={<UserDashboard />} />
           <Route path="course" element={<CourseDashboard />} />
           <Route path="scholarship" element={<ScholarshipDashboard />} />
+          <Route path="university" element={<UniversityDashboard />} />
           <Route path="overview" element={<DashboardOverview />} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />

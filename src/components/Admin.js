@@ -27,6 +27,7 @@ import {
   ExitToApp,
 } from "@mui/icons-material"
 
+import ApartmentIcon from '@mui/icons-material/Apartment';
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
 import "./Admin.css"
 
@@ -51,6 +52,8 @@ const Admin = () => {
     { text: "Teachers", icon: <PersonIcon />, path: "teacher" },            // /admin/teacher
     { text: "Courses", icon: <BookIcon />, path: "course" },                // /admin/course
     { text: "Reviews", icon: <ReviewIcon />, path: "review" },              // /admin/review
+    { text: "Universities", icon: <ApartmentIcon />, path: "university" },              // /admin/university
+
   ]
 
   // Title from current path

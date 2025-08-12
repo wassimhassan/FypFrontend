@@ -83,9 +83,12 @@ const ReviewDashboard = () => {
       </Box>
 
       {loading ? (
-        <Box display="flex" justifyContent="center" mt={4}>
-          <CircularProgress />
-        </Box>
+              <Box className="dashboard-overview">
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <Typography className="loading-text">Loading Reviews…</Typography>
+        </div>
+      </Box>
       ) : (
         <TableContainer component={Paper} className="review-data-table">
           <Table>

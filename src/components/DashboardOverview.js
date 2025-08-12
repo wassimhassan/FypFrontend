@@ -419,7 +419,7 @@ export default function DashboardOverview() {
           <EntityBarCard title="Reviews Created per Month" data={barsReviews} gradId="gradBarReviews" color="#f59e0b" />
         </Grid>
           <Grid item xs={12} md={6}>
-          <EntityBarCard title="Scholarships Created per Month" data={barsScholarships} gradId="gradBarReviews" color="#10b981" />
+          <EntityBarCard title="Scholarships Created per Month" data={barsScholarships} gradId="gradScholarships" color="#10b981" />
         </Grid>
       </Grid>
     </Box>
