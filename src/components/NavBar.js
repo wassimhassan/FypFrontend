@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import "./NavBar.css";
@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 
 function NavBar() {
   const navigate = useNavigate();
+  const location   = useLocation();               // ⬅️ get current route
+  const onProfile  = location.pathname.startsWith("/profile"); // ⬅️ are we on profile?
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -64,6 +66,9 @@ axios
             </button>
             <button className="btn-primary">Get Started</button>
           </>
+          ) : onProfile ? (
+          // ⬇️ When on /profile, show Homepage instead of the profile chip
+          <button className="btn-outline" onClick={() => navigate("/homepage")}>Homepage</button>
         ) : (
           <button className="profile-button" onClick={() => navigate("/profile")}>
             <img

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import NavBar from "./NavBar";
 import "./ProfileCard.css";
 
 const API_BASE_URL = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -11,6 +12,7 @@ const ProfileCard = () => {
   const [loading, setLoading]           = useState(true);
   const fileInputRef                    = useRef(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [myCourses, setMyCourses] = useState([]);
 
   /* ---------- Upload profile picture ----------------------------------- */
   const handleFileChangeAndUpload = async (e) => {
@@ -84,6 +86,14 @@ const ProfileCard = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) return setLoading(false);
+
+        const coursesRes = await fetch(`${API_BASE_URL}/courses/my`, {
+        headers: { Authorization: `Bearer ${token}` },
+        });
+        if (coursesRes.ok) {
+          const list = await coursesRes.json();
+          setMyCourses(list);
+        }
 
         const res = await fetch(`${API_BASE_URL}/profile/profile`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -160,6 +170,8 @@ const ProfileCard = () => {
   const fieldsToShow = ["email", "username", "phoneNumber"];
 
   return (
+    <>
+    <NavBar /> 
     <div className="profile-container">
       {/* ---------- Avatar & dropdown ---------- */}
       <div className="profile-img-wrapper" onClick={toggleDropdown}>
@@ -238,8 +250,46 @@ const ProfileCard = () => {
           <button onClick={handleLogout} className="logout-btn">Logout</button>
         </div>
       </div>
+    
+    {/* ---------- Registered Courses ---------- */}
+<div className="registered-courses">
+  <div className="rc-header">
+    <h3>Registered Courses</h3>
+    {myCourses?.length ? (
+      <span className="rc-count">{myCourses.length}</span>
+    ) : null}
+  </div>
+
+  {!myCourses?.length ? (
+    <p className="rc-empty">You haven’t registered for any course yet.</p>
+  ) : (
+    <div className="rc-grid">
+      {myCourses.map((c) => (
+        <article key={c._id} className="rc-card">
+          <div className="rc-card-top">
+            <h4 className="rc-title">{c.title}</h4>
+            <span className={`rc-badge ${c.price?.toLowerCase() === 'free' ? 'free' : 'paid'}`}>
+              {c.price}
+            </span>
+          </div>
+          <p className="rc-desc">
+            {c.description?.length > 110 ? c.description.slice(0, 110) + '…' : c.description}
+          </p>
+          <div className="rc-meta">
+            <span className="rc-date" title={new Date(c.createdAt).toLocaleString()}>
+              Joined: {new Date(c.createdAt).toLocaleDateString()}
+            </span>
+            <span className="rc-enrolled">
+              {c.enrolledStudents?.length ?? 0} enrolled
+            </span>
+          </div>
+        </article>
+      ))}
     </div>
-  );
-};
+  )}
+</div>
+</div>
+  </>
+  )};
 
 export default ProfileCard;

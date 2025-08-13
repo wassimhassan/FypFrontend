@@ -24,9 +24,9 @@ export default function CoursesTab() {
       <h2>Available Courses</h2>
       <p>Explore our featured courses to boost your skills.</p>
       <div className="card-row">
-        {courses.map((course, index) => (
+        {courses.map((course) => (
           <CourseCard
-            key={index}
+            key={course._id}
             title={course.title}
             description={course.description}
             badge={course.price}

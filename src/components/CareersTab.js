@@ -24,9 +24,9 @@ export default function CareersTab() {
       <h2>Career Paths</h2>
       <p>Discover potential careers for each major.</p>
       <div className="card-row">
-        {careers.map((career, index) => (
+        {careers.map((career) => (
           <CareerCard
-            key={index}
+            key={career._id}
             major={career.field}
             jobTitle={career.title}
             description={career.description}
