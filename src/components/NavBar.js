@@ -1,47 +1,46 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import "./NavBar.css";
-import { Link } from "react-router-dom";
-
 
 function NavBar() {
-  const navigate = useNavigate();
-  const location   = useLocation();               // ⬅️ get current route
-  const onProfile  = location.pathname.startsWith("/profile"); // ⬅️ are we on profile?
+  const navigate   = useNavigate();
+  const location   = useLocation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (!token) return;
 
-    if (token) {
-      try {
-        const decoded = jwtDecode(token);
-        console.log("✅ Token decoded:", decoded);
+    try {
+      const decoded = jwtDecode(token);
+      console.log("✅ Token decoded:", decoded);
 
-        // 🔥 Fetch full user info using /auth-check
-axios
-  .get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/auth-check`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then((res) => {
-    console.log("✅ User fetched:", res.data.user); // ✅ updated
-    setUser(res.data.user); // ✅ only set the user part
-  })
-  .catch((err) => {
-    console.error("❌ Error fetching user:", err);
-    localStorage.removeItem("token");
-  });
-
-      } catch (err) {
-        console.error("❌ Error decoding token:", err);
-        localStorage.removeItem("token");
-      }
+      axios
+        .get(`${process.env.REACT_APP_BACKEND_URL}/api/auth/auth-check`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => {
+          console.log("✅ User fetched:", res.data.user);
+          setUser(res.data.user);
+        })
+        .catch((err) => {
+          console.error("❌ Error fetching user:", err);
+          localStorage.removeItem("token");
+          setUser(null);
+        });
+    } catch (err) {
+      console.error("❌ Error decoding token:", err);
+      localStorage.removeItem("token");
+      setUser(null);
     }
   }, []);
+
+  const avatar =
+    user?.profilePicture && user.profilePicture !== ""
+      ? user.profilePicture
+      : "/default-avatar.png"; // optional fallback
 
   return (
     <nav className="navbar">
@@ -50,34 +49,46 @@ axios
           src="/logo-removebg-preview.png"
           alt="Logo"
           className="navbar-logo"
+          onClick={() => navigate("/homepage")}
+          style={{ cursor: "pointer" }}
         />
       </div>
 
       <div className="nav-links">
-    <Link to="/WelcomePage#reviews">Reviews</Link>
-        <a href="#">About</a>
-        <a href="#">Resources</a>
-        <a href="#">Support</a>
+        {/* Prefer Link over <a href="#"> to avoid page reloads */}
+        <Link to="/WelcomePage#reviews">Reviews</Link>
+        <Link to="/about">About</Link>
+        <Link to="/resources">Resources</Link>
+        <Link to="/support">Support</Link>
 
         {!user ? (
           <>
             <button className="btn-outline" onClick={() => navigate("/login")}>
               Sign In
             </button>
-            <button className="btn-primary">Get Started</button>
+            <button className="btn-primary" onClick={() => navigate("/signup")}>
+              Get Started
+            </button>
           </>
-          ) : onProfile ? (
-          // ⬇️ When on /profile, show Homepage instead of the profile chip
-          <button className="btn-outline" onClick={() => navigate("/homepage")}>Homepage</button>
         ) : (
-          <button className="profile-button" onClick={() => navigate("/profile")}>
-            <img
-              src={user.profilePicture }
-              alt="Profile"
-              className="profile-pic"
-            />
-            <span className="username">{user.username}</span>
-          </button>
+          // ✅ Logged-in: always show BOTH Homepage and Profile
+          <>
+            <button
+              className="btn-outline"
+              onClick={() => navigate("/homepage")}
+            >
+              Homepage
+            </button>
+
+            <button
+              className="profile-button"
+              onClick={() => navigate("/profile")}
+              title="Your profile"
+            >
+              <img src={avatar} alt="Profile" className="profile-pic" />
+              <span className="username">{user.username}</span>
+            </button>
+          </>
         )}
       </div>
     </nav>
