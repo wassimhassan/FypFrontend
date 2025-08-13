@@ -28,6 +28,7 @@ import {
 } from "@mui/icons-material"
 
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom"
 import "./Admin.css"
 
@@ -53,6 +54,7 @@ const Admin = () => {
     { text: "Courses", icon: <BookIcon />, path: "course" },                // /admin/course
     { text: "Reviews", icon: <ReviewIcon />, path: "review" },              // /admin/review
     { text: "Universities", icon: <ApartmentIcon />, path: "university" },              // /admin/university
+    { text: "Careers", icon: <AutoStoriesIcon />, path: "career" },              // /admin/university
 
   ]
 
