@@ -1,0 +1,128 @@
+.course-card {
+  position: relative; /* needed for hover buttons */
+  width: 280px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+  transition: transform 0.2s;
+}
+
+.course-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Hover buttons container */
+.card-hover-buttons {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.course-card:hover .card-hover-buttons {
+  opacity: 1;
+}
+
+/* Edit button */
+.edit-btn {
+  background: #fbbf24; /* yellow */
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.edit-btn:hover {
+  background: #f59e0b;
+}
+
+/* Delete button */
+.delete-btn {
+  background: #ef4444; /* red */
+  border: none;
+  padding: 4px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.delete-btn:hover {
+  background: #b91c1c;
+}
+
+/* Existing styles */
+.course-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.course-type {
+  font-size: 12px;
+  font-weight: 600;
+  color: #20438E;
+  background: #fef6e5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+}
+
+.course-price.free {
+  font-weight: 700;
+  color: #00b96b;
+}
+
+.course-price.paid {
+  font-weight: 700;
+  color: #1e2a5f;
+}
+
+.course-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e2a5f;
+}
+
+.course-instructor {
+  font-size: 14px;
+  color: #475569;
+}
+
+.course-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #475569;
+}
+
+.course-level {
+  align-self: flex-start;
+  font-size: 12px;
+  font-weight: 600;
+  color: #20438E;
+  background: #fef6e5;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+}
+
+.course-btn {
+  margin-top: 1rem;
+  background: #20438E;
+  color: #fff;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.course-btn:hover {
+  background: #16336f;
+}

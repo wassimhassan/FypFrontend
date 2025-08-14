@@ -1,26 +1,19 @@
+
 .card-row {
-  display: flex;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); 
   gap: 20px;
-  padding-bottom: 10px;
   max-width: 1100px;
   margin: 0 auto;
-  scroll-behavior: smooth;
+  overflow-x: hidden !important;
+  overflow-y: visible !important; 
 }
 
-.card-row::-webkit-scrollbar {
-  height: 8px;
-}
-
-.card-row::-webkit-scrollbar-thumb {
-  background-color: #20438E;
-  border-radius: 4px;
-}
 
 .card {
-  flex: 0 0 250px; /* same width */
+  width: 100%;
   background-color: #fff;
-  padding: 20px 25px; /* slightly less padding for less height */
+  padding: 20px 25px;
   border-radius: 12px;
   text-align: left;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
@@ -28,7 +21,11 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: auto; 
+  overflow: visible; 
 }
+
+
 
 .card-header {
   display: flex;
@@ -74,9 +71,24 @@
   font-weight: 600;
   font-size: 16px;
   transition: background-color 0.3s ease;
-  margin-top: auto; /* push button to bottom */
+  margin-top: auto;
 }
 
 .enroll-btn:hover {
   background-color: #18306a;
-}
+} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -17,6 +17,10 @@ import ScholarshipDashboard from "./components/ScholarshipDashboard.js";
 import DashboardOverview from "./components/DashboardOverview.js";
 import UniversityDashboard from "./components/UniversityDashboard.js";
 import CareerDashboard from "./components/CareerDashboard.js";
+import Teacher from "./components/Teacher.js"; // ✅ import the component
+import "./components/Teacher.css";             // ✅ import the CSS
+
+
 
 function App() {
   return (
@@ -31,8 +35,8 @@ function App() {
         <Route path="/profile" element={<ProfileCard />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
-
-        {/* Admin layout + nested dashboards */}
+       <Route path="/teacher" element={<Teacher />} />
+        {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}>
         
           <Route index element={<DashboardOverview />} />
