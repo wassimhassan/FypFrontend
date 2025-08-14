@@ -1,104 +1,131 @@
-import React, { useState } from "react";
+// Teacher.js
+import React, { useEffect, useState } from "react";
 import TeacherCourse from "./TeacherCourse";
 import "./Teacher.css";
+import axios from "axios";
+import NavBar from "./NavBar";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Teacher() {
-  const [courses, setCourses] = useState([
-    {
-      type: "Test Prep",
-      title: "SAT Preparation Course",
-      instructor: "Dr. Ahmed Hassan",
-      duration: "8 weeks",
-      students: "3,247",
-      rating: 4.9,
-      level: "Advanced",
-      price: "Free",
-    },
-    {
-      type: "Language",
-      title: "TOEFL Training Program",
-      instructor: "Sarah Mitchell",
-      duration: "6 weeks",
-      students: "2,156",
-      rating: 4.8,
-      level: "Intermediate",
-      price: "$150",
-    },
-  ]);
-
+  const [courses, setCourses] = useState([]);
   const [showForm, setShowForm] = useState(false);
+
+  // track when we're editing an existing course
+  const [editingId, setEditingId] = useState(null);
+
   const [newCourse, setNewCourse] = useState({
-    type: "",
+    category: "",
     title: "",
-    instructor: "",
-    duration: "",
-    students: "",
-    rating: "",
+    instructor: "",        // you can auto-fill from /auth-check if you like
+    durationDays: "",
     level: "",
-    price: "",
+    price: "",             // "Free" or "$150"
+    description: "",
   });
 
-  const [editIndex, setEditIndex] = useState(null); // track course being edited
+  const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    // fetch ONLY my courses
+    axios
+      .get(`${API}/courses/mine-created`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setCourses(res.data))
+      .catch(console.error);
+  }, [token]);
 
   const handleChange = (e) => {
-    setNewCourse({ ...newCourse, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setNewCourse((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddOrEditCourse = (e) => {
+  // Add or Edit (PUT if editingId exists, POST otherwise)
+  const handleAdd = async (e) => {
     e.preventDefault();
-    if (editIndex !== null) {
-      // Update existing course
-      const updatedCourses = [...courses];
-      updatedCourses[editIndex] = newCourse;
-      setCourses(updatedCourses);
+    // block submit if any field empty or duration < 1
+const required = ["category","title","instructor","durationDays","level","price","description"];
+for (const f of required) {
+  if (!String(newCourse[f] ?? "").trim()) {
+    alert(`Please fill the ${f} field.`);
+    return;
+  }
+}
+const d = Number(newCourse.durationDays);
+if (!Number.isFinite(d) || d < 1) {
+  alert("Duration must be a number ≥ 1 (days).");
+  return;
+}
+    const payload = {
+      ...newCourse,
+      durationDays: d,
+    };
+
+    if (editingId) {
+      // UPDATE
+      const { data: updated } = await axios.put(
+        `${API}/courses/${editingId}`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setCourses((prev) => prev.map((c) => (c._id === editingId ? updated : c)));
     } else {
-      // Add new course
-      setCourses([...courses, newCourse]);
+      // CREATE
+      const { data: created } = await axios.post(`${API}/courses`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCourses((prev) => [created, ...prev]);
     }
-    // Reset form
+
+    // reset form state
+    setShowForm(false);
+    setEditingId(null);
     setNewCourse({
-      type: "",
+      category: "",
       title: "",
       instructor: "",
-      duration: "",
-      students: "",
-      rating: "",
+      durationDays: "",
       level: "",
       price: "",
+      description: "",
     });
-    setEditIndex(null);
-    setShowForm(false);
   };
 
-  const handleDelete = (index) => {
-    const updatedCourses = courses.filter((_, i) => i !== index);
-    setCourses(updatedCourses);
-  };
-
-  const handleEdit = (index) => {
-    setNewCourse(courses[index]); // pre-fill form
-    setEditIndex(index);
+  // open modal pre-filled for edit
+  const openEdit = (course) => {
+    setNewCourse({
+      category: course.category || "",
+      title: course.title || "",
+      instructor: course.instructor || "",
+      durationDays: course.durationDays || "",
+      level: course.level || "",
+      price: course.price || "",
+      description: course.description || "",
+    });
+    setEditingId(course._id);
     setShowForm(true);
   };
 
   return (
+    <>
+    <NavBar />
     <div className="dashboard">
-      {/* + Button */}
       <div className="top-center">
         <button
           className="add-course-btn"
           onClick={() => {
+            // ensure we're in "add" mode and clear form
+            setEditingId(null);
             setNewCourse({
-              type: "",
+              category: "",
               title: "",
               instructor: "",
-              duration: "",
-              students: "",
-              rating: "",
+              durationDays: "",
               level: "",
               price: "",
-            }); // reset form
-            setEditIndex(null); // set Add mode
+              description: "",
+            });
             setShowForm(true);
           }}
         >
@@ -106,90 +133,90 @@ export default function Teacher() {
         </button>
       </div>
 
-      {/* Courses */}
       <main className="courses-container">
-        {courses.map((course, index) => (
+        {courses.map((course) => (
           <TeacherCourse
-            key={index}
+            key={course._id}
             course={course}
-            onEdit={() => handleEdit(index)}
-            onDelete={() => handleDelete(index)}
+            onEdit={() => openEdit(course)} // ✅ now opens the edit form
+            onDelete={async () => {
+              // ✅ ask before deleting
+              const ok = window.confirm(`Delete “${course.title}”?`);
+              if (!ok) return;
+              await axios.delete(`${API}/courses/${course._id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              setCourses((prev) => prev.filter((c) => c._id !== course._id));
+            }}
           />
         ))}
       </main>
 
-      {/* Modal Form */}
       {showForm && (
         <div className="modal">
-          <form className="course-form" onSubmit={handleAddOrEditCourse}>
-            <h2>{editIndex !== null ? "Edit Course" : "Add New Course"}</h2>
+          <form className="course-form" onSubmit={handleAdd}>
+            <h2>Add New Course</h2>
+
             <input
-              name="type"
-              placeholder="Type"
-              value={newCourse.type}
+              name="category"
+              required
+              placeholder="Category"
+              value={newCourse.category}
               onChange={handleChange}
             />
             <input
               name="title"
+              required
               placeholder="Title"
               value={newCourse.title}
               onChange={handleChange}
             />
             <input
               name="instructor"
+              required
               placeholder="Instructor"
               value={newCourse.instructor}
               onChange={handleChange}
             />
             <input
-              name="duration"
-              placeholder="Duration"
-              value={newCourse.duration}
-              onChange={handleChange}
-            />
-            <input
-              name="students"
-              placeholder="Students"
-              value={newCourse.students}
-              onChange={handleChange}
-            />
-            <input
-              name="rating"
-              placeholder="Rating"
-              value={newCourse.rating}
+              name="durationDays"
+              placeholder="Duration (days)"
+              type="number"
+              min="1"
+              step="1"
+              required
+              value={newCourse.durationDays}
               onChange={handleChange}
             />
             <input
               name="level"
-              placeholder="Level"
+              required
+              placeholder="Level (Beginner/Intermediate/Advanced)"
               value={newCourse.level}
               onChange={handleChange}
             />
             <input
               name="price"
-              placeholder="Price"
+              required
+              placeholder="Price (Free or $...)"
               value={newCourse.price}
               onChange={handleChange}
             />
+            <textarea
+            required
+              name="description"
+              placeholder="Short description"
+              value={newCourse.description}
+              onChange={handleChange}
+            />
+
             <div className="form-buttons">
-              <button type="submit">
-                {editIndex !== null ? "Save Changes" : "Add"}
-              </button>
+              <button type="submit">Add</button>
               <button
                 type="button"
                 onClick={() => {
                   setShowForm(false);
-                  setEditIndex(null);
-                  setNewCourse({
-                    type: "",
-                    title: "",
-                    instructor: "",
-                    duration: "",
-                    students: "",
-                    rating: "",
-                    level: "",
-                    price: "",
-                  });
+                  setEditingId(null);
                 }}
               >
                 Cancel
@@ -199,5 +226,6 @@ export default function Teacher() {
         </div>
       )}
     </div>
+    </>
   );
 }

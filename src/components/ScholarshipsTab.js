@@ -1,7 +1,7 @@
-
 import React, { useEffect, useState } from 'react';
 import ScholarshipCard from './ScholarshipCard';
 import axios from 'axios';
+import './ScholarshipsTab.css';
 
 const ScholarshipsTab = () => {
   const [scholarships, setScholarships] = useState([]);

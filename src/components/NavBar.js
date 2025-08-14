@@ -9,6 +9,11 @@ function NavBar() {
   const location   = useLocation();
   const [user, setUser] = useState(null);
 
+  const goHome = () => {
+  navigate(user?.role === "teacher" ? "/teacherHomePage" : "/homepage");
+};
+
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) return;
@@ -75,7 +80,7 @@ function NavBar() {
           <>
             <button
               className="btn-outline"
-              onClick={() => navigate("/homepage")}
+              onClick={goHome}
             >
               Homepage
             </button>

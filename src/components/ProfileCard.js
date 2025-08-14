@@ -217,7 +217,7 @@ const ProfileCard = () => {
       {/* ---------- Card ---------- */}
       <div className="profile-card">
         <div className="profile-header">
-          <h2 className="profile-title">Member Profile</h2> <span role="img" aria-label="fitness"></span>
+          <h2 className="profile-title">Member Profile</h2> 
         </div>
 
         <div className="profile-details">
@@ -265,26 +265,45 @@ const ProfileCard = () => {
   ) : (
     <div className="rc-grid">
       {myCourses.map((c) => (
-        <article key={c._id} className="rc-card">
-          <div className="rc-card-top">
-            <h4 className="rc-title">{c.title}</h4>
-            <span className={`rc-badge ${c.price?.toLowerCase() === 'free' ? 'free' : 'paid'}`}>
-              {c.price}
-            </span>
-          </div>
-          <p className="rc-desc">
-            {c.description?.length > 110 ? c.description.slice(0, 110) + '…' : c.description}
-          </p>
-          <div className="rc-meta">
-            <span className="rc-date" title={new Date(c.createdAt).toLocaleString()}>
-              Joined: {new Date(c.createdAt).toLocaleDateString()}
-            </span>
-            <span className="rc-enrolled">
-              {c.enrolledStudents?.length ?? 0} enrolled
-            </span>
-          </div>
-        </article>
-      ))}
+  <article key={c._id} className="rc-card">
+    {/* header pills: category + price */}
+    <div className="rc-card-top">
+      <span className="rc-type">{c.category}</span>
+      <span className={`rc-badge ${c.price?.toLowerCase() === 'free' ? 'free' : 'paid'}`}>
+        {c.price}
+      </span>
+    </div>
+
+    <h4 className="rc-title">{c.title}</h4>
+    <p className="rc-instructor">by {c.instructor}</p>
+
+    {/* quick facts row */}
+    <div className="rc-info">
+      <span title={`${c.durationDays} days`}>⏱ {c.durationDays} d</span>
+      <span>👥 {(c.enrolledStudents?.length ?? 0)}</span>
+      <span>⭐ {c.ratingAvg ?? 0}</span>
+    </div>
+
+    {/* level pill */}
+    <span className="rc-level">{c.level}</span>
+
+    {/* description */}
+    <p className="rc-desc" title={c.description}>
+      {c.description?.length > 110 ? c.description.slice(0, 110) + "…" : c.description}
+    </p>
+
+    {/* meta */}
+    <div className="rc-meta">
+      <span className="rc-date" title={new Date(c.createdAt).toLocaleString()}>
+        Joined: {new Date(c.createdAt).toLocaleDateString()}
+      </span>
+      <span className="rc-enrolled">
+        {(c.enrolledStudents?.length ?? 0)} enrolled
+      </span>
+    </div>
+  </article>
+))}
+
     </div>
   )}
 </div>

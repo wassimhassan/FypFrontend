@@ -232,7 +232,7 @@ body {
   }
 
   .registered-courses {
-  max-width: 860px;
+  max-width: 960px;
   margin: 24px auto 0;
   background: #fff;
   border-radius: 16px;
@@ -268,8 +268,16 @@ body {
 
 .rc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 14px;
+}
+
+/* responsive fallbacks */
+@media (max-width: 980px){
+  .rc-grid{ grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px){
+  .rc-grid{ grid-template-columns: 1fr; }
 }
 
 .rc-card {
@@ -332,3 +340,38 @@ body {
   color: #64748b;
 }
 
+/* new bits for enriched card */
+.rc-type{
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color:#3730a3;
+  border: 1px solid #e5e7eb;
+}
+
+.rc-instructor{
+  color:#475569;
+  font-size: .9rem;
+  margin: 2px 0 6px;
+}
+
+.rc-info{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:.9rem;
+  color:#475569;
+  margin: 6px 0 8px;
+}
+
+.rc-level{
+  display:inline-block;
+  font-size: .78rem;
+  padding: 3px 8px;
+  border-radius: 8px;
+  background:#f1f5f9;
+  color:#0f172a;
+  border:1px solid #e2e8f0;
+  margin-bottom: 6px;
+}

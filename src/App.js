@@ -35,7 +35,7 @@ function App() {
         <Route path="/profile" element={<ProfileCard />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
-       <Route path="/teacher" element={<Teacher />} />
+       <Route path="/teacherHomePage" element={<Teacher />} />
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}>
         
