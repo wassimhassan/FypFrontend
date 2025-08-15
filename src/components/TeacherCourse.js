@@ -1,7 +1,8 @@
+
 import React from "react";
 import "./TeacherCourse.css";
 
-export default function TeacherCourse({ course, onEdit, onDelete }) {
+export default function TeacherCourse({ course, onEdit, onDelete, onManage }) {
   return (
     <div className="course-card">
       <div className="card-hover-buttons">
@@ -24,7 +25,7 @@ export default function TeacherCourse({ course, onEdit, onDelete }) {
       </div>
 
       <span className="course-level">{course.level}</span>
-      <button className="course-btn">Manage Course</button>
+      <button className="course-btn" onClick={() => onManage?.(course)}>Manage Course</button>
     </div>
   );
 }

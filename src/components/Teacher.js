@@ -4,10 +4,13 @@ import TeacherCourse from "./TeacherCourse";
 import "./Teacher.css";
 import axios from "axios";
 import NavBar from "./NavBar";
+import { useNavigate } from "react-router-dom";
+
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Teacher() {
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
@@ -148,6 +151,7 @@ if (!Number.isFinite(d) || d < 1) {
               });
               setCourses((prev) => prev.filter((c) => c._id !== course._id));
             }}
+            onManage={() => navigate(`/teacherHomePage/courses/${course._id}/manage`)} // ✅ go to manage page
           />
         ))}
       </main>

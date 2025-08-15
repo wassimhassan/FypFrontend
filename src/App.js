@@ -7,6 +7,8 @@ import ChangePassword from "./components/ChangePassword.js";
 import WelcomePage from "./components/WelcomePage";
 import ProfileCard from "./components/ProfileCard.js";
 import HomePage from "./components/HomePage.js";
+import ManageCourse from "./components/ManageCourse.js";
+import CourseView from "./components/CourseView.js";
 
 import Admin from "./components/Admin.js";               // <-- acts as layout
 import ReviewDashboard from "./components/ReviewDashboard.js";
@@ -35,7 +37,10 @@ function App() {
         <Route path="/profile" element={<ProfileCard />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/change-password" element={<ChangePassword />} />
-       <Route path="/teacherHomePage" element={<Teacher />} />
+        <Route path="/teacherHomePage" element={<Teacher />} />
+        <Route path="/teacherHomePage/courses/:courseId/manage" element={<ManageCourse />} />
+        <Route path="/courses/:courseId" element={<CourseView />} />
+
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}>
         
