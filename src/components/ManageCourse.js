@@ -2,6 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import './ManageCourse.css';
+import NavBar from './NavBar';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -73,6 +75,9 @@ export default function ManageCourse() {
   };
 
   return (
+    <>
+    <NavBar />
+    <div className='BG'>
     <div className="manage-wrap">
       <h2>Manage Course Files</h2>
 
@@ -103,5 +108,7 @@ export default function ManageCourse() {
         ))}
       </ul>
     </div>
+    </div>
+    </>
   );
 }

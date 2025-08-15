@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./CoursePage.css"
+import NavBar from "./NavBar";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,6 +20,8 @@ export default function CoursesPage() {
   }, []);
 
   return (
+    <>
+    <NavBar />
     <div className="courses-page">
       <h2>My Courses</h2>
       {courses.length === 0 ? (
@@ -36,5 +40,6 @@ export default function CoursesPage() {
         </ul>
       )}
     </div>
+    </>
   );
 }

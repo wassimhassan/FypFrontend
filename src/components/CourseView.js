@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import "./CourseView.css";
+import NavBar from "./NavBar";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -17,6 +19,9 @@ export default function CourseView() {
   }, [courseId]);
 
   return (
+    <>
+    <NavBar />
+    <div className="B">
     <div className="manage-wrap">
       <h2>Course Files</h2>
       {!files.length ? (
@@ -32,5 +37,7 @@ export default function CourseView() {
         </ul>
       )}
     </div>
+    </div>
+    </>
   );
 }
