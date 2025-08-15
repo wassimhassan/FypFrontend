@@ -8,6 +8,7 @@ import WelcomePage from "./components/WelcomePage";
 import ProfileCard from "./components/ProfileCard.js";
 import HomePage from "./components/HomePage.js";
 import ManageCourse from "./components/ManageCourse.js";
+import CoursesPage from "./components/CoursesPage";
 import CourseView from "./components/CourseView.js";
 
 import Admin from "./components/Admin.js";               // <-- acts as layout
@@ -39,6 +40,7 @@ function App() {
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/teacherHomePage" element={<Teacher />} />
         <Route path="/teacherHomePage/courses/:courseId/manage" element={<ManageCourse />} />
+        <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:courseId" element={<CourseView />} />
 
         {/* Admin layout + nested dashboards */}. . 

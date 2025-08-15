@@ -78,6 +78,17 @@ function NavBar() {
         ) : (
           // ✅ Logged-in: always show BOTH Homepage and Profile
           <>
+
+              {/* Show "Courses" only for students */}
+            {user?.role === "student" && (
+            <button
+             className="btn-outline"
+             onClick={() => navigate("/courses")}
+              >
+            Courses
+          </button>
+          )}
+          
             <button
               className="btn-outline"
               onClick={goHome}
