@@ -72,3 +72,71 @@
   border-radius: 14px;
   padding: 20px;
 }
+
+.reviews-wrap {
+  margin-top: 24px;
+  background: var(--card, #d0d6e3);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.rating-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.rating-left {
+  font-size: 20px;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.rating-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stars {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.star {
+  font-size: 24px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 120ms ease-in-out;
+  color: #9fb0d0;
+}
+
+.star.on {
+  transform: scale(1.06);
+  color: gold;
+}
+
+.small {
+  font-size: 0.9em;
+}
+
+.muted {
+  opacity: 0.7;
+}
+
+/* tiny link-style button */
+.btn-link {
+  background: none; border: 0; padding: 0 6px;
+  cursor: pointer; text-decoration: underline; font: inherit;
+  color: var(--text, #e8f0ff);
+}
+.btn-link.small { font-size: 0.9em; }
+.btn-link.danger { color: #ff6b6b; }
+.btn-link:disabled, .btn-link[aria-disabled="true"] {
+  opacity: .6; cursor: default; text-decoration: none;
+}

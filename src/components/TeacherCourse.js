@@ -21,8 +21,8 @@ export default function TeacherCourse({ course, onEdit, onDelete, onAction, butt
 
       <div className="course-info">
         <span>⏱ {course.durationDays} days</span>
-        <span>👥 {course.studentsCount ?? course.enrolledStudents?.length ?? 0}</span>
-        <span>⭐ {course.ratingAvg ?? 0}</span>
+        <span>👥 {course.enrolledStudents?.length ?? 0}</span>
+        <span>⭐ {course.ratingAvg ?? 0}/5 ({course?.ratingCount ?? 0})</span>
       </div>
 
       <span className="course-level">{course.level}</span>

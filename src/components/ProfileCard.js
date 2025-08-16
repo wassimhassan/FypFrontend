@@ -281,7 +281,7 @@ const ProfileCard = () => {
     <div className="rc-info">
       <span title={`${c.durationDays} days`}>⏱ {c.durationDays} d</span>
       <span>👥 {(c.enrolledStudents?.length ?? 0)}</span>
-      <span>⭐ {c.ratingAvg ?? 0}</span>
+      <span>⭐ {c.ratingAvg ?? 0}/5 ({c?.ratingCount ?? 0})</span>
     </div>
 
     {/* level pill */}
