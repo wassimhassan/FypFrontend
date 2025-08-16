@@ -2,14 +2,15 @@
 import React from "react";
 import "./TeacherCourse.css";
 
-export default function TeacherCourse({ course, onEdit, onDelete, onManage }) {
+export default function TeacherCourse({ course, onEdit, onDelete, onAction, buttonLabel }) {
   return (
     <div className="course-card">
+      {(onEdit || onDelete) && (
       <div className="card-hover-buttons">
         <button className="edit-btn" onClick={onEdit}>✎</button>
         <button className="delete-btn" onClick={onDelete}>🗑</button>
       </div>
-
+      )}
       <div className="course-header">
         <span className="course-type">{course.category}</span>
         <span className={`course-price ${course.price === "Free" ? "free" : "paid"}`}>{course.price}</span>
@@ -25,7 +26,7 @@ export default function TeacherCourse({ course, onEdit, onDelete, onManage }) {
       </div>
 
       <span className="course-level">{course.level}</span>
-      <button className="course-btn" onClick={() => onManage?.(course)}>Manage Course</button>
+      <button className="course-btn" onClick={() => onAction?.(course)}>{buttonLabel}</button>
     </div>
   );
 }

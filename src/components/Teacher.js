@@ -151,7 +151,8 @@ if (!Number.isFinite(d) || d < 1) {
               });
               setCourses((prev) => prev.filter((c) => c._id !== course._id));
             }}
-            onManage={() => navigate(`/teacherHomePage/courses/${course._id}/manage`)} // ✅ go to manage page
+            onAction={() => navigate(`/teacherHomePage/courses/${course._id}/manage`)} // ✅ go to manage page
+            buttonLabel="Manage Course"
           />
         ))}
       </main>

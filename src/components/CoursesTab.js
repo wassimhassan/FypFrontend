@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './CoursesTab.css';
-import CourseCard from '../components/CourseCard';
+import TeacherCourse from '../components/TeacherCourse';
 import axios from 'axios';
 
 export default function CoursesTab() {
@@ -25,11 +25,10 @@ export default function CoursesTab() {
       <p>Explore our featured courses to boost your skills.</p>
       <div className="card-row">
         {courses.map((course) => (
-          <CourseCard
-            key={course._id}
-            title={course.title}
-            description={course.description}
-            badge={course.price}
+          <TeacherCourse
+          key={course._id}
+          course={course}
+          buttonLabel="View/Enroll"
           />
         ))}
       </div>
