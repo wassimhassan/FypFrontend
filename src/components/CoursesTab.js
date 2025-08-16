@@ -28,7 +28,7 @@ export default function CoursesTab() {
           <TeacherCourse
           key={course._id}
           course={course}
-          buttonLabel="View/Enroll"
+          buttonLabel="View / Enroll"
           />
         ))}
       </div>
