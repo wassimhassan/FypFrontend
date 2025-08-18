@@ -33,7 +33,6 @@ body {
   box-shadow: 0 10px 30px rgba(32, 67, 142, 0.1);
   border: 1px solid #e2e8f0;
 }
-
 .Login-logo-box img {
   max-width: 100%;
   height: auto;
@@ -49,30 +48,32 @@ body {
   padding: 40px;
   width: 400px;
   color: #1f2937;
-  margin-left: -100px;
+  margin-left: -60px; /* slight overlap on wide screens */
   position: relative;
   z-index: 1;
   box-shadow: 0 20px 40px rgba(32, 67, 142, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
-
 .Login-form-box h1 {
-  margin-right: -25px;
+  margin: 0 0 30px 0;
   font-size: 36px;
   font-weight: 700;
   color: #20438e;
   text-align: center;
-  margin-bottom: 30px;
 }
 
+/* Fluid form */
 .Login-form-box form {
   display: flex;
   flex-direction: column;
-  width: 350px;
-  margin-left: 40px;
+  width: 100%;
+  margin-left: 0;
 }
 
+/* Inputs */
 .Login-form-box input {
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(248, 250, 252, 0.8);
   border: 2px solid #e2e8f0;
   border-radius: 8px;
@@ -82,19 +83,18 @@ body {
   font-size: 16px;
   transition: all 0.3s ease;
 }
-
 .Login-form-box input:focus {
   outline: none;
   border-color: #20438e;
   background: #fff;
   box-shadow: 0 0 0 3px rgba(32, 67, 142, 0.1);
 }
-
 .Login-form-box input::placeholder {
   color: #6b7280;
   font-weight: 500;
 }
 
+/* Submit button */
 .Login-form-box button {
   background: linear-gradient(135deg, #20438e 0%, #1e3a8a 100%);
   border: none;
@@ -107,57 +107,37 @@ body {
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(32, 67, 142, 0.3);
 }
-
 .Login-form-box button:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(32, 67, 142, 0.4);
 }
-
 .Login-form-box button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
+/* Footer below form */
 .Login-data {
   display: flex;
   justify-content: space-around;
   font-size: 14px;
   text-align: center;
   margin-top: 20px;
-  margin-right: -35px;
   gap: 20px;
 }
-
-.Login-data p {
-  color: #475569;
-  margin: 0;
-}
-
+.Login-data p { color: #475569; margin: 0; }
 .Login-data a {
   color: #20438e;
   text-decoration: none;
   font-weight: 500;
   transition: color 0.3s ease;
 }
+.Login-data a:hover { color: #1e3a8a; text-decoration: underline; }
+.link-button { color: #20438e !important; cursor: pointer; font-weight: 500; }
+.link-button:hover { color: #1e3a8a !important; text-decoration: underline; }
 
-.Login-data a:hover {
-  color: #1e3a8a;
-  text-decoration: underline;
-}
-
-.link-button {
-  color: #20438e !important;
-  cursor: pointer;
-  font-weight: 500;
-  transition: color 0.3s ease;
-}
-
-.link-button:hover {
-  color: #1e3a8a !important;
-  text-decoration: underline;
-}
-
+/* Flash messages */
 .error-message {
   color: #dc2626;
   font-size: 14px;
@@ -167,7 +147,6 @@ body {
   border: 1px solid #fecaca;
   border-radius: 6px;
 }
-
 .success-message {
   color: #059669;
   font-size: 14px;
@@ -178,104 +157,137 @@ body {
   border-radius: 6px;
 }
 
-/* Modal styles */
+/* ================= Modal (centered, tidy) ================= */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(2px);
   z-index: 1000;
 }
 
 .modal {
-  background: white;
-  padding: 30px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
-
-.modal h3 {
-  color: #20438e;
-  margin-bottom: 15px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.modal p {
-  color: #475569;
-  margin-bottom: 20px;
-  line-height: 1.5;
-}
-
-.modal input {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e2e8f0;
-  border-radius: 8px;
-  margin-bottom: 15px;
-  font-size: 16px;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: 0;
   box-sizing: border-box;
+
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 20px 60px rgba(2, 6, 23, 0.35);
+
+  display: flex;
+  flex-direction: column;
+  animation: modalSlideUp .18s ease-out;
 }
 
-.modal input:focus {
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px 20px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  border-bottom: 1px solid #e5e7eb;
+}
+.modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e3a8a;
+}
+.modal-close {
+  appearance: none;
+  border: none;
+  background: #e2e8f0;
+  color: #0f172a;
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .1s ease;
+}
+.modal-close:hover { background: #cbd5e1; transform: translateY(-1px); }
+
+.modal-body {
+  padding: 18px 20px 6px 20px;
+}
+.modal-body p {
+  color: #475569;
+  margin: 0 0 12px 0;
+  line-height: 1.45;
+}
+.modal-body input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 16px;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.modal-body input:focus {
   outline: none;
   border-color: #20438e;
-  box-shadow: 0 0 0 3px rgba(32, 67, 142, 0.1);
+  box-shadow: 0 0 0 3px rgba(32, 67, 142, 0.12);
 }
 
-.modal button {
-  background: #20438e;
-  color: white;
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  padding: 14px 20px 20px 20px;
+  justify-content: flex-end;
+  border-top: 1px solid #f1f5f9;
+}
+.btn-primary,
+.btn-secondary {
+  appearance: none;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-weight: 700;
   cursor: pointer;
-  margin-right: 10px;
-  font-weight: 500;
-  transition: background 0.3s ease;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+.btn-primary {
+  color: #fff;
+  background: linear-gradient(135deg, #20438e, #1e40af);
+  box-shadow: 0 6px 16px rgba(32, 67, 142, 0.25);
+}
+.btn-primary:hover { transform: translateY(-1px); filter: brightness(1.03); }
+.btn-primary:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+.btn-secondary { background: #e2e8f0; color: #0f172a; }
+.btn-secondary:hover { transform: translateY(-1px); }
+
+/* Animation */
+@keyframes modalSlideUp {
+  from { transform: translate(-50%, calc(-50% + 8px)); opacity: .98; }
+  to   { transform: translate(-50%, -50%);            opacity: 1; }
 }
 
-.modal button:hover {
-  background: #1e3a8a;
-}
-
-.modal button:last-child {
-  background: #6b7280;
-}
-
-.modal button:last-child:hover {
-  background: #4b5563;
-}
-
+/* Responsive */
 @media (max-width: 768px) {
   .Login-container {
     flex-direction: column;
     gap: 20px;
     padding: 20px;
   }
-
   .Login-logo-box,
   .Login-form-box {
     width: 100%;
-    max-width: 400px;
-    margin-left: 0;
+    max-width: 420px;
+    margin-left: 0; /* no overlap on mobile */
   }
+  .Login-form-box form { width: 100%; margin-left: 0; }
 
-  .Login-form-box form {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .Login-data {
-    flex-direction: column;
-    gap: 10px;
-    margin-right: 0;
-  }
+  .Login-data { flex-direction: column; gap: 10px; }
 }
