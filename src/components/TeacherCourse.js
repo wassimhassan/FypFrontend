@@ -1,32 +1,56 @@
-
-import React from "react";
-import "./TeacherCourse.css";
+"use client"
+import { FiClock, FiUsers, FiStar, FiEdit3, FiTrash2, FiBookOpen, FiDollarSign } from "react-icons/fi"
+import "./TeacherCourse.css"
 
 export default function TeacherCourse({ course, onEdit, onDelete, onAction, buttonLabel }) {
   return (
-    <div className="course-card">
+    <div className="modern-course-card">
       {(onEdit || onDelete) && (
-      <div className="card-hover-buttons">
-        <button className="edit-btn" onClick={onEdit}>✎</button>
-        <button className="delete-btn" onClick={onDelete}>🗑</button>
-      </div>
+        <div className="course-hover-buttons">
+          <button className="course-edit-btn" onClick={onEdit}>
+            <FiEdit3 />
+          </button>
+          <button className="course-delete-btn" onClick={onDelete}>
+            <FiTrash2 />
+          </button>
+        </div>
       )}
-      <div className="course-header">
-        <span className="course-type">{course.category}</span>
-        <span className={`course-price ${course.price === "Free" ? "free" : "paid"}`}>{course.price}</span>
+
+      <div className="course-card-header">
+        <div className="course-category">
+          <FiBookOpen className="category-icon" />
+          {course.category}
+        </div>
+        <div className={`course-pricing ${course.price === "Free" ? "free" : "paid"}`}>
+          <FiDollarSign className="price-icon" />
+          {course.price}
+        </div>
       </div>
 
-      <h3 className="course-title">{course.title}</h3>
-      <p className="course-instructor">by {course.instructor}</p>
+      <h3 className="course-card-title">{course.title}</h3>
+      <p className="course-card-instructor">by {course.instructor}</p>
 
-      <div className="course-info">
-        <span>⏱ {course.durationDays} days</span>
-        <span>👥 {course.enrolledStudents?.length ?? 0}</span>
-        <span>⭐ {course.ratingAvg ?? 0}/5 ({course?.ratingCount ?? 0})</span>
+      <div className="course-card-stats">
+        <div className="stat-item">
+          <FiClock className="stat-icon" />
+          <span>{course.durationDays} days</span>
+        </div>
+        <div className="stat-item">
+          <FiUsers className="stat-icon" />
+          <span>{course.enrolledStudents?.length ?? 0}</span>
+        </div>
+        <div className="stat-item">
+          <FiStar className="stat-icon" />
+          <span>
+            {course.ratingAvg ?? 0}/5 ({course?.ratingCount ?? 0})
+          </span>
+        </div>
       </div>
 
-      <span className="course-level">{course.level}</span>
-      <button className="course-btn" onClick={() => onAction?.(course)}>{buttonLabel}</button>
+      <div className="course-card-level">{course.level}</div>
+      <button className="course-card-btn" onClick={() => onAction?.(course)}>
+        {buttonLabel}
+      </button>
     </div>
-  );
+  )
 }

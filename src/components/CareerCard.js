@@ -1,32 +1,54 @@
-import React from 'react';
-import './CareersTab.css'; // reuse the same CSS
+import { FiTrendingUp, FiBriefcase, FiDollarSign, FiStar } from "react-icons/fi"
+import "./CareerCard.css"
 
 const CareerCard = ({ major, jobTitle, description, salary, skills, industries, badge }) => {
   return (
-    <div className="card">
+    <div className="career-card">
       {badge && (
-        <div className="card-header">
-          <span className="badge">{badge}</span>
+        <div className="career-badge">
+          <FiStar className="badge-icon" />
+          {badge}
         </div>
       )}
 
-      <button className="major-badge">{major}</button>
-
-      <h4>{jobTitle}</h4>
-      <p>{description}</p>
-      <p><strong>Annual Salary:</strong> {salary}</p>
-
-      <strong>Key Skills:</strong>
-      <div className="skills-container">
-        {skills.map((skill, idx) => (
-          <span key={idx} className="skill-badge">{skill}</span>
-        ))}
+      <div className="career-major">
+        <FiBriefcase className="major-icon" />
+        {major}
       </div>
 
-      <p><strong>Industries:</strong> {industries.join(', ')}</p>
-      <button className="enroll-btn">Learn More</button>
-    </div>
-  );
-};
+      <h4 className="career-title">{jobTitle}</h4>
+      <p className="career-description">{description}</p>
 
-export default CareerCard;
+      <div className="career-salary">
+        <FiDollarSign className="salary-icon" />
+        <span>
+          <strong>Annual Salary:</strong> {salary}
+        </span>
+      </div>
+
+      <div className="career-skills-section">
+        <strong className="skills-label">Key Skills:</strong>
+        <div className="career-skills">
+          {skills.slice(0, 3).map((skill, idx) => (
+            <span key={idx} className="career-skill-tag">
+              {skill}
+            </span>
+          ))}
+          {skills.length > 3 && <span className="skills-more">+{skills.length - 3} more</span>}
+        </div>
+      </div>
+
+      <div className="career-industries">
+        <FiTrendingUp className="industries-icon" />
+        <span>
+          <strong>Industries:</strong> {industries.slice(0, 2).join(", ")}
+        </span>
+        {industries.length > 2 && <span className="industries-more">+{industries.length - 2} more</span>}
+      </div>
+
+      <button className="career-learn-btn">Learn More</button>
+    </div>
+  )
+}
+
+export default CareerCard
