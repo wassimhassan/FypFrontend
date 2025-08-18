@@ -1,23 +1,27 @@
+/* Card shell – same rhythm as university cards */
+/* Card shell */
 .modern-course-card {
-  position: relative;
-  width: 320px;
-  height: 380px;
-  background: #ffffff;
+  position: relative;            /* needed for absolute button */
+  width: 100%;
+  height: 420px;
+  background: linear-gradient(135deg,#fff 0%,#f8fafc 100%);
   border-radius: 16px;
-  padding: 24px;
+  padding: 20px;
+  padding-bottom: 76px;          /* reserve room for button */
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(32,67,142,.10);
   border: 1px solid #e2e8f0;
-  transition: all 0.3s ease;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
   overflow: hidden;
 }
-
 .modern-course-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(32, 67, 142, 0.15);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(32, 67, 142, 0.18);
+  border-color: #20438e;
 }
 
+/* Hover edit/delete */
 .course-hover-buttons {
   position: absolute;
   top: 12px;
@@ -25,172 +29,169 @@
   display: flex;
   gap: 6px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity .2s ease;
 }
+.modern-course-card:hover .course-hover-buttons { opacity: 1; }
 
-.modern-course-card:hover .course-hover-buttons {
-  opacity: 1;
-}
-
-.course-edit-btn {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.course-edit-btn:hover {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  transform: scale(1.05);
-}
-
+.course-edit-btn,
 .course-delete-btn {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
   border: none;
   padding: 8px;
   border-radius: 8px;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: transform .15s ease, filter .15s ease;
 }
+.course-edit-btn { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.course-edit-btn:hover { transform: scale(1.05); filter: brightness(0.95); }
+.course-delete-btn { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.course-delete-btn:hover { transform: scale(1.05); filter: brightness(0.95); }
 
-.course-delete-btn:hover {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  transform: scale(1.05);
-}
-
+/* Header chips */
 .course-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .course-category {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
   background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
   color: #0277bd;
   padding: 8px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  border: 1px solid #29b6f6;
-}
-
-.category-icon {
-  width: 14px;
-  height: 14px;
-}
-
-.course-pricing {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+  border: 1px solid #29b6f6;
 }
+.category-icon { font-size: 14px; }
 
+.course-pricing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
 .course-pricing.free {
   background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   color: #166534;
   border: 1px solid #22c55e;
 }
-
 .course-pricing.paid {
   background: linear-gradient(135deg, #fef3c7, #fed7aa);
   color: #92400e;
   border: 1px solid #fbbf24;
 }
+.price-icon { font-size: 14px; }
 
-.price-icon {
-  width: 14px;
-  height: 14px;
-}
-
+/* Title & instructor */
 .course-card-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  margin: 0 0 8px 0;
-  line-height: 1.3;
+  font-size: 18px;
+  font-weight: 800;
+  color: #20438e;
+  margin: 0 0 6px 0;
+  line-height: 1.25;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
-
 .course-card-instructor {
   font-size: 14px;
   color: #64748b;
-  margin: 0 0 20px 0;
+  margin: 0 0 10px 0;
   font-style: italic;
 }
 
+/* Stats – uniform tiles like universities */
 .course-card-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex: 1 1 auto;                     /* pushes level + button down */
 }
 
-.stat-item {
+.stat-tile {
+  display: grid;
+  grid-template-columns: 40px 1fr;    /* fixed icon box */
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  min-height: 64px;                   /* same height across tiles */
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+}
+.stat-ico {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #1e3a8a;
+  font-size: 16px;
+}
+.stat-text {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+}
+.stat-label {
   font-size: 12px;
-  color: #64748b;
+  color: #6b7280;
+  font-weight: 700;
+}
+.stat-value {
+  font-size: 15px;
+  color: #0f172a;
+  font-weight: 900;
 }
 
-.stat-icon {
-  width: 14px;
-  height: 14px;
-  color: #20438e;
-}
-
+/* Level chip */
 .course-card-level {
   display: inline-block;
   background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
   color: #0369a1;
   padding: 8px 12px;
-  border-radius: 20px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
   width: fit-content;
   border: 1px solid #0ea5e9;
 }
-
+/* CTA pinned to bottom – ALWAYS visible */
 .course-card-btn {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  margin-top: 0;                 /* no auto margin anymore */
   background: linear-gradient(135deg, #20438e, #1e40af);
-  color: white;
+  color: #fff;
   border: none;
-  padding: 12px 24px;
-  border-radius: 10px;
-  font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 800;
   font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: auto;
+  box-shadow: 0 4px 12px rgba(32,67,142,.25);
+  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  z-index: 2;                    /* sits above any decoration */
 }
-
 .course-card-btn:hover {
-  background: linear-gradient(135deg, #1e40af, #1d4ed8);
   transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 6px 16px rgba(32,67,142,.35);
 }

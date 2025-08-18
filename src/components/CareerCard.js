@@ -1,7 +1,11 @@
-import { FiTrendingUp, FiBriefcase, FiDollarSign, FiStar } from "react-icons/fi"
-import "./CareerCard.css"
+import { FiTrendingUp, FiBriefcase, FiDollarSign, FiStar } from "react-icons/fi";
+import "./CareerCard.css";
 
-const CareerCard = ({ major, jobTitle, description, salary, skills, industries, badge }) => {
+const CareerCard = ({ major, jobTitle, salary, skills = [], industries = [], badge }) => {
+  const primarySkills = skills.slice(0, 3);
+  const extraSkills = skills.slice(3);
+  const fullSkillsText = skills.join(", ");
+
   return (
     <div className="career-card">
       {badge && (
@@ -17,38 +21,57 @@ const CareerCard = ({ major, jobTitle, description, salary, skills, industries, 
       </div>
 
       <h4 className="career-title">{jobTitle}</h4>
-      <p className="career-description">{description}</p>
 
-      <div className="career-salary">
-        <FiDollarSign className="salary-icon" />
-        <span>
-          <strong>Annual Salary:</strong> {salary}
-        </span>
-      </div>
-
-      <div className="career-skills-section">
-        <strong className="skills-label">Key Skills:</strong>
-        <div className="career-skills">
-          {skills.slice(0, 3).map((skill, idx) => (
-            <span key={idx} className="career-skill-tag">
-              {skill}
-            </span>
-          ))}
-          {skills.length > 3 && <span className="skills-more">+{skills.length - 3} more</span>}
+      <div className="career-tile">
+        <div className="tile-ico salary-ico">
+          <FiDollarSign />
+        </div>
+        <div className="tile-text">
+          <span className="tile-label">Annual Salary</span>
+          <span className="tile-value">{salary || "—"}</span>
         </div>
       </div>
 
-      <div className="career-industries">
-        <FiTrendingUp className="industries-icon" />
-        <span>
-          <strong>Industries:</strong> {industries.slice(0, 2).join(", ")}
-        </span>
-        {industries.length > 2 && <span className="industries-more">+{industries.length - 2} more</span>}
+      {/* Key Skills – 2-line clamp + “+N more” with hover tooltip */}
+      <div className="career-tile">
+        <div className="tile-ico skills-ico">
+          <FiStar />
+        </div>
+        <div className="tile-text">
+          <span className="tile-label">Key Skills</span>
+          <div className="skills-line">
+            <span className="tile-value skills-clamp">
+              {primarySkills.length ? primarySkills.join(", ") : "—"}
+            </span>
+            {extraSkills.length > 0 && (
+              <span
+                className="skills-more-badge"
+                data-tooltip={fullSkillsText}
+                aria-label={fullSkillsText}
+              >
+                +{extraSkills.length} more
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="career-tile">
+        <div className="tile-ico industries-ico">
+          <FiTrendingUp />
+        </div>
+        <div className="tile-text">
+          <span className="tile-label">Industries</span>
+          <span className="tile-value">
+            {industries.slice(0, 2).join(", ") || "—"}
+            {industries.length > 2 && ` +${industries.length - 2} more`}
+          </span>
+        </div>
       </div>
 
       <button className="career-learn-btn">Learn More</button>
     </div>
-  )
-}
+  );
+};
 
-export default CareerCard
+export default CareerCard;

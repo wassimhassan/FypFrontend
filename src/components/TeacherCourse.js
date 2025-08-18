@@ -1,56 +1,138 @@
-"use client"
-import { FiClock, FiUsers, FiStar, FiEdit3, FiTrash2, FiBookOpen, FiDollarSign } from "react-icons/fi"
-import "./TeacherCourse.css"
+"use client";
+import {
+  FiClock,
+  FiUsers,
+  FiStar,
+  FiEdit3,
+  FiTrash2,
+  FiBookOpen,
+  FiDollarSign,
+} from "react-icons/fi";
+import "./TeacherCourse.css";
 
-export default function TeacherCourse({ course, onEdit, onDelete, onAction, buttonLabel }) {
+export default function TeacherCourse({
+  course,
+  onEdit,
+  onDelete,
+  onAction,
+  buttonLabel,
+}) {
+  // ---- Safe formatting (prevents NaN / undefined showing) ----
+  const durationDays =
+    typeof course?.durationDays === "number"
+      ? course.durationDays
+      : Number(course?.durationDays) || 0;
+
+  const enrolled =
+    Array.isArray(course?.enrolledStudents)
+      ? course.enrolledStudents.length
+      : Number(course?.enrolledStudents) || 0;
+
+  const ratingAvg =
+    typeof course?.ratingAvg === "number"
+      ? course.ratingAvg
+      : Number(course?.ratingAvg) || 0;
+
+  const ratingCount =
+    typeof course?.ratingCount === "number"
+      ? course.ratingCount
+      : Number(course?.ratingCount) || 0;
+
+  const priceRaw = course?.price;
+  const priceDisplay =
+    priceRaw === "Free" || priceRaw === 0
+      ? "Free"
+      : typeof priceRaw === "number"
+      ? `$${priceRaw.toLocaleString()}`
+      : String(priceRaw || "—");
+
   return (
     <div className="modern-course-card">
       {(onEdit || onDelete) && (
         <div className="course-hover-buttons">
-          <button className="course-edit-btn" onClick={onEdit}>
-            <FiEdit3 />
-          </button>
-          <button className="course-delete-btn" onClick={onDelete}>
-            <FiTrash2 />
-          </button>
+          {onEdit && (
+            <button className="course-edit-btn" onClick={onEdit} aria-label="Edit">
+              <FiEdit3 />
+            </button>
+          )}
+          {onDelete && (
+            <button className="course-delete-btn" onClick={onDelete} aria-label="Delete">
+              <FiTrash2 />
+            </button>
+          )}
         </div>
       )}
 
+      {/* Header chips */}
       <div className="course-card-header">
         <div className="course-category">
           <FiBookOpen className="category-icon" />
-          {course.category}
+          {course?.category || "General"}
         </div>
-        <div className={`course-pricing ${course.price === "Free" ? "free" : "paid"}`}>
+
+        <div
+          className={`course-pricing ${
+            priceDisplay === "Free" ? "free" : "paid"
+          }`}
+          title={`Price: ${priceDisplay}`}
+        >
           <FiDollarSign className="price-icon" />
-          {course.price}
+          {priceDisplay}
         </div>
       </div>
 
-      <h3 className="course-card-title">{course.title}</h3>
-      <p className="course-card-instructor">by {course.instructor}</p>
+      {/* Title + Instructor */}
+      <h3 className="course-card-title">{course?.title || "Untitled course"}</h3>
+      <p className="course-card-instructor">
+        by {course?.instructor || "Unknown"}
+      </p>
 
+      {/* Stats tiles (uniform height & aligned like universities) */}
       <div className="course-card-stats">
-        <div className="stat-item">
-          <FiClock className="stat-icon" />
-          <span>{course.durationDays} days</span>
+        <div className="stat-tile">
+          <div className="stat-ico">
+            <FiClock />
+          </div>
+          <div className="stat-text">
+            <span className="stat-label">Duration</span>
+            <span className="stat-value">{durationDays} days</span>
+          </div>
         </div>
-        <div className="stat-item">
-          <FiUsers className="stat-icon" />
-          <span>{course.enrolledStudents?.length ?? 0}</span>
+
+        <div className="stat-tile">
+          <div className="stat-ico">
+            <FiUsers />
+          </div>
+          <div className="stat-text">
+            <span className="stat-label">Students</span>
+            <span className="stat-value">{enrolled.toLocaleString()}</span>
+          </div>
         </div>
-        <div className="stat-item">
-          <FiStar className="stat-icon" />
-          <span>
-            {course.ratingAvg ?? 0}/5 ({course?.ratingCount ?? 0})
-          </span>
+
+        <div className="stat-tile">
+          <div className="stat-ico">
+            <FiStar />
+          </div>
+          <div className="stat-text">
+            <span className="stat-label">Rating</span>
+            <span className="stat-value">
+              {ratingAvg.toFixed(1)}/5 ({ratingCount})
+            </span>
+          </div>
         </div>
       </div>
 
-      <div className="course-card-level">{course.level}</div>
-      <button className="course-card-btn" onClick={() => onAction?.(course)}>
+      {/* Level chip */}
+      <div className="course-card-level">{course?.level || "All levels"}</div>
+
+      {/* CTA pinned to bottom */}
+      <button
+        className="course-card-btn"
+        onClick={() => onAction?.(course)}
+        aria-label={buttonLabel}
+      >
         {buttonLabel}
       </button>
     </div>
-  )
+  );
 }
