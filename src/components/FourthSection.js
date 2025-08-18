@@ -142,9 +142,20 @@ const FourthSection = () => {
         />
       </div>
 
-      <button className="write-review-btn" onClick={() => setShowModal(true)}>
-        Write a Review
-      </button>
+<button
+  className="write-review-btn"
+  onClick={() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You must be logged in to write a review.");
+      window.location.href = "/login"; // 🔒 redirect to login
+      return;
+    }
+    setShowModal(true);
+  }}
+>
+  Write a Review
+</button>
 
       {/* Write Modal */}
       {showModal && (

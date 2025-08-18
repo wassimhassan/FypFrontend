@@ -22,6 +22,7 @@ import UniversityDashboard from "./components/UniversityDashboard.js";
 import CareerDashboard from "./components/CareerDashboard.js";
 import Teacher from "./components/Teacher.js"; // ✅ import the component
 import "./components/Teacher.css";             // ✅ import the CSS
+import Chatbot from "./components/Chatbot.js";
 
 
 
@@ -42,6 +43,7 @@ function App() {
         <Route path="/teacherHomePage/courses/:courseId/manage" element={<ManageCourse />} />
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:courseId" element={<CourseView />} />
+        <Route path="chatbot" element={<Chatbot />} />
 
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}>
