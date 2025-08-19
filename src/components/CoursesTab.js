@@ -91,6 +91,8 @@ useEffect(() => {
         course={selected}
         onClose={closeModal}
         onEnroll={handleEnroll}
+        loading={enrolling}
+        error={enrollError}
       />
     </section>
   );
