@@ -1,0 +1,49 @@
+.upcoming-events {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.upcoming-events h3 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #20438E;
+  margin-bottom: 0.5rem;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.event-card {
+  border: 1px solid #e2e8f0; /* slate-200 */
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: box-shadow 0.2s;
+}
+
+.event-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-card h4 {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.event-card p {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.event-card button {
+  margin-top: 0.25rem;
+  background-color: #20438E;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}

@@ -10,7 +10,7 @@ import HomePage from "./components/HomePage.js";
 import ManageCourse from "./components/ManageCourse.js";
 import CoursesPage from "./components/CoursesPage";
 import CourseView from "./components/CourseView.js";
-
+import DashboardPage from "./components/DashboardPage";
 import Admin from "./components/Admin.js";               // <-- acts as layout
 import ReviewDashboard from "./components/ReviewDashboard.js";
 import TeacherDashboard from "./components/TeacherDashboard.js";
@@ -44,7 +44,7 @@ function App() {
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:courseId" element={<CourseView />} />
         <Route path="chatbot" element={<Chatbot />} />
-
+        <Route path="/calendar" element={<DashboardPage />} />
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}>
         
