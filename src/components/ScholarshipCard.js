@@ -17,7 +17,6 @@ const ScholarshipCard = ({ badge, amount, title, description, requirements }) =>
           {badge || "Scholarship"}
         </div>
         <div className="scholarship-amount">
-          <FiDollarSign className="amount-icon" />
           {formatAmount(amount)}
         </div>
       </div>

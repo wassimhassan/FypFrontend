@@ -116,14 +116,13 @@ export default function TeacherCourse({
           <div className="stat-text">
             <span className="stat-label">Rating</span>
             <span className="stat-value">
-              {ratingAvg.toFixed(1)}/5 ({ratingCount})
+              {ratingAvg}/5 ({ratingCount})
             </span>
           </div>
         </div>
       </div>
 
-      {/* Level chip */}
-      <div className="course-card-level">{course?.level || "All levels"}</div>
+     
 
       {/* CTA pinned to bottom */}
       <button
