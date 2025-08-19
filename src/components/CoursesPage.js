@@ -1,32 +1,45 @@
-import React from "react";
-import "./CoursePage.css";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "./CoursePage.css"
+import NavBar from "./NavBar";
 
-export default function StudentCourse({ course, onAction, buttonLabel }) {
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+export default function CoursesPage() {
+  const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    axios.get(`${API}/courses/my`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => setCourses(res.data))
+      .catch(console.error);
+  }, []);
+
   return (
-    <div className="course-card">
-      <div className="course-header">
-        <span className="course-type">{course.category}</span>
-        <span className={`course-price ${course.price === "Free" ? "free" : "paid"}`}>
-          {course.price}
-        </span>
-      </div>
-
-      <h3 className="course-title">{course.title}</h3>
-      <p className="course-instructor">by {course.instructor}</p>
-
-      <div className="course-info">
-        <span>⏱ {course.durationDays} days</span>
-        <span>👥 {course.studentsCount ?? course.enrolledStudents?.length ?? 0}</span>
-        <span>⭐ {course.ratingAvg ?? 0}</span>
-      </div>
-
-      <span className="course-level">{course.level}</span>
-      <button
-        className="course-btn"
-        onClick={() => onAction?.(course)}
-      >
-        {buttonLabel}
-      </button>
+    <>
+    <NavBar />
+    <div className="courses-page">
+      <h2>My Courses</h2>
+      {courses.length === 0 ? (
+        <p>No registered courses yet.</p>
+      ) : (
+        <ul>
+          {courses.map(course => (
+            <li
+              key={course._id}
+              style={{ cursor: "pointer", color: "blue" }}
+              onClick={() => navigate(`/courses/${course._id}`)}
+            >
+              {course.title}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
+    </>
   );
 }
