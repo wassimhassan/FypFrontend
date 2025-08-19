@@ -1,6 +1,4 @@
-// ===============================
-// ViewEnrollModal.jsx
-// ===============================
+
 import React, { useEffect } from "react";
 import "./ViewEnrollModal.css";
 
