@@ -288,3 +288,19 @@
     font-size: 13px;
   }
 }
+
+.manage-actions {
+  display: flex;
+  gap: 12px; /* space between the two buttons */
+}
+
+/* Green Enrolled button (overrides the orange base) */
+.enrollment-toggle-btn.Enrolled {
+  background: linear-gradient(180deg, #10b981, #059669);
+  border: 1px solid rgba(16,185,129,.5);
+}
+
+.enrollment-toggle-btn.Enrolled:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(16,185,129,.3);
+}

@@ -5,6 +5,7 @@ import axios from 'axios';
 import './ManageCourse.css';
 import NavBar from './NavBar';
 import EnrollmentRequests from './EnrollmentRequests';
+import EnrolledStudents     from './EnrolledStudents';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -14,6 +15,7 @@ export default function ManageCourse() {
   const [list, setList] = useState([]);
   const [course, setCourse] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
+  const [showEnrolledSidebar, setShowEnrolled] = useState(false);
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
   const fileInputRef = useRef(null);
@@ -99,15 +101,23 @@ export default function ManageCourse() {
           <div className="manage-header">
             <h2>Manage Course Files</h2>
             {course && (
-              <button 
-                className="enrollment-toggle-btn"
-                onClick={() => setShowSidebar(!showSidebar)}
-              >
-                {showSidebar ? 'Hide' : 'Show'} Enrollment Requests 
-                {course.pendingStudents && course.pendingStudents.length > 0 && (
-                  <span className="pending-badge">{course.pendingStudents.length}</span>
-                )}
-              </button>
+              <div className="manage-actions">
+        <button 
+          className="enrollment-toggle-btn"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          {showSidebar ? 'Hide' : 'Show'} Enrollment Requests
+          {course.pendingStudents && course.pendingStudents.length > 0 && (
+            <span className="pending-badge">{course.pendingStudents.length}</span>
+          )}
+        </button>
+        <button
+          className="enrollment-toggle-btn Enrolled"
+          onClick={() => setShowEnrolled(!showEnrolledSidebar)}
+        >
+          {showEnrolledSidebar ? 'Hide' : 'Show'} Enrolled Students
+        </button>
+      </div>
             )}
           </div>
 
@@ -161,6 +171,18 @@ export default function ManageCourse() {
             </div>
           </div>
         )}
+        {/* Sidebar for enrolled students */}
+  {showEnrolledSidebar && (
+    <div className="manage-sidebar">
+      <div className="sidebar-header">
+        <h3>Enrolled Students</h3>
+        <button className="close-sidebar-btn" onClick={() => setShowEnrolled(false)}>×</button>
+      </div>
+      <div className="sidebar-content">
+        <EnrolledStudents courseId={courseId} onUpdate={fetchCourse} />
+      </div>
+    </div>
+  )}
       </div>
     </div>
     </>
