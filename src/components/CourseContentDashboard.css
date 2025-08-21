@@ -1,0 +1,74 @@
+.content-dashboard {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.content-data-table {
+  border-radius: 16px !important;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08) !important;
+  border: 1px solid rgba(32, 67, 142, 0.1) !important;
+}
+
+.content-data-table .MuiTableHead-root {
+  background: linear-gradient(135deg, #20438e, #1a3a7a) !important;
+}
+
+.content-data-table .MuiTableHead-root .MuiTableCell-root {
+  color: white !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.content-table-row:hover {
+  background-color: rgba(32, 67, 142, 0.04) !important;
+  transform: scale(1.01);
+  transition: all 0.2s ease;
+}
+
+.content-data-table table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.content-data-table .MuiTableCell-root {
+  border-bottom: 1px solid rgba(32, 67, 142, 0.1) !important;
+  padding: 16px !important;
+  vertical-align: middle;
+}
+
+/* file link styling */
+.content-file-link {
+  color: #20438e;
+  text-decoration: none;
+  font-weight: 600;
+}
+.content-table-row:hover .content-file-link {
+  text-decoration: underline;
+}
+
+/* chips */
+.content-type-chip {
+  border-radius: 16px !important;
+  font-weight: 500 !important;
+}
+
+/* action buttons on one line */
+.actions-cell {
+  white-space: nowrap;
+}
+
+/* Reuse your existing keyframes for consistency */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Ellipsis helpers (reused across your project) */
+.one-line-ellipsis {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

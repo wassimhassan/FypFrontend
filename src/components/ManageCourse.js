@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import './ManageCourse.css';
 import NavBar from './NavBar';
+import EnrollmentRequests from './EnrollmentRequests';
+import EnrolledStudents     from './EnrolledStudents';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -11,6 +13,9 @@ export default function ManageCourse() {
   const { courseId } = useParams();
   const [files, setFiles] = useState([]);
   const [list, setList] = useState([]);
+  const [course, setCourse] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(false);
+  const [showEnrolledSidebar, setShowEnrolled] = useState(false);
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
   const fileInputRef = useRef(null);
@@ -21,7 +26,19 @@ export default function ManageCourse() {
     setList(data);
   };
 
-  useEffect(() => { fetchList(); }, [courseId]);
+  const fetchCourse = async () => {
+    try {
+      const { data } = await axios.get(`${API}/courses/${courseId}`, { headers });
+      setCourse(data);
+    } catch (error) {
+      console.error('Error fetching course:', error);
+    }
+  };
+
+  useEffect(() => { 
+    fetchList(); 
+    fetchCourse();
+  }, [courseId]);
 
   const upload = async (e) => {
   e.preventDefault();
@@ -78,36 +95,95 @@ export default function ManageCourse() {
     <>
     <NavBar />
     <div className='BG'>
-    <div className="manage-wrap">
-      <h2>Manage Course Files</h2>
+      <div className="manage-layout">
+        {/* Main content */}
+        <div className="manage-main">
+          <div className="manage-header">
+            <h2>Manage Course Files</h2>
+            {course && (
+              <div className="manage-actions">
+        <button 
+          className="enrollment-toggle-btn"
+          onClick={() => setShowSidebar(!showSidebar)}
+        >
+          {showSidebar ? 'Hide' : 'Show'} Enrollment Requests
+          {course.pendingStudents && course.pendingStudents.length > 0 && (
+            <span className="pending-badge">{course.pendingStudents.length}</span>
+          )}
+        </button>
+        <button
+          className="enrollment-toggle-btn Enrolled"
+          onClick={() => setShowEnrolled(!showEnrolledSidebar)}
+        >
+          {showEnrolledSidebar ? 'Hide' : 'Show'} Enrolled Students
+        </button>
+      </div>
+            )}
+          </div>
 
-      <form ref={formRef} onSubmit={upload} className="upload-box" encType="multipart/form-data">
-        <input
-          type="file"
-          name="files"
-          multiple
-          ref={fileInputRef}
-          onChange={(e) => setFiles(Array.from(e.target.files || []))}
-          accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.webp,.gif"
-        />
-        <div style={{ marginTop: 8 }}>
-          <span style={{ marginRight: 8 }}>
-            {files.length ? `${files.length} selected (max 10)` : 'No files selected'}
-          </span>
-          <button type="submit" disabled={!files || !files.length || files.length > 10}>Upload</button>
+          <form ref={formRef} onSubmit={upload} className="upload-box" encType="multipart/form-data">
+            <input
+              type="file"
+              name="files"
+              multiple
+              ref={fileInputRef}
+              onChange={(e) => setFiles(Array.from(e.target.files || []))}
+              accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.webp,.gif"
+            />
+            <div style={{ marginTop: 8 }}>
+              <span style={{ marginRight: 8 }}>
+                {files.length ? `${files.length} selected (max 10)` : 'No files selected'}
+              </span>
+              <button type="submit" disabled={!files || !files.length || files.length > 10}>Upload</button>
+            </div>
+          </form>
+
+          <ul className="file-list">
+            {list.map(item => (
+              <li key={item._id}>
+                <a href={item.fileUrl} target="_blank" rel="noreferrer">{item.title}</a>
+                <span>{(item.size/1024/1024).toFixed(1)} MB</span>
+                <button onClick={() => remove(item._id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
         </div>
-      </form>
 
-      <ul className="file-list">
-        {list.map(item => (
-          <li key={item._id}>
-            <a href={item.fileUrl} target="_blank" rel="noreferrer">{item.title}</a>
-            <span>{(item.size/1024/1024).toFixed(1)} MB</span>
-            <button onClick={() => remove(item._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
+        {/* Sidebar for enrollment requests */}
+        {showSidebar && (
+          <div className="manage-sidebar">
+            <div className="sidebar-header">
+              <h3>Enrollment Requests</h3>
+              <button 
+                className="close-sidebar-btn"
+                onClick={() => setShowSidebar(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="sidebar-content">
+              <EnrollmentRequests 
+                courseId={courseId} 
+                onUpdate={() => {
+                  fetchCourse(); // Refresh course data to update pending count
+                }}
+              />
+            </div>
+          </div>
+        )}
+        {/* Sidebar for enrolled students */}
+  {showEnrolledSidebar && (
+    <div className="manage-sidebar">
+      <div className="sidebar-header">
+        <h3>Enrolled Students</h3>
+        <button className="close-sidebar-btn" onClick={() => setShowEnrolled(false)}>×</button>
+      </div>
+      <div className="sidebar-content">
+        <EnrolledStudents courseId={courseId} onUpdate={fetchCourse} />
+      </div>
     </div>
+  )}
+      </div>
     </div>
     </>
   );

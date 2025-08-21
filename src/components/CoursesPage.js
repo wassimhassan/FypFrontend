@@ -1,21 +1,31 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./CoursePage.css"
+import "./CoursesPage.css"
 import NavBar from "./NavBar";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState([]);
+  const [pending, setPending] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    if (!token) return;
+
     axios.get(`${API}/courses/my`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => setCourses(res.data))
+      .catch(console.error);
+
+    axios
+      .get(`${API}/courses/my/pending`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setPending(res.data))
       .catch(console.error);
   }, []);
 
@@ -39,6 +49,53 @@ export default function CoursesPage() {
           ))}
         </ul>
       )}
+       <h2 style={{ marginTop: "40px" }}>Pending Requests</h2>
+        {pending.length === 0 ? (
+          <p className="empty-state">No pending requests.</p>
+        ) : (
+          <ul>
+            {pending.map((course) => (
+              <li key={course._id}>
+                <div>{course.title}</div>
+                <div className="pending-row">
+                <span className="badge">Pending Approval</span>
+                  <button
+            className="btn-cancel btn-danger"
+            onClick={async () => {
+              try {
+                // optimistic UI: mark as loading
+                setPending((prev) =>
+                  prev.map((c) =>
+                    c._id === course._id ? { ...c, __loading: true } : c
+                  )
+                );
+                const token = localStorage.getItem("token");
+                await axios.delete(
+                  `${API}/courses/${course._id}/pending`,
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+                // remove from list
+                setPending((prev) => prev.filter((c) => c._id !== course._id));
+              } catch (e) {
+                console.error(e);
+                // revert loading state
+                setPending((prev) =>
+                  prev.map((c) =>
+                    c._id === course._id ? { ...c, __loading: false } : c
+                  )
+                );
+                alert("Failed to cancel. Try again.");
+              }
+            }}
+            disabled={course.__loading}
+          >
+            {course.__loading ? "Cancelling..." : "Cancel request"}
+          </button>
+          </div>
+              </li>
+            ))}
+          </ul>
+        )}
     </div>
     </>
   );
