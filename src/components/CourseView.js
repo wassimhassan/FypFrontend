@@ -94,12 +94,12 @@ export default function CourseView() {
     <>
     <NavBar />
     <div className="B">
-    <div className="manage-wrap">
+    <div className="Manage-Wrap">
       <h2>Course Files</h2>
       {!files.length ? (
         <p>No files yet.</p>
       ) : (
-        <ul className="file-list">
+        <ul className="File-List">
           {files.map(f => (
             <li key={f._id} className="file-row">
               <a href={f.fileUrl} target="_blank" rel="noreferrer">{f.title}</a>
