@@ -39,31 +39,40 @@ export default function Login({ setIsLoggingIn = () => {} }) {
     return () => window.removeEventListener("keydown", onEsc);
   }, [showForgot, onEsc]);
 
-  const roleDest = { student: "/student", teacher: "/teacher", admin: "/admin" };
+// put this near the top of your component
+const roleDest = {
+  student: "/homePage",
+  teacher: "/teacherHomePage",
+  admin: "/admin",
+};
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-    try {
-      localStorage.clear();
-      const res = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`,
-        { email, password }
-      );
-      const { token } = res.data;
-      localStorage.setItem("token", token);
-      const { role, id: userId } = jwtDecode(token);
-      localStorage.setItem("role", role);
-      localStorage.setItem("userId", userId);
-      navigate(roleDest[role] || "/");
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed. Try again.");
-      setForgotEmail(email);
-    } finally {
-      setLoading(false);
-    }
-  };
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setError("");
+  setLoading(true);
+  try {
+    localStorage.clear();
+    const res = await axios.post(
+      `${process.env.REACT_APP_BACKEND_URL}/api/auth/login`,
+      { email, password }
+    );
+
+    const { token } = res.data;
+    localStorage.setItem("token", token);
+
+    const { role, id: userId } = jwtDecode(token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("userId", userId);
+
+    // 👇 redirect based on role
+    navigate(roleDest[role] || "/homePage", { replace: true });
+  } catch (err) {
+    setError(err.response?.data?.message || "Login failed. Try again.");
+    setForgotEmail(email);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleForgotPassword = async () => {
     setResetMsg("");
