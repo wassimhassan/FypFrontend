@@ -51,7 +51,7 @@ function App() {
         
 
         <Route path="chatbot" element={<Chatbot />} />
-        <Route path="/calendar" element={<DashboardPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
 
         {/* Student or Admin only */}
         <Route
