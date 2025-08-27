@@ -1,19 +1,60 @@
-import React, { useState } from "react";
-import Calendar from "./Calendar.js";
-import UpcomingEvents from "./UpcomingEvents.js";
+// CalendarPage.js
+import React, { useState, useEffect, useMemo } from "react";
+import Calendar from "./Calendar";
+import UpcomingEvents from "./UpcomingEvents";
 import "./Calendar.css";
 import "./UpcomingEvents.css";
+import axios from "axios";
+
+function fmtDateRange(startsAt, endsAt) {
+  const s = new Date(startsAt);
+  const e = endsAt ? new Date(endsAt) : null;
+
+  const dateStr = s.toLocaleDateString(undefined, {
+    weekday: "short", month: "short", day: "numeric"
+  });
+
+  const timeStart = s.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+  const timeEnd   = e ? e.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" }) : null;
+  const timeStr   = timeEnd ? `${timeStart} - ${timeEnd}` : timeStart;
+
+  return { dateStr, timeStr };
+}
 
 const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
+  const [events, setEvents] = useState([]);
 
-  const events = [
-    { id: "1", title: "University Fair 2026", tag: "University Fair", date: "Mon, Mar 9", time: "10:00 AM - 4:00 PM", mode: "Online", type: "Virtual", desc: "Meet representatives from top universities in Lebanon and abroad. Get information about admission requirements, scholarships, and programs"},
-    { id: "2", title: "SAT Preparation Workshop", tag: "Workshop", date: "Mon, Mar 16", time: "2:00 PM - 5:00 PM", mode: "Online", type: "Virtual", desc: "Intensive SAT preparation workshop..." },
-    { id: "3", title: "Career Expo - Tech Industry", tag: "Career Fair", date: "Sun, Mar 22", time: "9:00 AM - 6:00 PM", mode: "Online", type: "Virtual", desc: "Connect with leading tech companies..." },
-    { id: "4", title: "Scholarship Application Deadline", tag: "Deadline", date: "Thu, Mar 26", time: "11:59 PM", mode: "Online", type: "Virtual", desc: "Final deadline for merit-based scholarship applications..." },
-    { id: "5", title: "Study Abroad Information Session", tag: "Information Session", date: "Sun, Mar 29", time: "6:00 PM - 8:00 PM", mode: "Online", type: "Virtual", desc: "Learn about study abroad opportunities..." },
-  ];
+  useEffect(() => {
+    const API = `${process.env.REACT_APP_BACKEND_URL}/api/events`;
+
+    axios.get(API)
+      .then(res => {
+        const items = res.data.items || res.data; // depends on your controller return
+        const mapped = items.map(ev => {
+          const { dateStr, timeStr } = fmtDateRange(ev.startsAt, ev.endsAt);
+          return {
+            id: ev._id,
+            title: ev.title,
+            tag: ev.tag || "",
+            date: dateStr,
+            time: timeStr,
+            mode: ev.mode || "Online",
+            type: ev.type || "",
+            desc: ev.description || ""
+          };
+        });
+        setEvents(mapped);
+      })
+      .catch(err => console.error("Failed to load events:", err));
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!selectedDate) return events;
+    return events.filter(ev =>
+      ev.date.includes(`${selectedDate.month.slice(0,3)} ${selectedDate.date}`)
+    );
+  }, [events, selectedDate]);
 
   return (
     <div className="page">
@@ -24,7 +65,7 @@ const CalendarPage = () => {
 
       <div className="container">
         <Calendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-        <UpcomingEvents events={events} />
+        <UpcomingEvents events={filtered} />
       </div>
     </div>
   );
