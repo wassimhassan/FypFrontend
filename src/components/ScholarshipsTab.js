@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import ScholarshipCard from './ScholarshipCard';
-import axios from 'axios';
-import './ScholarshipsTab.css';
+import React, { useEffect, useState } from "react";
+import ScholarshipCard from "./ScholarshipCard";
+import axios from "axios";
+import "./ScholarshipsTab.css";
 
 const ScholarshipsTab = () => {
   const [scholarships, setScholarships] = useState([]);
@@ -9,23 +9,22 @@ const ScholarshipsTab = () => {
   useEffect(() => {
     const fetchScholarships = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/scholarships`);
-        console.log("Fetched scholarships:", response.data);
-        setScholarships(response.data);
+        const { data } = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/scholarships`
+        );
+        setScholarships(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching scholarships:", error);
       }
     };
-
     fetchScholarships();
   }, []);
 
   return (
     <div className="tab-content">
       <h2>Scholarship Opportunities</h2>
-      <p>
-        Find and apply for scholarships that match your academic achievements and career goals.
-      </p>
+      <p>Find and apply for scholarships that match your goals.</p>
+
       <div className="card-grid">
         {scholarships.map((sch) => (
           <ScholarshipCard
@@ -34,6 +33,7 @@ const ScholarshipsTab = () => {
             amount={sch.scholarship_value}
             title={sch.scholarship_title}
             description={sch.scholarship_description}
+            requirements={sch.scholarship_requirements}
           />
         ))}
       </div>

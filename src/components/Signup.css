@@ -6,7 +6,7 @@ body {
   padding: 0;
 }
 
-/* Background gradient for full page */
+/* Background */
 .signup-container {
   display: flex;
   align-items: center;
@@ -19,7 +19,7 @@ body {
   position: relative;
 }
 
-/* Form box */
+/* Form card */
 .signup-form-box {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -34,21 +34,24 @@ body {
 }
 
 .signup-form-box h1 {
-  margin-right: 55px;
+  margin: 0 0 30px 0;            /* remove right offset */
   font-size: 36px;
   font-weight: 700;
   color: #20438e;
   text-align: center;
-  margin-bottom: 30px;
 }
 
+/* Make the form fluid so inputs never overflow */
 .signup-form-box form {
   display: flex;
   flex-direction: column;
-  width: 350px;
+  width: 100%;                   /* was 350px */
 }
 
+/* Inputs fill card width */
 .signup-form-box input {
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(248, 250, 252, 0.8);
   border: 2px solid #e2e8f0;
   border-radius: 8px;
@@ -71,6 +74,7 @@ body {
   font-weight: 500;
 }
 
+/* Button */
 .signup-form-box button {
   background: linear-gradient(135deg, #20438e 0%, #1e3a8a 100%);
   border: none;
@@ -95,11 +99,11 @@ body {
   transform: none;
 }
 
+/* Footer text */
 .signup-form-box p {
   font-size: 14px;
   text-align: center;
   margin-top: 20px;
-  margin-right: 55px;
   color: #475569;
 }
 
@@ -109,22 +113,21 @@ body {
   font-weight: 500;
   transition: color 0.3s ease;
 }
-
 .signup-form-box a:hover {
   color: #1e3a8a;
   text-decoration: underline;
 }
 
-/* Logo box - bigger and overlapping */
+/* Logo card (slight overlap on desktop) */
 .signup-logo-box {
   background: #fff;
   border-radius: 20px;
   padding: 30px;
-  width: 400px;
+  width: 450px;                  /* larger canvas for the logo */
   display: flex;
-  flex-direction: column;
   align-items: center;
-  margin-left: -100px;
+  justify-content: center;
+  margin-left: -60px;            /* gentle overlap; removed on mobile */
   z-index: 1;
   box-shadow: 0 10px 30px rgba(32, 67, 142, 0.1);
   border: 1px solid #e2e8f0;
@@ -137,6 +140,7 @@ body {
   border-radius: 12px;
 }
 
+/* Alerts */
 .error-message {
   color: #dc2626;
   font-size: 14px;
@@ -146,7 +150,6 @@ body {
   border: 1px solid #fecaca;
   border-radius: 6px;
 }
-
 .success-message {
   color: #059669;
   font-size: 14px;
@@ -155,6 +158,11 @@ body {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
   border-radius: 6px;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .signup-logo-box { width: 480px; }
 }
 
 @media (max-width: 768px) {
@@ -167,16 +175,9 @@ body {
   .signup-logo-box,
   .signup-form-box {
     width: 100%;
-    max-width: 400px;
-    margin-left: 0;
+    max-width: 420px;
+    margin-left: 0;              /* no overlap on mobile */
   }
 
-  .signup-form-box form {
-    width: 100%;
-  }
-
-  .signup-form-box h1,
-  .signup-form-box p {
-    margin-right: 0;
-  }
+  .signup-form-box form { width: 100%; }
 }

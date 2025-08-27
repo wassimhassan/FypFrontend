@@ -3,13 +3,18 @@ import './UniversitiesTab.css';
 import UniversityCard from '../components/UniversityCard'; // Adjust path if needed
 import axios from 'axios';
 
+// ✅ Import the university icon
+import { FaUniversity } from "react-icons/fa";
+
 export default function UniversitiesTab() {
   const [universities, setUniversities] = useState([]);
 
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/universities`);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/universities`
+        );
         setUniversities(response.data);
       } catch (error) {
         console.error("Error fetching universities:", error);
@@ -27,13 +32,21 @@ export default function UniversitiesTab() {
         {universities.map((uni) => (
           <UniversityCard
             key={uni._id}
-            icon="🏛️"
+            icon={<FaUniversity />} 
             name={uni.name}
             location={uni.location}
             rank={uni.rank}
             acceptanceRate={`${uni.acceptanceRate}%`}
-            students={uni.numberOfStudents.toLocaleString()}
-            tuition={`$${uni.tuition.toLocaleString()}`}
+            students={
+              uni.numberOfStudents
+                ? uni.numberOfStudents.toLocaleString()
+                : "—"
+            }
+            tuition={
+              uni.tuition
+                ? `$${uni.tuition.toLocaleString()}`
+                : "—"
+            }
             website={uni.website || "#"}
           />
         ))}

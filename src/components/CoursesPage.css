@@ -1,0 +1,160 @@
+.courses-page {
+  min-height: 100vh;
+  padding: 20px;
+  background: #e8e6e6;
+}
+
+.courses-page h2 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-left: 3px;
+  max-width: 1100px;
+}
+
+.courses-page ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.courses-page li {
+  background: white;
+  color: black;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  flex: 0 1 400px; 
+}
+
+.courses-page li:hover {
+  transform: translateY(-1px);
+  
+  border-color: rgba(91,140,255,0.5);
+}
+
+.course-title {
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.Empty-State {
+  text-align: center;
+  color: black;
+  padding: 40px 10px;
+  border: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: white !important;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.Empty-State:hover {
+  transform: translateY(-1px);
+}
+
+.badge.enrolled {
+  background: rgba(34,197,94,0.15);
+  border-color: rgba(34,197,94,0.35);
+  color: #9ae6b4;
+}
+
+.badge .pending {
+  background: rgba(91,140,255,0.12);
+  border-color: rgba(91,140,255,0.45);
+  color: #bcd3ff;
+}
+
+/* empty states */
+.empty-state,
+.courses-page > p {
+  text-align: center;
+  color: #9fb0d0;
+  padding: 40px 10px;
+  border: 1px dashed rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: white !important;
+  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+  max-width: 1100px;
+  margin: 0 0 24px 0;
+}
+
+.courses-page > p:hover{
+  transform: translateY(-1px);
+}
+
+/* pending row with action */
+.pending-item { position: relative; }
+.pending-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* cancel button */
+.btn-cancel {
+  appearance: none;
+  border: 1px solid rgba(91,140,255,0.35);
+  background: rgba(91,140,255,0.12);
+  color: #bcd3ff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.btn-cancel:hover { filter: brightness(1.05); }
+.btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Red cancel button with hover animation --- */
+.btn-danger {
+  appearance: none;
+  border: 1px solid rgba(239, 68, 68, 0.55);          /* red-500 */
+  background: rgb(165, 4, 4);
+  color: #fecaca;                                      /* red-200 text */
+  font-weight: 700;
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    transform .14s ease,
+    box-shadow .2s ease,
+    background-color .2s ease,
+    border-color .2s ease,
+    color .2s ease;
+}
+
+.btn-danger:hover {
+  background: rgb(165, 4, 4);
+  border-color: rgba(239, 68, 68, 0.85);
+  color: #ffe4e6;                                      /* a bit brighter */
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 10px 24px rgba(239, 68, 68, 0.25),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.btn-danger:active {
+  transform: translateY(0) scale(0.99);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+}
+
+.btn-danger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}

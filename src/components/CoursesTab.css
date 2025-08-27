@@ -1,95 +1,144 @@
-/*
+/* Updated to 4-cards-per-row grid layout */
 .card-row {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr)); 
+  grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  max-width: 1100px;
+  max-width: 1200px;
   margin: 0 auto;
-  overflow-x: hidden !important;
-  overflow-y: visible !important; 
+  padding: 20px 0;
 }
 
+/* Responsive grid for smaller screens */
+@media (max-width: 1200px) {
+  .card-row {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
 
+@media (max-width: 900px) {
+  .card-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .card-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Fixed card size and improved design */
 .card {
   width: 100%;
-  background-color: #fff;
-  padding: 20px 25px;
-  border-radius: 12px;
+  height: 400px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
+  border-radius: 16px;
   text-align: left;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  border: 1px solid #ddd;
+  box-shadow: 0 4px 12px rgba(32, 67, 142, 0.08);
+  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  height: auto; 
-  overflow: visible; 
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(32, 67, 142, 0.15);
+  border-color: #20438e;
+}
 
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #20438e, #3b82f6);
+}
+
+.card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #20438e;
+  line-height: 1.3;
+  display: -webkit-box;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card p {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #64748b;
+  margin: 0 0 12px 0;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex-grow: 1;
+}
 
 .card-header {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 6px;
+  margin: 0 0 12px 0;
 }
 
 .badge {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+  padding: 6px 12px;
   font-size: 12px;
-  font-weight: bold;
-  color: #20438E;
-  background: #FED78433;
-  padding: 4px 8px;
-  border: #FED784 solid 1px;
-  border-radius: 12px;
+  font-weight: 600;
+  border-radius: 20px;
 }
 
 .skills-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
-  margin: 4px 0 10px 0;
+  gap: 6px;
+  margin: 12px 0;
+  min-height: 60px;
+  overflow: hidden;
 }
 
 .skill-badge {
-  background-color: #FED78433;
-  color: #20438E;
-  border: 1px solid #FED784;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  color: #1e40af;
+  border: 1px solid #3b82f6;
   border-radius: 12px;
   padding: 4px 10px;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   white-space: nowrap;
 }
 
 .enroll-btn {
-  background-color: #20438E;
+  background: linear-gradient(135deg, #20438e, #1e3a8a);
   color: white;
-  padding: 10px 16px;
+  padding: 12px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
+  font-size: 14px;
+  transition: all 0.3s ease;
   margin-top: auto;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .enroll-btn:hover {
-  background-color: #18306a;
-} 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*/
+  background: linear-gradient(135deg, #1e3a8a, #1e40af);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(32, 67, 142, 0.3);
+}

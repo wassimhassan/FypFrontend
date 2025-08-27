@@ -61,6 +61,7 @@ function NavBar() {
 
       <div className="nav-links">
         {/* Prefer Link over <a href="#"> to avoid page reloads */}
+        <Link to="/chatbot">ChatBot</Link>
         <Link to="/WelcomePage#reviews">Reviews</Link>
         <Link to="/about">About</Link>
         <Link to="/resources">Resources</Link>
