@@ -95,6 +95,7 @@ const FIELD_MAP = [
   { key: "title", label: "Title", required: true, type: "text" },
   { key: "mode", label: "Mode (Online/In-Person/Hybrid)", required: true, type: "text" },
   { key: "tag", label: "Tag", required: false, type: "text" },
+    { key: "type", label: "Type", required: false, type: "text" },
   { key: "location", label: "Location", required: false, type: "text" },
   { key: "link", label: "Link (URL)", required: false, type: "text" },
   { key: "startsAt", label: "Starts At", required: true, type: "datetime-local" },
@@ -286,6 +287,7 @@ const EventDashboard = () => {
                 <TableCell>Title</TableCell>
                 <TableCell>Mode</TableCell>
                 <TableCell>Tag</TableCell>
+                <TableCell>Type</TableCell>
                 <TableCell>Starts At</TableCell>
                 <TableCell>Ends At</TableCell>
                 <TableCell>Location</TableCell>
@@ -306,6 +308,9 @@ const EventDashboard = () => {
                   </TableCell>
                   <TableCell sx={{ maxWidth: 160 }}>
                     <Ellipsize value={e.tag} maxWidth={160} />
+                  </TableCell>
+                    <TableCell sx={{ maxWidth: 160 }}>
+                    <Ellipsize value={e.type} maxWidth={120} />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200 }}>
                     <Ellipsize
