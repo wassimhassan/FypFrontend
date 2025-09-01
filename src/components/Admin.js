@@ -24,6 +24,7 @@ import {
   Person as PersonIcon,
   RateReview as ReviewIcon,
   Book as BookIcon,
+  Event as EventIcon,        // <-- alias it
   ExitToApp,
 } from "@mui/icons-material"
 
@@ -55,6 +56,9 @@ const Admin = () => {
     { text: "Reviews", icon: <ReviewIcon />, path: "review" },              // /admin/review
     { text: "Universities", icon: <ApartmentIcon />, path: "university" },              // /admin/university
     { text: "Careers", icon: <AutoStoriesIcon />, path: "career" },              // /admin/university
+    { text: "Events", icon: <EventIcon />, path: "event" },
+
+
 
   ]
 

@@ -26,6 +26,7 @@ import "./components/Teacher.css";
 import Chatbot from "./components/Chatbot.js";
 
 import ProtectedRoute from "./components/ProtectedRoutes.js";
+import EventDashboard from "./components/EventDashboard.js";
 
 
 function App() {
@@ -115,6 +116,7 @@ function App() {
           <Route path="scholarship" element={<ScholarshipDashboard />} />
           <Route path="university" element={<UniversityDashboard />} />
           <Route path="career" element={<CareerDashboard />} />
+          <Route path="event" element={<EventDashboard />} />
           <Route path="overview" element={<DashboardOverview />} />
         </Route>
 
