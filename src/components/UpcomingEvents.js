@@ -1,33 +1,44 @@
 import React from "react";
-import "./UpcomingEvents.css";
+import { FaCalendarAlt, FaClock, FaMapMarkerAlt } from "react-icons/fa";
+import { FaArrowTrendUp } from "react-icons/fa6";
 
-export default function UpcomingEvents({ events }) {
-  // Sort events by date and take next 6 upcoming
-  const upcoming = events
-    .filter((e) => new Date(e.date) >= new Date())
-    .sort((a, b) => new Date(a.date) - new Date(b.date))
-    .slice(0, 6);
-
+const UpcomingEvents = ({ events }) => {
   return (
-    <div className="upcoming-events">
-      <h3>Upcoming Events</h3>
-      {upcoming.length > 0 ? (
-        <div className="events-list">
-          {upcoming.map((event) => (
-            <div key={event.id} className="event-card">
-              <h4>{event.title}</h4>
-              <p>{new Date(event.date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</p>
-              <p>{event.time}</p>
-              <p>{event.location}</p>
-              <button onClick={() => window.open(event.registrationLink, "_blank")}>
-                {event.type === "Deadline" ? "More Info" : "Register Now"}
-              </button>
-            </div>
-          ))}
+    <div className="right card-box">
+      <h2 className="section-title">
+        <FaArrowTrendUp className="icon-title" /> Upcoming Events
+      </h2>
+      <p className="section-subtext">Don't miss these important educational events</p>
+
+      {events.map((item) => (
+        <div key={item.id} className="card">
+          <div className="header-row">
+            <h3 className="event-title">{item.title}</h3>
+            <span className="tag">{item.tag}</span>
+          </div>
+
+          <div className="row">
+            <FaCalendarAlt className="icon" />
+            <span>{item.date}</span>
+          </div>
+
+          <div className="row">
+            <FaClock className="icon" />
+            <span>{item.time}</span>
+          </div>
+
+          <div className="row">
+            <FaMapMarkerAlt className="icon" />
+            <span>{item.mode}</span>
+            <span className="badge">{item.type}</span>
+          </div>
+
+          <p className="desc">{item.desc}</p>
+          <button className="button">Register Now</button>
         </div>
-      ) : (
-        <p>No upcoming events</p>
-      )}
+      ))}
     </div>
   );
-}
+};
+
+export default UpcomingEvents;

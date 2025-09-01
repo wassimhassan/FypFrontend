@@ -7,12 +7,12 @@
 }
 
 .enrollment-requests h3 {
-  color: #e8f0ff;
+  color: #000000;
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 16px 0;
   padding-bottom: 8px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 2px solid rgba(5, 4, 4, 0.1);
 }
 
 .enrollment-requests-loading,
@@ -43,17 +43,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #000000d4;
+  border: 1px solid rgba(255, 255, 255, 0);
   border-radius: 10px;
   transition: all 0.2s ease;
 }
 
 .pending-student-card:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(91,140,255,0.3);
+  background: #000000d4 !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(91,140,255,0.1);
+  box-shadow: 0 4px 12px rgba(91,140,255,0.15);
 }
 
 .student-info {
@@ -79,14 +78,14 @@
 
 .student-details h4 {
   margin: 0 0 4px 0;
-  color: #e8f0ff;
+  color: #fefeff;
   font-size: 14px;
   font-weight: 600;
 }
 
 .student-details p {
   margin: 0;
-  color: #9fb0d0;
+  color: #ffffff;
   font-size: 12px;
   margin-right: 12px;
 }
@@ -96,6 +95,7 @@
   gap: 6px;
 }
 
+/* Button palette matches your requests UI */
 .approve-btn,
 .reject-btn {
   padding: 6px 8px;
@@ -111,7 +111,6 @@
   background: linear-gradient(135deg, #10b981, #059669);
   color: white;
 }
-
 .approve-btn:hover {
   background: linear-gradient(135deg, #059669, #047857);
   transform: translateY(-1px);
@@ -122,26 +121,23 @@
   background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
 }
-
 .reject-btn:hover {
   background: linear-gradient(135deg, #dc2626, #b91c1c);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
-/* Responsive design */
+/* Responsive */
 @media (max-width: 768px) {
   .pending-student-card {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
-  
   .student-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
   .approve-btn,
   .reject-btn {
     flex: 1;

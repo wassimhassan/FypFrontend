@@ -1,65 +1,79 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Calendar.css";
 
-export default function Calendar({ events, selectedDate, setSelectedDate }) {
-  const month = selectedDate.getMonth();
-  const year = selectedDate.getFullYear();
+const Calendar = ({ selectedDate, setSelectedDate }) => {
+  const today = new Date();
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1));
 
-  const firstDayOfMonth = new Date(year, month, 1);
-  const startDate = new Date(firstDayOfMonth);
-  startDate.setDate(startDate.getDate() - firstDayOfMonth.getDay());
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const monthNames = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const days = [];
-  const currentDate = new Date(startDate);
+  for (let i = 0; i < firstDay; i++) days.push(null);
+  for (let d = 1; d <= daysInMonth; d++) days.push(d);
 
-  for (let i = 0; i < 42; i++) {
-    const dateCopy = new Date(currentDate);
-    const isCurrentMonth = dateCopy.getMonth() === month;
-    const isToday = dateCopy.toDateString() === new Date().toDateString();
-    const hasEvents = events.some(e => e.date === dateCopy.toISOString().split("T")[0]);
-
-    days.push(
-      <button
-        key={dateCopy.toISOString()}
-        onClick={() => setSelectedDate(new Date(dateCopy))}
-        className={`calendar-day ${isCurrentMonth ? "" : "other-month"} ${
-          isToday ? "today" : ""
-        } ${selectedDate.toDateString() === dateCopy.toDateString() ? "selected" : ""}`}
-      >
-        <span className="date-number">{dateCopy.getDate()}</span>
-        {hasEvents && <span className="event-dot"></span>}
-      </button>
-    );
-
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-
-  const prevMonth = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    setSelectedDate(newDate);
+  const handleDatePress = (day) => {
+    if (!day) return;
+    const dateObj = new Date(year, month, day);
+    const weekdayName = weekdays[dateObj.getDay()];
+    setSelectedDate({
+      day: weekdayName,
+      month: monthNames[month],
+      date: day,
+      year: year,
+    });
   };
 
-  const nextMonth = () => {
-    const newDate = new Date(selectedDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    setSelectedDate(newDate);
-  };
+  const prevMonth = () => setCurrentDate(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentDate(new Date(year, month + 1, 1));
 
   return (
-    <div className="calendar-card">
-      <div className="calendar-header">
-        <button onClick={prevMonth}>←</button>
-        <h3>{selectedDate.toLocaleString("en-US", { month: "long", year: "numeric" })}</h3>
-        <button onClick={nextMonth}>→</button>
-      </div>
+    <div className="left card-box">
+      <h2 className="section-title">Event Calendar</h2>
+      <p className="section-subtext">Click on a date to see events for that day</p>
 
-      <div className="calendar-grid">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
-          <div key={d} className="calendar-weekday">{d}</div>
-        ))}
-        {days}
+      <div className="calendar-box">
+        <div className="calendar-header">
+          <span className="month-display">{monthNames[month]} {year}</span>
+          <div className="arrows">
+            <button className="arrow" onClick={prevMonth}>&lt;</button>
+            <button className="arrow" onClick={nextMonth}>&gt;</button>
+          </div>
+        </div>
+
+        <div className="weekdays">
+          {weekdays.map((day) => (
+            <div key={day} className="weekday">{day}</div>
+          ))}
+        </div>
+
+        <div className="calendar">
+          {days.map((d, i) => {
+            const isToday = d && year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+            return (
+              <button
+                key={i}
+                onClick={() => handleDatePress(d)}
+                className={`day-box ${d ? "" : "empty"} 
+                  ${selectedDate?.date === d && selectedDate?.month === monthNames[month] && selectedDate?.year === year ? "selected" : ""} 
+                  ${isToday ? "today" : ""}`}
+              >
+                {d || ""}
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
-}
+};
+
+export default Calendar;

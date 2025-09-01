@@ -41,7 +41,6 @@ export default function CoursesPage() {
           {courses.map(course => (
             <li
               key={course._id}
-              style={{ cursor: "pointer", color: "blue" }}
               onClick={() => navigate(`/courses/${course._id}`)}
             >
               {course.title}
@@ -51,7 +50,7 @@ export default function CoursesPage() {
       )}
        <h2 style={{ marginTop: "40px" }}>Pending Requests</h2>
         {pending.length === 0 ? (
-          <p className="empty-state">No pending requests.</p>
+          <p className="Empty-State">No pending requests.</p>
         ) : (
           <ul>
             {pending.map((course) => (
