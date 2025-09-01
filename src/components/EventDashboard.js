@@ -62,7 +62,7 @@ const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
   );
 };
 
-/* ===== FIX: stringify location objects for UI ===== */
+/* -------- helpers for location & date fields -------- */
 const locationToText = (loc) => {
   if (!loc) return "";
   if (typeof loc === "string") return loc;
@@ -71,15 +71,34 @@ const locationToText = (loc) => {
   return s || onlineLink || "";
 };
 
-// Fields (kept simple like Career: text/multiline only)
+const toISOStringOrNull = (v) => {
+  if (!v) return null;
+  const d = new Date(v);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString();
+};
+
+const formatLocalInput = (d) => {
+  if (!d) return "";
+  const date = typeof d === "string" ? new Date(d) : d;
+  if (Number.isNaN(date.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  const yyyy = date.getFullYear();
+  const mm = pad(date.getMonth() + 1);
+  const dd = pad(date.getDate());
+  const hh = pad(date.getHours());
+  const mi = pad(date.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+};
+
+// Fields (kept simple like Career; dates use native pickers)
 const FIELD_MAP = [
   { key: "title", label: "Title", required: true, type: "text" },
   { key: "mode", label: "Mode (Online/In-Person/Hybrid)", required: true, type: "text" },
   { key: "tag", label: "Tag", required: false, type: "text" },
   { key: "location", label: "Location", required: false, type: "text" },
   { key: "link", label: "Link (URL)", required: false, type: "text" },
-  { key: "startsAt", label: "Starts At (ISO or date string)", required: true, type: "text" },
-  { key: "endsAt", label: "Ends At (ISO or date string)", required: false, type: "text" },
+  { key: "startsAt", label: "Starts At", required: true, type: "datetime-local" },
+  { key: "endsAt", label: "Ends At", required: false, type: "datetime-local" },
   { key: "description", label: "Description", required: false, type: "multiline", clamped: true },
 ];
 
@@ -152,17 +171,14 @@ const EventDashboard = () => {
         if (typeof payload[k] === "string") payload[k] = payload[k].trim();
       });
 
-      /* ===== FIX: if admin pasted JSON into Location, parse it ===== */
-      if (
-        typeof payload.location === "string" &&
-        payload.location.trim().startsWith("{")
-      ) {
-        try {
-          payload.location = JSON.parse(payload.location);
-        } catch {
-          /* keep as string if bad JSON */
-        }
+      // Parse location JSON if admin pasted an object
+      if (payload.location?.trim?.().startsWith("{")) {
+        try { payload.location = JSON.parse(payload.location); } catch {}
       }
+
+      // Convert date-time picker strings to ISO for API
+      payload.startsAt = toISOStringOrNull(payload.startsAt);
+      payload.endsAt = toISOStringOrNull(payload.endsAt);
 
       const res = await fetch(API_BASE, {
         method: "POST",
@@ -190,17 +206,14 @@ const EventDashboard = () => {
         if (typeof payload[k] === "string") payload[k] = payload[k].trim();
       });
 
-      /* ===== FIX: allow JSON in Location on edit as well ===== */
-      if (
-        typeof payload.location === "string" &&
-        payload.location.trim().startsWith("{")
-      ) {
-        try {
-          payload.location = JSON.parse(payload.location);
-        } catch {
-          /* keep as string */
-        }
+      // Parse location JSON if admin pasted an object
+      if (payload.location?.trim?.().startsWith("{")) {
+        try { payload.location = JSON.parse(payload.location); } catch {}
       }
+
+      // Convert date-time picker strings to ISO for API
+      payload.startsAt = toISOStringOrNull(payload.startsAt);
+      payload.endsAt = toISOStringOrNull(payload.endsAt);
 
       const res = await fetch(`${API_BASE}/${selectedEvent._id}`, {
         method: "PUT",
@@ -307,7 +320,7 @@ const EventDashboard = () => {
                     />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 220 }}>
-                    {/* ===== FIX: stringify object locations ===== */}
+                    {/* stringify object locations for safe render */}
                     <Ellipsize value={locationToText(e.location)} maxWidth={220} />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 380 }}>
@@ -327,11 +340,11 @@ const EventDashboard = () => {
                       onClick={() => {
                         const shaped = {
                           ...e,
-                          // Keep as plain strings in the edit form (same as Career)
-                          startsAt: e.startsAt || "",
-                          endsAt: e.endsAt || "",
-                          // ===== FIX: ensure TextField gets string, not object
+                          // prepare values for edit inputs
+                          startsAt: formatLocalInput(e.startsAt),
+                          endsAt: formatLocalInput(e.endsAt),
                           location: locationToText(e.location),
+                          link: e.link || "",
                         };
                         setSelectedEvent(shaped);
                         setEditDialogOpen(true);
@@ -373,7 +386,7 @@ const EventDashboard = () => {
             <TextField
               key={f.key}
               label={f.label}
-              type={f.type === "multiline" ? "text" : "text"}
+              type={f.type === "multiline" ? "text" : f.type}
               fullWidth
               multiline={f.type === "multiline"}
               rows={f.type === "multiline" ? 3 : 1}
@@ -382,6 +395,7 @@ const EventDashboard = () => {
               onChange={(e) =>
                 setNewEvent((prev) => ({ ...prev, [f.key]: e.target.value }))
               }
+              InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
               sx={{ mb: 2 }}
             />
           ))}
@@ -409,7 +423,7 @@ const EventDashboard = () => {
               <TextField
                 key={f.key}
                 label={f.label}
-                type={f.type === "multiline" ? "text" : "text"}
+                type={f.type === "multiline" ? "text" : f.type}
                 fullWidth
                 multiline={f.type === "multiline"}
                 rows={f.type === "multiline" ? 3 : 1}
@@ -420,7 +434,7 @@ const EventDashboard = () => {
                     prev ? { ...prev, [f.key]: e.target.value } : prev
                   )
                 }
-                slotProps={{ inputLabel: { shrink: true } }}
+                InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
                 sx={{ mb: 2 }}
               />
             ))}
