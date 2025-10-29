@@ -25,8 +25,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./EventDashboard.css";
 
 // API base (env override supported)
-const API_BASE =
-  (process.env.REACT_APP_BACKEND_URL || "http://localhost:3001") + "/api/universities";
+const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api/events`;
 
 // Ellipsize + Tooltip helper (same as Career)
 const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
