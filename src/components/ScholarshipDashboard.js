@@ -26,7 +26,7 @@ import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "./ScholarshipDashboard.css"
 
-const API_BASE = "http://localhost:3001/api/scholarships"
+const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api/scholarships`;
 
 const ScholarshipDashboard = () => {
   const [openDialog, setOpenDialog] = useState(false)

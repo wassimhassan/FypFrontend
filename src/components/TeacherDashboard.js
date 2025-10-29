@@ -48,112 +48,117 @@ const TeacherDashboard = () => {
     password: "",
   });
 
-  const fetchTeachers = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/users/teachers");
-      if (!res.ok) throw new Error("Failed to fetch teachers");
-      const data = await res.json();
-      setTeachers(data);
-    } catch (err) {
-      console.error("Error fetching teachers:", err.message);
-      toast.error("Failed to load teachers");
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchTeachers = async () => {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/teachers`);
+    if (!res.ok) throw new Error("Failed to fetch teachers");
+    const data = await res.json();
+    setTeachers(data);
+  } catch (err) {
+    console.error("Error fetching teachers:", err.message);
+    toast.error("Failed to load teachers");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchTeachers();
   }, []);
 
-  const handleDeleteUser = async () => {
-    if (!userToDelete) return;
+const handleDeleteUser = async () => {
+  if (!userToDelete) return;
 
-    try {
-      const res = await fetch(`http://localhost:3001/api/users/${userToDelete._id}`, {
-        method: "DELETE",
-      });
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
+      { method: "DELETE" }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to delete user");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to delete user");
 
-      setTeachers((prev) => prev.filter((u) => u._id !== userToDelete._id));
-      toast.success("User deleted successfully");
-    } catch (err) {
-      console.error("Delete error:", err);
-      toast.error("Failed to delete user");
-    } finally {
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
+    setTeachers((prev) => prev.filter((u) => u._id !== userToDelete._id));
+    toast.success("User deleted successfully");
+  } catch (err) {
+    console.error("Delete error:", err);
+    toast.error("Failed to delete user");
+  } finally {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  }
+};
+
+const handleUpdateUser = async () => {
+  if (!selectedUser) return;
+
+  try {
+    // only include password if user typed a new one
+    const payload = { ...selectedUser };
+    if (editPassword.trim()) {
+      payload.password = editPassword.trim();
+    } else {
+      delete payload.password;
     }
-  };
 
-  const handleUpdateUser = async () => {
-    if (!selectedUser) return;
-
-    try {
-      // only include password if user typed a new one
-      const payload = { ...selectedUser };
-      if (editPassword.trim()) {
-        payload.password = editPassword.trim();
-      } else {
-        delete payload.password;
-      }
-
-      const res = await fetch(`http://localhost:3001/api/users/${selectedUser._id}`, {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
+      {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update user");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to update user");
 
-      setTeachers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
-      toast.success("User updated successfully");
+    setTeachers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
+    toast.success("User updated successfully");
 
-      setEditDialogOpen(false);
-      setSelectedUser(null);
-      setEditPassword("");
-      setShowPassword(false);
-    } catch (err) {
-      toast.error(err.message || "Failed to update user");
-      console.error("Error updating user:", err);
-    }
-  };
+    setEditDialogOpen(false);
+    setSelectedUser(null);
+    setEditPassword("");
+    setShowPassword(false);
+  } catch (err) {
+    toast.error(err.message || "Failed to update user");
+    console.error("Error updating user:", err);
+  }
+};
 
-  const handleAddTeacher = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          role: "teacher", // always teacher
-        }),
-      });
+const handleAddTeacher = async () => {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...form,
+        role: "teacher", // always teacher
+      }),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create teacher");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to create teacher");
 
-      setTeachers((prev) => [
-        ...prev,
-        {
-          ...form,
-          role: "teacher",
-          _id: data.userId,
-          createdAt: new Date().toISOString(),
-        },
-      ]);
+    setTeachers((prev) => [
+      ...prev,
+      {
+        ...form,
+        role: "teacher",
+        _id: data.userId,
+        createdAt: new Date().toISOString(),
+      },
+    ]);
 
-      setForm({ username: "", email: "", password: "" });
-      setOpenDialog(false);
-      toast.success("Teacher added successfully");
-    } catch (err) {
-      console.error("Backend message:", err.message);
-      toast.error(err.message || "Failed to create user");
-    }
-  };
+    setForm({ username: "", email: "", password: "" });
+    setOpenDialog(false);
+    toast.success("Teacher added successfully");
+  } catch (err) {
+    console.error("Backend message:", err.message);
+    toast.error(err.message || "Failed to create user");
+  }
+};
 
   return (
     <Box className="teacher-dashboard">

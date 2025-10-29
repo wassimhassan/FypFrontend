@@ -26,7 +26,7 @@ import "./UniversityDashboard.css";
 
 // ✅ Prefer env when available
 const API_BASE =
-  (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3001") + "/api/universities";
+  (process.env.REACT_APP_BACKEND_URL || "http://localhost:3001") + "/api/universities";
 
 // ✅ Column config aligned to your Mongoose model
 const FIELD_MAP = [

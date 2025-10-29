@@ -54,107 +54,113 @@ const UserDashboard = () => {
   // Fetch users on mount
   useEffect(() => {
     const fetchUsers = async () => {
-      try {
-        const res = await fetch("http://localhost:3001/api/users");
-        if (!res.ok) throw new Error("Failed to fetch users");
-        const data = await res.json();
-        setUsers(data);
-      } catch (err) {
-        console.error("Error fetching users:", err);
-        toast.error("Failed to load users");
-      } finally {
-        setLoading(false);
-      }
-    };
+  try {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`);
+    if (!res.ok) throw new Error("Failed to fetch users");
+    const data = await res.json();
+    setUsers(data);
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    toast.error("Failed to load users");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
     fetchUsers();
   }, []);
 
-  const handleAddUser = async () => {
-    try {
-      const res = await fetch("http://localhost:3001/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+ const handleAddUser = async () => {
+  try {
+    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(form),
+    });
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to create user");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to create user");
 
-      setUsers((prev) => [
-        ...prev,
-        {
-          ...form,
-          _id: data.userId,
-          profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
-          createdAt: new Date().toISOString(),
-        },
-      ]);
+    setUsers((prev) => [
+      ...prev,
+      {
+        ...form,
+        _id: data.userId,
+        profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+        createdAt: new Date().toISOString(),
+      },
+    ]);
 
-      toast.success("User added successfully");
-      setForm({ username: "", email: "", password: "", role: "student" });
-      setOpenDialog(false);
-    } catch (err) {
-      console.error("Backend message:", err.message);
-      toast.error(err.message || "Failed to create user");
-    }
-  };
+    toast.success("User added successfully");
+    setForm({ username: "", email: "", password: "", role: "student" });
+    setOpenDialog(false);
+  } catch (err) {
+    console.error("Backend message:", err.message);
+    toast.error(err.message || "Failed to create user");
+  }
+};
 
   const handleUpdateUser = async () => {
-    if (!selectedUser) return;
-    try {
-      // Build payload: only include password if a new one is provided
-      const payload = { ...selectedUser };
-      if (editPassword.trim()) {
-        payload.password = editPassword.trim();
-      } else {
-        delete payload.password;
-      }
+  if (!selectedUser) return;
+  try {
+    // Build payload: only include password if a new one is provided
+    const payload = { ...selectedUser };
+    if (editPassword.trim()) {
+      payload.password = editPassword.trim();
+    } else {
+      delete payload.password;
+    }
 
-      const res = await fetch(`http://localhost:3001/api/users/${selectedUser._id}`, {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
+      {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
-      });
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to update user");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to update user");
 
-      setUsers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
+    setUsers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
 
-      toast.success("User updated successfully");
+    toast.success("User updated successfully");
 
-      setEditDialogOpen(false);
-      setSelectedUser(null);
-      setEditPassword(""); // clear temp password
-      setShowPassword(false);
-    } catch (err) {
-      toast.error(err.message || "Failed to update user");
-      console.error("Error updating user:", err);
-    }
-  };
+    setEditDialogOpen(false);
+    setSelectedUser(null);
+    setEditPassword(""); // clear temp password
+    setShowPassword(false);
+  } catch (err) {
+    toast.error(err.message || "Failed to update user");
+    console.error("Error updating user:", err);
+  }
+};
 
-  const handleDeleteUser = async () => {
-    if (!userToDelete) return;
 
-    try {
-      const res = await fetch(`http://localhost:3001/api/users/${userToDelete._id}`, {
-        method: "DELETE",
-      });
+ const handleDeleteUser = async () => {
+  if (!userToDelete) return;
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Failed to delete user");
+  try {
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
+      { method: "DELETE" }
+    );
 
-      setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id));
-      toast.success("User deleted successfully");
-    } catch (err) {
-      console.error("Delete error:", err);
-      toast.error("Failed to delete user");
-    } finally {
-      setDeleteDialogOpen(false);
-      setUserToDelete(null);
-    }
-  };
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Failed to delete user");
+
+    setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id));
+    toast.success("User deleted successfully");
+  } catch (err) {
+    console.error("Delete error:", err);
+    toast.error("Failed to delete user");
+  } finally {
+    setDeleteDialogOpen(false);
+    setUserToDelete(null);
+  }
+};
 
   return (
     <Box className="user-dashboard">

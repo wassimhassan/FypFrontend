@@ -29,7 +29,7 @@ import "react-toastify/dist/ReactToastify.css"
 import "./CourseDashboard.css"
 import { Tooltip } from "@mui/material"
 
-const API_BASE = "http://localhost:3001"
+const API_BASE = process.env.REACT_APP_BACKEND_URL;
 const LEVELS = ["Beginner", "Intermediate", "Advanced"]
 
 const CourseDashboard = () => {
