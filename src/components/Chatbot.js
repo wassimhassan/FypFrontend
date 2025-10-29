@@ -2,23 +2,29 @@
 
 import { useEffect, useMemo, useRef, useState } from "react"
 import "./Chatbot.css"
-import { useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom"
+import { toast as notify } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+/** New agent backend */
+const BASE = process.env.REACT_APP_BACKEND_URL || "";
+// make sure there are no duplicate slashes
+const DEFAULT_API_URL = BASE
+  ? `${BASE.replace(/\/+$/, "")}/api/agent/chat`
+  : "/api/agent/chat";
 
-/** Your backend proxy (index.js → /api/chatbot/chat) */
-const DEFAULT_API_URL = "http://localhost:3001/api/chatbot/chat"
-
-export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI Assistant", accent = "#20438E" }) {
- const navigate = useNavigate();
+export default function Chatbot({
+  apiUrl = DEFAULT_API_URL,
+  title = "Fekra AI Assistant",
+  accent = "#20438E",
+}) {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (!token) {
-      navigate("/login");                                           // ✅ redirect
+      navigate("/login") // ✅ redirect if not authenticated
     }
-  }, [navigate]);
-
+  }, [navigate])
 
   const [messages, setMessages] = useState(() => {
     try {
@@ -40,7 +46,6 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
   const [input, setInput] = useState("")
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState("")
-  const [model, setModel] = useState("default")
 
   const listRef = useRef(null)
   const inputRef = useRef(null)
@@ -55,12 +60,10 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, isSending])
 
-  // models
-  const modelMap = {
-    default: "deepseek/deepseek-r1:free",
-  }
-
-  const canSend = useMemo(() => input.trim().length > 0 && !isSending && !!apiUrl, [input, isSending, apiUrl])
+  const canSend = useMemo(
+    () => input.trim().length > 0 && !isSending && !!apiUrl,
+    [input, isSending, apiUrl],
+  )
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey && canSend) {
@@ -86,31 +89,22 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
   const copyText = async (text) => {
     try {
       await navigator.clipboard.writeText(text)
-      toast("Copied!")
+      notify("Copied!")
     } catch {}
   }
 
-  const toast = (msg) => {
+  const showError = (msg) => {
     setError(msg)
     setTimeout(() => setError(""), 1500)
   }
 
-  const parseAIText = async (res) => {
+  const parseAgentReply = async (res) => {
+    // Your controller returns { answer, data? } or { error }
     try {
       const data = await res.json()
-
-      // OpenAI/OpenRouter-like
-      const c0 = data?.choices?.[0]
-      if (c0?.message?.content) return String(c0.message.content)
-      if (c0?.text) return String(c0.text)
-
-      // generic fallbacks
+      if (data?.answer) return String(data.answer)
       if (typeof data === "string") return data
-      if (data?.reply) return String(data.reply)
-      if (data?.message) return String(data.message)
-      if (data?.output) return String(data.output)
-      if (data?.data && typeof data.data === "string") return data.data
-
+      if (data?.error) return `⚠️ ${data.error}`
       return JSON.stringify(data)
     } catch {
       return "Received a non-JSON response or could not parse the response."
@@ -135,15 +129,16 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
     setInput("")
 
     try {
-      const payload = {
-        model: modelMap[model] || modelMap.default,
-        messages: [...messages, userMsg].map(({ role, content }) => ({ role, content })),
-      }
+      const token = localStorage.getItem("token")
 
       const res = await fetch(apiUrl, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ message: text }),
       })
 
       if (!res.ok) {
@@ -151,7 +146,7 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
         throw new Error(`API error ${res.status}: ${detail || res.statusText}`)
       }
 
-      const aiText = await parseAIText(res)
+      const aiText = await parseAgentReply(res)
 
       setMessages((m) => [
         ...m,
@@ -168,11 +163,12 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
         {
           id: crypto.randomUUID(),
           role: "assistant",
-          content: "⚠️ I couldn't reach the AI service. Check the backend route and try again.",
+          content:
+            "⚠️ I couldn't reach the agent service. Check the /api/agent/chat route and try again.",
           ts: Date.now(),
         },
       ])
-      setError(e.message || "Failed to send message.")
+      showError(e.message || "Failed to send message.")
     } finally {
       setIsSending(false)
       inputRef.current?.focus()
@@ -182,84 +178,86 @@ export default function Chatbot({ apiUrl = DEFAULT_API_URL, title = "Fekra AI As
   return (
     <div className="chatbot-app" style={{ ["--accent"]: accent }}>
       <nav className="chatbot-navbar">
-  <div className="navbar-brand">
-    <div className="brand-icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M12 2L2 7L12 12L22 7L12 2Z"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M2 17L12 22L22 17"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M2 12L12 17L22 12"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </div>
-    <span className="brand-text">{title}</span>
-        <div className="status-indicator">
-      <div className="status-dot"></div>
-      <span>Online</span>
-    </div>
-  </div>
+        <div className="navbar-brand">
+          <div className="brand-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 2L2 7L12 12L22 7L12 2Z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M2 17L12 22L22 17"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <path
+                d="M2 12L12 17L22 12"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </div>
+          <span className="brand-text">{title}</span>
+          <div className="status-indicator">
+            <div className="status-dot"></div>
+            <span>Online</span>
+          </div>
+        </div>
 
-  <div className="navbar-actions">
-    {/* 🏠 Home Button */}
-    <button
-      className="nav-btn"
-      onClick={() => (window.location.href = "/")}
-      title="Go to Home"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M3 9L12 2l9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H3z" />
-      </svg>
-      Home
-    </button>
+        <div className="navbar-actions">
+          <button
+            className="nav-btn"
+            onClick={() => (window.location.href = "/")}
+            title="Go to Home"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 9L12 2l9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H3z" />
+            </svg>
+            Home
+          </button>
 
-    <button className="nav-btn secondary" onClick={clearChat} title="New Chat">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M12 5V19M5 12H19"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
-      New Chat
-    </button>
-
-
-  </div>
-</nav>
-
+          <button className="nav-btn secondary" onClick={clearChat} title="New Chat">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 5V19M5 12H19"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            New Chat
+          </button>
+        </div>
+      </nav>
 
       <div className="chat-container">
         <div className="chat-wrapper">
           <main className="messages-area" ref={listRef}>
             <div className="messages-list">
               {messages.map((m) => (
-                <ChatBubble key={m.id} role={m.role} content={m.content} ts={m.ts} onCopy={() => copyText(m.content)} />
+                <ChatBubble
+                  key={m.id}
+                  role={m.role}
+                  content={m.content}
+                  ts={m.ts}
+                  onCopy={() => copyText(m.content)}
+                />
               ))}
 
               {isSending && (
@@ -411,16 +409,16 @@ function renderInlineMarkdown(s) {
   // italic: *text* or _text_
   s = s.replace(/(^|[\s(])\*(?!\s)(.+?)\*(?=[\s).,!?:;]|$)/g, "$1<em>$2</em>")
   s = s.replace(/(^|[\s(])_(?!\s)(.+?)_(?=[\s).,!?:;]|$)/g, "$1<em>$2</em>")
-  // links: [text](url)
+  // links: [text](url)  ✅ fixed regex
   s = s.replace(
-    /\[([^\]]+)\]$$(https?:\/\/[^\s)]+)$$/g,
+    /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
     `<a class="fk-link" href="$2" target="_blank" rel="noopener noreferrer">$1</a>`,
   )
   return s
 }
 
 function renderBlocks(md) {
-  // split code blocks \`\`\`...\`\`\`
+  // split code blocks ```...```
   const codeBlockRegex = /```(?:\w+)?\n([\s\S]*?)```/g
   const parts = []
   let last = 0
@@ -446,66 +444,61 @@ function RichText({ text }) {
           </pre>
         ) : (
           // simple block parser: headers, lists, paragraphs
-          p.v
-            .split(/\n{2,}/)
-            .map((block, k) => {
-              const line = block.trim()
+          p.v.split(/\n{2,}/).map((block, k) => {
+            const line = block.trim()
 
-              // headers ###, ##, #
-              const h3 = line.match(/^###\s+(.*)$/m)
-              if (h3)
-                return (
-                  <h3
-                    className="text-h3"
-                    key={`${i}-h3-${k}`}
-                    dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h3[1]) }}
-                  />
-                )
-
-              const h2 = line.match(/^##\s+(.*)$/m)
-              if (h2)
-                return (
-                  <h2
-                    className="text-h2"
-                    key={`${i}-h2-${k}`}
-                    dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h2[1]) }}
-                  />
-                )
-
-              const h1 = line.match(/^#\s+(.*)$/m)
-              if (h1)
-                return (
-                  <h1
-                    className="text-h1"
-                    key={`${i}-h1-${k}`}
-                    dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h1[1]) }}
-                  />
-                )
-
-              // unordered list
-              if (/^[-*]\s+/.test(line)) {
-                const items = line
-                  .split(/\n/)
-                  .filter(Boolean)
-                  .map((li, idx) => li.replace(/^[-*]\s+/, ""))
-                return (
-                  <ul className="text-list" key={`${i}-ul-${k}`}>
-                    {items.map((it, idx) => (
-                      <li key={idx} dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(it) }} />
-                    ))}
-                  </ul>
-                )
-              }
-
-              // paragraph
+            const h3 = line.match(/^###\s+(.*)$/m)
+            if (h3)
               return (
-                <p
-                  className="text-paragraph"
-                  key={`${i}-p-${k}`}
-                  dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(line) }}
+                <h3
+                  className="text-h3"
+                  key={`${i}-h3-${k}`}
+                  dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h3[1]) }}
                 />
               )
-            })
+
+            const h2 = line.match(/^##\s+(.*)$/m)
+            if (h2)
+              return (
+                <h2
+                  className="text-h2"
+                  key={`${i}-h2-${k}`}
+                  dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h2[1]) }}
+                />
+              )
+
+            const h1 = line.match(/^#\s+(.*)$/m)
+            if (h1)
+              return (
+                <h1
+                  className="text-h1"
+                  key={`${i}-h1-${k}`}
+                  dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(h1[1]) }}
+                />
+              )
+
+            if (/^[-*]\s+/.test(line)) {
+              const items = line
+                .split(/\n/)
+                .filter(Boolean)
+                .map((li) => li.replace(/^[-*]\s+/, ""))
+              return (
+                <ul className="text-list" key={`${i}-ul-${k}`}>
+                  {items.map((it, idx) => (
+                    <li key={idx} dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(it) }} />
+                  ))}
+                </ul>
+              )
+            }
+
+            return (
+              <p
+                className="text-paragraph"
+                key={`${i}-p-${k}`}
+                dangerouslySetInnerHTML={{ __html: renderInlineMarkdown(line) }}
+              />
+            )
+          })
         ),
       )}
     </>
@@ -541,26 +534,8 @@ function ChatBubble({ role, content, ts, onCopy }) {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               />
-              <line
-                x1="9"
-                y1="9"
-                x2="9.01"
-                y2="9"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <line
-                x1="15"
-                y1="9"
-                x2="15.01"
-                y2="9"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <line x1="9" y1="9" x2="9.01" y2="9" stroke="currentColor" strokeWidth="2" />
+              <line x1="15" y1="9" x2="15.01" y2="9" stroke="currentColor" strokeWidth="2" />
             </svg>
           )}
         </div>
