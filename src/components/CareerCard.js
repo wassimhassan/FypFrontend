@@ -1,10 +1,16 @@
 import { FiTrendingUp, FiBriefcase, FiDollarSign, FiStar } from "react-icons/fi";
 import "./CareerCard.css";
+import { useNavigate } from "react-router-dom";
 
-const CareerCard = ({ major, jobTitle, salary, skills = [], industries = [], badge }) => {
+const CareerCard = ({ _id, major, jobTitle, salary, skills = [], industries = [], badge }) => {
   const primarySkills = skills.slice(0, 3);
   const extraSkills = skills.slice(3);
   const fullSkillsText = skills.join(", ");
+  const navigate = useNavigate();
+
+  const handleLearnMore = () => {
+    navigate(`/careers/${_id}`);
+  };
 
   return (
     <div className="career-card">
@@ -69,7 +75,10 @@ const CareerCard = ({ major, jobTitle, salary, skills = [], industries = [], bad
         </div>
       </div>
 
-      <button className="career-learn-btn">Learn More</button>
+      <button className="career-learn-btn" onClick={handleLearnMore}>
+  Learn More
+</button>
+
     </div>
   );
 };

@@ -24,10 +24,10 @@ import CareerDashboard from "./components/CareerDashboard.js";
 import Teacher from "./components/Teacher.js"; 
 import "./components/Teacher.css";            
 import Chatbot from "./components/Chatbot.js";
-
+import CareersTab from "./components/CareersTab.js";
 import ProtectedRoute from "./components/ProtectedRoutes.js";
-
-
+import ScholarshipDetailsModal from "./components/ScholarshipDetailsModal.js";
+import CareerDetails from "./components/CareerDetails.js";
 function App() {
   return (
     <Router>
@@ -46,6 +46,8 @@ function App() {
         <Route path="/courses" element={<CoursesPage />} />
         <Route path="/courses/:courseId" element={<CourseView />} />
         <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/careers" element={<CareersTab />} />
+        <Route path="/careers/:id" element={<CareerDetails />} />
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}/>
         

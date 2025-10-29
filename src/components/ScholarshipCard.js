@@ -1,13 +1,12 @@
 import { FiDollarSign, FiAward, FiFileText, FiList } from "react-icons/fi";
 import "./ScholarshipCard.css";
-
 const formatAmount = (val) => {
   if (val === 0 || typeof val === "number") return `$${Number(val).toLocaleString()}`;
   if (!val) return "—";
   return String(val);
 };
 
-const ScholarshipCard = ({ badge, amount, title, description, requirements }) => {
+const ScholarshipCard = ({ badge, amount, title, description, requirements, onViewDetails }) => {
   return (
     <div className="scholarship-card">
       {/* Top chips */}
@@ -52,8 +51,11 @@ const ScholarshipCard = ({ badge, amount, title, description, requirements }) =>
         </div>
       </div>
 
-      <button className="scholarship-apply-btn">View Details</button>
-    </div>
+    <button className="scholarship-apply-btn"
+        onClick={() => onViewDetails && onViewDetails()}>
+        View Details
+      </button>
+     </div>
   );
 };
 

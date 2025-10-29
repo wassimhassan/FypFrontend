@@ -1,72 +1,261 @@
-/* Page scaffold */
-.enroll-page { padding: 24px; }
-.page-title { margin: 0 0 16px; color: #0f2a53; }
-.grid {
-display: grid;
-grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-gap: 16px;
+/* --- Base Variables --- */
+:root {
+  --blue-primary: #3B82F6;
+  --blue-dark: #1E40AF;
+  --blue-light-bg: #EFF6FF;
+  --text-dark: #111827;
+  --text-body: #4B5563;
+  --text-light: #6B7281;
+  --border-color: #E5E7EB;
+  --yellow-light-bg: #FEF3C7;
+  --yellow-dark-text: #92400E;
 }
-.simple-card {
-background: #fff;
-border: 1px solid #e6eefb;
-border-radius: 14px;
-padding: 16px;
-box-shadow: 0 6px 20px rgba(15, 60, 140, 0.06);
-}
-.simple-card .muted { color: #6d7b99; margin-top: 4px; }
 
-
-/* Buttons */
-.enroll-btn {
-appearance: none;
-border: 0;
-border-radius: 12px;
-padding: 10px 14px;
-font-weight: 600;
-cursor: pointer;
-}
-.enroll-btn.primary { background: #1e66ff; color: white; }
-.enroll-btn.primary:hover { filter: brightness(0.95); }
-.enroll-btn.ghost { background: #f2f6ff; color: #1e66ff; }
-.enroll-btn.ghost:hover { background: #e6eefb; }
-
-
-/* Modal */
+/* --- Overlay & Card --- */
 .enroll-overlay {
-position: fixed; inset: 0; display: grid; place-items: center;
-background: rgba(8, 24, 64, 0.35);
-z-index: 1000;
-backdrop-filter: blur(2px);
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
 }
+
 .enroll-card {
-width: min(680px, 92vw);
-background: #ffffff;
-border-radius: 16px;
-border: 1px solid #e6eefb;
-box-shadow: 0 18px 60px rgba(15, 60, 140, 0.18);
-overflow: hidden;
+  background: #fff;
+  border-radius: 16px;
+  width: 520px; /* Adjusted width */
+  max-width: 95%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-out;
 }
-.enroll-header {
-display: flex; align-items: center; justify-content: space-between;
-padding: 14px 16px; background: linear-gradient(90deg, #1e66ff, #3a87ff);
-color: #fff;
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
-.enroll-title { margin: 0; font-size: 18px; font-weight: 700; }
+
 .enroll-close {
-background: transparent; border: 0; color: #fff; font-size: 22px; cursor: pointer;
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--text-light);
+  cursor: pointer;
+  line-height: 1;
 }
-.enroll-body { padding: 16px; }
-.enroll-row { margin-bottom: 14px; }
-.enroll-label { display: block; font-size: 12px; color: #36508a; margin-bottom: 6px; }
-.enroll-pill {
-display: inline-block; padding: 6px 10px; border-radius: 999px;
-background: #edf3ff; color: #1e66ff; font-weight: 600; border: 1px solid #d7e5ff;
+
+/* --- Modal Content --- */
+.enroll-content {
+  padding: 28px 32px;
+  box-sizing: border-box;
 }
+
+.enroll-tag {
+  display: inline-block;
+  background-color: var(--yellow-light-bg);
+  color: var(--yellow-dark-text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.enroll-content h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.enroll-subtitle {
+  font-size: 16px;
+  color: var(--text-light);
+  margin: 4px 0 24px 0;
+}
+
+.enroll-info-section {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.enroll-info-section:last-of-type {
+  margin-bottom: 0;
+}
+
+.enroll-info-section .icon-wrapper {
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.enroll-info-section svg {
+  width: 20px;
+  height: 20px;
+}
+
+.enroll-info-section strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.enroll-info-section p {
+  font-size: 14px;
+  color: var(--text-body);
+  margin: 2px 0 0 0;
+}
+
 .enroll-desc {
-margin: 0; line-height: 1.6; color: #243156; background: #fafcff; border: 1px solid #eef3ff;
-padding: 12px; border-radius: 10px;
+  line-height: 1.5;
 }
+
+/* --- Notice Box --- */
+.notice-box {
+  display: flex;
+  gap: 12px;
+  background-color: var(--blue-light-bg);
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 24px;
+}
+
+.notice-box .icon-wrapper {
+  color: var(--blue-primary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notice-text strong {
+  font-size: 14px;
+  color: var(--blue-dark);
+}
+
+.notice-text p {
+  font-size: 13px;
+  color: #1E3A8A; /* A slightly different blue for the paragraph */
+  margin: 4px 0 0 0;
+  line-height: 1.4;
+}
+
+/* --- Footer & Buttons --- */
 .enroll-footer {
-display: flex; justify-content: flex-end; gap: 10px; padding: 12px 16px; background: #f7faff;
-border-top: 1px solid #e6eefb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border-color);
+  padding: 20px 32px;
+  background-color: #fcfcfd; /* A very light off-white */
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
 }
+
+.btn {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background-color: #fff;
+  color: #374151;
+  border-color: #D1D5DB;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #F9FAFB;
+}
+
+.btn-primary {
+  background-color: var(--blue-primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #2563EB;
+}
+
+/* --- Error Styling --- */
+.enroll-error {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #FEF2F2;
+  border-radius: 8px;
+}
+
+.enroll-error p {
+  margin: 0;
+  color: #991B1B;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* ... (root variables and overlay styles remain the same) */
+
+.enroll-card {
+  background: #fff;
+  border-radius: 16px;
+  width: 520px;
+  max-width: 95%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* ... (fadeIn animation and close button styles remain the same) */
+
+.enroll-content {
+  padding: 28px 32px;
+  box-sizing: border-box;
+}
+
+/* 👇 ADDED THIS NEW RULE FOR THE HEADER */
+.enroll-header {
+  text-align: left;
+  margin-bottom: 24px; /* Creates space between header and body */
+}
+
+.enroll-tag {
+  display: inline-block;
+  background-color: var(--yellow-light-bg);
+  color: var(--yellow-dark-text);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.enroll-content h1 {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin: 0;
+}
+
+.enroll-subtitle {
+  font-size: 16px;
+  color: var(--text-light);
+  margin: 4px 0 0 0; /* 👇 REMOVED BOTTOM MARGIN HERE */
+}
+
+/* ... (all other styles for info-section, notice-box, footer, etc. remain the same) */

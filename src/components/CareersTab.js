@@ -27,6 +27,7 @@ export default function CareersTab() {
         {careers.map((career) => (
           <CareerCard
             key={career._id}
+            _id={career._id} 
             major={career.field}
             jobTitle={career.title}
             description={career.description}

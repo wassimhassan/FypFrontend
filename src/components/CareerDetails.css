@@ -1,0 +1,47 @@
+.career-details-container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(32, 67, 142, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.career-details-title {
+  color: #20438e;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.career-details-field,
+.career-details-salary {
+  font-size: 16px;
+  color: #475569;
+  margin-bottom: 6px;
+}
+
+.career-details-desc {
+  margin: 20px 0;
+  font-size: 15px;
+  color: #334155;
+  line-height: 1.6;
+}
+
+.career-details-section {
+  margin-top: 20px;
+}
+
+.career-details-section h4 {
+  color: #1e3a8a;
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.career-details-section ul {
+  list-style: disc;
+  margin-left: 20px;
+  color: #475569;
+}

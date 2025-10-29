@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import ScholarshipCard from "./ScholarshipCard";
+import ScholarshipDetailsModal from "./ScholarshipDetailsModal";
 import axios from "axios";
 import "./ScholarshipsTab.css";
 
 const ScholarshipsTab = () => {
   const [scholarships, setScholarships] = useState([]);
+  const [selectedScholarship, setSelectedScholarship] = useState(null); // 🆕 track which scholarship is selected
+  const [modalOpen, setModalOpen] = useState(false); // 🆕 track modal open/close
 
   useEffect(() => {
     const fetchScholarships = async () => {
@@ -20,6 +23,17 @@ const ScholarshipsTab = () => {
     fetchScholarships();
   }, []);
 
+  // 🆕 Handler when "View Details" is clicked
+  const handleViewDetails = (scholarship) => {
+    setSelectedScholarship(scholarship);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedScholarship(null);
+  };
+
   return (
     <div className="tab-content">
       <h2>Scholarship Opportunities</h2>
@@ -34,9 +48,17 @@ const ScholarshipsTab = () => {
             title={sch.scholarship_title}
             description={sch.scholarship_description}
             requirements={sch.scholarship_requirements}
+            onViewDetails={() => handleViewDetails(sch)} // 🆕 pass selected scholarship
           />
         ))}
       </div>
+
+      {/* 🆕 Render the modal */}
+      <ScholarshipDetailsModal
+        open={modalOpen}
+        scholarship={selectedScholarship}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
