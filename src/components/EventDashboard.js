@@ -26,7 +26,7 @@ import "./EventDashboard.css";
 
 // API base (env override supported)
 const API_BASE =
-  (process.env.NEXT_PUBLIC_API_BASE || "http://localhost:3001") + "/api/events";
+  (process.env.REACT_APP_BACKEND_URL || "http://localhost:3001") + "/api/universities";
 
 // Ellipsize + Tooltip helper (same as Career)
 const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
