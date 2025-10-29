@@ -28,6 +28,9 @@ import CareersTab from "./components/CareersTab.js";
 import ProtectedRoute from "./components/ProtectedRoutes.js";
 import ScholarshipDetailsModal from "./components/ScholarshipDetailsModal.js";
 import CareerDetails from "./components/CareerDetails.js";
+import EventDashboard from "./components/EventDashboard.js";
+
+
 function App() {
   return (
     <Router>
@@ -117,6 +120,7 @@ function App() {
           <Route path="scholarship" element={<ScholarshipDashboard />} />
           <Route path="university" element={<UniversityDashboard />} />
           <Route path="career" element={<CareerDashboard />} />
+          <Route path="event" element={<EventDashboard />} />
           <Route path="overview" element={<DashboardOverview />} />
         </Route>
 

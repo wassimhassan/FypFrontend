@@ -312,38 +312,38 @@ const ScholarshipDashboard = () => {
                       {sch.createdAt ? new Date(sch.createdAt).toLocaleDateString() : "-"}
                     </TableCell>
 
-                    <TableCell>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        className="scholarship-edit-btn"
-                        onClick={() => {
-                          // include description & requirements into edit state
-                          setSelectedScholarship({
-                            ...sch,
-                            scholarship_value: sch.scholarship_value ?? "",
-                            scholarship_type: sch.scholarship_type ?? "",
-                            scholarship_description: sch.scholarship_description ?? "",
-                            scholarship_requirements: sch.scholarship_requirements ?? "",
-                          })
-                          setEditDialogOpen(true)
-                        }}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="error"
-                        sx={{ ml: 1 }}
-                        onClick={() => {
-                          setScholarshipToDelete(sch)
-                          setDeleteDialogOpen(true)
-                        }}
-                      >
-                        Delete
-                      </Button>
-                    </TableCell>
+                        <TableCell className="actions-cell">
+              <Box display="flex" alignItems="center" gap={1} sx={{ flexWrap: "nowrap" }}>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  className="scholarship-edit-btn"
+                  onClick={() => {
+                    setSelectedScholarship({
+                      ...sch,
+                      scholarship_value: sch.scholarship_value ?? "",
+                      scholarship_type: sch.scholarship_type ?? "",
+                      scholarship_description: sch.scholarship_description ?? "",
+                      scholarship_requirements: sch.scholarship_requirements ?? "",
+                    })
+                    setEditDialogOpen(true)
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="small"
+                  variant="outlined"
+                  color="error"
+                  onClick={() => {
+                    setScholarshipToDelete(sch)
+                    setDeleteDialogOpen(true)
+                  }}
+                >
+                  Delete
+                </Button>
+              </Box>
+            </TableCell>
                   </TableRow>
                 )
               })}
