@@ -27,7 +27,7 @@ import "./CareerDashboard.css";
 
 // API base (env override supported)
 const API_BASE =
-  (process.env.REACT_APP_BACKEND_URL || "http://localhost:3001") + "/api/universities";
+  (process.env.REACT_APP_BACKEND_URL || "http://localhost:3001") + "/api/careers";
 
 // Ellipsize + Tooltip helper
 const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
