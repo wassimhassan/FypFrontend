@@ -34,7 +34,12 @@ const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
   const text = value ?? "";
   const isMulti = lines > 1;
   return (
-    <Tooltip title={text || ""} arrow placement="top" disableHoverListener={!text}>
+    <Tooltip
+      title={text || ""}
+      arrow
+      placement="top"
+      disableHoverListener={!text}
+    >
       <span
         style={
           isMulti
@@ -94,14 +99,30 @@ const formatLocalInput = (d) => {
 // Fields
 const FIELD_MAP = [
   { key: "title", label: "Title", required: true, type: "text" },
-  { key: "mode", label: "Mode (Online/In-Person/Hybrid)", required: true, type: "text" },
+  {
+    key: "mode",
+    label: "Mode (Online/In-Person/Hybrid)",
+    required: true,
+    type: "text",
+  },
   { key: "tag", label: "Tag", required: false, type: "text" },
   { key: "type", label: "Type", required: false, type: "text" },
   { key: "location", label: "Location", required: false, type: "text" },
   { key: "link", label: "Link (URL)", required: false, type: "text" },
-  { key: "startsAt", label: "Starts At", required: true, type: "datetime-local" },
+  {
+    key: "startsAt",
+    label: "Starts At",
+    required: true,
+    type: "datetime-local",
+  },
   { key: "endsAt", label: "Ends At", required: false, type: "datetime-local" },
-  { key: "description", label: "Description", required: false, type: "multiline", clamped: true },
+  {
+    key: "description",
+    label: "Description",
+    required: false,
+    type: "multiline",
+    clamped: true,
+  },
 ];
 
 const EventDashboard = () => {
@@ -132,22 +153,30 @@ const EventDashboard = () => {
   const [newEvent, setNewEvent] = useState(emptyForm);
 
   // Auth header (admin endpoints)
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
 
   // Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_BASE, { headers: { Accept: "application/json" } });
+      const res = await fetch(API_BASE, {
+        headers: { Accept: "application/json" },
+      });
       let data = null;
       try {
         data = await res.json();
       } catch {
         data = null;
       }
-      if (!res.ok) throw new Error(data?.message || `Failed to fetch (${res.status})`);
-      const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      if (!res.ok)
+        throw new Error(data?.message || `Failed to fetch (${res.status})`);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.items)
+        ? data.items
+        : [];
       setEvents(list);
     } catch (err) {
       console.error(err);
@@ -175,7 +204,11 @@ const EventDashboard = () => {
             locationToText(e.location),
             e.description,
           ];
-          return fields.some((f) => String(f || "").toLowerCase().includes(q));
+          return fields.some((f) =>
+            String(f || "")
+              .toLowerCase()
+              .includes(q)
+          );
         })
       : events.slice();
 
@@ -312,7 +345,14 @@ const EventDashboard = () => {
       <ToastContainer position="top-right" autoClose={3000} />
 
       {/* Header: title + search + add */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} gap={2} flexWrap="wrap">
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+        gap={2}
+        flexWrap="wrap"
+      >
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Event Management
         </Typography>
@@ -376,7 +416,9 @@ const EventDashboard = () => {
                 </TableCell>
                 <TableCell>Tag</TableCell>
                 <TableCell>Type</TableCell>
-                <TableCell sortDirection={orderBy === "startsAt" ? order : false}>
+                <TableCell
+                  sortDirection={orderBy === "startsAt" ? order : false}
+                >
                   <TableSortLabel
                     active={orderBy === "startsAt"}
                     direction={orderBy === "startsAt" ? order : "asc"}
@@ -388,7 +430,9 @@ const EventDashboard = () => {
                 <TableCell>Ends At</TableCell>
                 <TableCell>Location</TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                <TableCell
+                  sortDirection={orderBy === "createdAt" ? order : false}
+                >
                   <TableSortLabel
                     active={orderBy === "createdAt"}
                     direction={orderBy === "createdAt" ? order : "asc"}
@@ -418,25 +462,36 @@ const EventDashboard = () => {
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200 }}>
                     <Ellipsize
-                      value={e.startsAt ? new Date(e.startsAt).toLocaleString() : "-"}
+                      value={
+                        e.startsAt ? new Date(e.startsAt).toLocaleString() : "-"
+                      }
                       maxWidth={200}
                     />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200 }}>
                     <Ellipsize
-                      value={e.endsAt ? new Date(e.endsAt).toLocaleString() : "-"}
+                      value={
+                        e.endsAt ? new Date(e.endsAt).toLocaleString() : "-"
+                      }
                       maxWidth={200}
                     />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 220 }}>
-                    <Ellipsize value={locationToText(e.location)} maxWidth={220} />
+                    <Ellipsize
+                      value={locationToText(e.location)}
+                      maxWidth={220}
+                    />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 380 }}>
                     <Ellipsize value={e.description} lines={2} maxWidth={380} />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 160 }}>
                     <Ellipsize
-                      value={e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "-"}
+                      value={
+                        e.createdAt
+                          ? new Date(e.createdAt).toLocaleDateString()
+                          : "-"
+                      }
                       maxWidth={160}
                     />
                   </TableCell>
@@ -502,7 +557,9 @@ const EventDashboard = () => {
               onChange={(e) =>
                 setNewEvent((prev) => ({ ...prev, [f.key]: e.target.value }))
               }
-              InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
+              InputLabelProps={
+                f.type === "datetime-local" ? { shrink: true } : undefined
+              }
               sx={{ mb: 2 }}
             />
           ))}
@@ -541,7 +598,9 @@ const EventDashboard = () => {
                     prev ? { ...prev, [f.key]: e.target.value } : prev
                   )
                 }
-                InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
+                InputLabelProps={
+                  f.type === "datetime-local" ? { shrink: true } : undefined
+                }
                 sx={{ mb: 2 }}
               />
             ))}
