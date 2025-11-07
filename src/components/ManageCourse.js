@@ -7,6 +7,19 @@ import NavBar from './NavBar';
 import EnrollmentRequests from './EnrollmentRequests';
 import EnrolledStudents     from './EnrolledStudents';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// NEW: MUI dialog bits
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Button,
+} from '@mui/material';
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function ManageCourse() {
@@ -16,6 +29,11 @@ export default function ManageCourse() {
   const [course, setCourse] = useState(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showEnrolledSidebar, setShowEnrolled] = useState(false);
+
+  // NEW: delete dialog state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toDelete, setToDelete] = useState(null);
+
   const token = localStorage.getItem('token');
   const headers = { Authorization: `Bearer ${token}` };
   const fileInputRef = useRef(null);
@@ -41,150 +59,188 @@ export default function ManageCourse() {
   }, [courseId]);
 
   const upload = async (e) => {
-  e.preventDefault();
-  if (!files || files.length === 0) return alert("Pick at least one file");
-  if (files.length > 10) return alert("You can upload up to 10 files at a time.");
-
-  try {
-    let fd = new FormData(formRef.current);
-    let selected = fd.getAll('files');
-
-    // If the browser didn't capture files from the form for any reason, fall back to manual append
-    if (!selected || selected.length === 0) {
-      fd = new FormData();
-      files.forEach((f) => fd.append('files', f, f.name));
-      selected = files;
+    e.preventDefault();
+    if (!files || files.length === 0) {
+      toast.warn("Pick at least one file");
+      return;
+    }
+    if (files.length > 10) {
+      toast.warn("You can upload up to 10 files at a time.");
+      return;
     }
 
-    // Debug: log what we're about to send
     try {
-      const debugEntries = [];
-      for (const [k, v] of fd.entries()) {
-        debugEntries.push([k, v && v.name ? v.name : v]);
+      let fd = new FormData(formRef.current);
+      let selected = fd.getAll('files');
+
+      if (!selected || selected.length === 0) {
+        fd = new FormData();
+        files.forEach((f) => fd.append('files', f, f.name));
+        selected = files;
       }
-      console.log('[ManageCourse] FormData entries:', debugEntries);
-    } catch {}
 
-    const res = await fetch(`${API}/courses/${courseId}/content`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    });
+      try {
+        const debugEntries = [];
+        for (const [k, v] of fd.entries()) {
+          debugEntries.push([k, v && v.name ? v.name : v]);
+        }
+        console.log('[ManageCourse] FormData entries:', debugEntries);
+      } catch {}
 
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      throw new Error(data?.message || `Upload failed with status ${res.status}`);
+      const res = await fetch(`${API}/courses/${courseId}/content`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.message || `Upload failed with status ${res.status}`);
+      }
+
+      setFiles([]);
+      if (fileInputRef.current) fileInputRef.current.value = null;
+      await fetchList();
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Upload failed: ' + (error.message));
     }
+  };
 
-    setFiles([]);
-    if (fileInputRef.current) fileInputRef.current.value = null;
-    await fetchList();
-  } catch (error) {
-    console.error('Upload error:', error);
-    alert('Upload failed: ' + (error.message));
-  }
-};
+  const remove = (contentId) => {
+    const item = list.find((x) => x._id === contentId);
+    setToDelete(item || { _id: contentId });
+    setDeleteOpen(true);
+  };
 
-  const remove = async (contentId) => {
-    if (!window.confirm('Delete this file?')) return;
-    await axios.delete(`${API}/courses/content/${contentId}`, { headers });
-    await fetchList();
+  // NEW: confirmed delete handler
+  const handleDelete = async () => {
+    if (!toDelete?._id) return;
+    try {
+      await axios.delete(`${API}/courses/content/${toDelete._id}`, { headers });
+      setDeleteOpen(false);
+      setToDelete(null);
+      await fetchList();
+      toast.success('File deleted.');
+    } catch (err) {
+      console.error('Delete error:', err);
+      toast.error(err?.response?.data?.message || 'Failed to delete file');
+    }
   };
 
   return (
     <>
-    <NavBar />
-    <div className='BG'>
-      <div className="manage-layout">
-        {/* Main content */}
-        <div className="manage-main">
-          <div className="manage-header">
-            <h2>Manage Course Files</h2>
-            {course && (
-              <div className="manage-actions">
-        <button 
-          className="enrollment-toggle-btn"
-          onClick={() => setShowSidebar(!showSidebar)}
-        >
-          {showSidebar ? 'Hide' : 'Show'} Enrollment Requests
-          {course.pendingStudents && course.pendingStudents.length > 0 && (
-            <span className="pending-badge">{course.pendingStudents.length}</span>
-          )}
-        </button>
-        <button
-          className="enrollment-toggle-btn Enrolled"
-          onClick={() => setShowEnrolled(!showEnrolledSidebar)}
-        >
-          {showEnrolledSidebar ? 'Hide' : 'Show'} Enrolled Students
-        </button>
-      </div>
-            )}
-          </div>
-
-          <form ref={formRef} onSubmit={upload} className="upload-box" encType="multipart/form-data">
-            <input
-              type="file"
-              name="files"
-              multiple
-              ref={fileInputRef}
-              onChange={(e) => setFiles(Array.from(e.target.files || []))}
-              accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.webp,.gif"
-            />
-            <div style={{ marginTop: 8 }}>
-              <span style={{ marginRight: 8 }}>
-                {files.length ? `${files.length} selected (max 10)` : 'No files selected'}
-              </span>
-              <button type="submit" disabled={!files || !files.length || files.length > 10}>Upload</button>
+      <NavBar />
+      <ToastContainer position="top-right" autoClose={2000} />
+      <div className='BG'>
+        <div className="manage-layout">
+          {/* Main content */}
+          <div className="manage-main">
+            <div className="manage-header">
+              <h2>Manage Course Files</h2>
+              {course && (
+                <div className="manage-actions">
+                  <button 
+                    className="enrollment-toggle-btn"
+                    onClick={() => setShowSidebar(!showSidebar)}
+                  >
+                    {showSidebar ? 'Hide' : 'Show'} Enrollment Requests
+                    {course.pendingStudents && course.pendingStudents.length > 0 && (
+                      <span className="pending-badge">{course.pendingStudents.length}</span>
+                    )}
+                  </button>
+                  <button
+                    className="enrollment-toggle-btn Enrolled"
+                    onClick={() => setShowEnrolled(!showEnrolledSidebar)}
+                  >
+                    {showEnrolledSidebar ? 'Hide' : 'Show'} Enrolled Students
+                  </button>
+                </div>
+              )}
             </div>
-          </form>
 
-          <ul className="file-list">
-            {list.map(item => (
-              <li key={item._id}>
-                <a href={item.fileUrl} target="_blank" rel="noreferrer">{item.title}</a>
-                <span>{(item.size/1024/1024).toFixed(1)} MB</span>
-                <button onClick={() => remove(item._id)}>Delete</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Sidebar for enrollment requests */}
-        {showSidebar && (
-          <div className="manage-sidebar">
-            <div className="sidebar-header">
-              <h3>Enrollment Requests</h3>
-              <button 
-                className="close-sidebar-btn"
-                onClick={() => setShowSidebar(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="sidebar-content">
-              <EnrollmentRequests 
-                courseId={courseId} 
-                onUpdate={() => {
-                  fetchCourse(); // Refresh course data to update pending count
-                }}
+            <form ref={formRef} onSubmit={upload} className="upload-box" encType="multipart/form-data">
+              <input
+                type="file"
+                name="files"
+                multiple
+                ref={fileInputRef}
+                onChange={(e) => setFiles(Array.from(e.target.files || []))}
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png,.webp,.gif"
               />
-            </div>
+              <div style={{ marginTop: 8 }}>
+                <span style={{ marginRight: 8 }}>
+                  {files.length ? `${files.length} selected (max 10)` : 'No files selected'}
+                </span>
+                <button type="submit" disabled={!files || !files.length || files.length > 10}>Upload</button>
+              </div>
+            </form>
+
+            <ul className="file-list">
+              {list.map(item => (
+                <li key={item._id}>
+                  <a href={item.fileUrl} target="_blank" rel="noreferrer">{item.title}</a>
+                  <span>{(item.size/1024/1024).toFixed(1)} MB</span>
+                  <button onClick={() => remove(item._id)}>Delete</button>
+                </li>
+              ))}
+            </ul>
           </div>
-        )}
-        {/* Sidebar for enrolled students */}
-  {showEnrolledSidebar && (
-    <div className="manage-sidebar">
-      <div className="sidebar-header">
-        <h3>Enrolled Students</h3>
-        <button className="close-sidebar-btn" onClick={() => setShowEnrolled(false)}>×</button>
+
+          {/* Sidebar for enrollment requests */}
+          {showSidebar && (
+            <div className="manage-sidebar">
+              <div className="sidebar-header">
+                <h3>Enrollment Requests</h3>
+                <button 
+                  className="close-sidebar-btn"
+                  onClick={() => setShowSidebar(false)}
+                >
+                  ×
+                </button>
+              </div>
+              <div className="sidebar-content">
+                <EnrollmentRequests 
+                  courseId={courseId} 
+                  onUpdate={() => {
+                    fetchCourse(); // Refresh course data to update pending count
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Sidebar for enrolled students */}
+          {showEnrolledSidebar && (
+            <div className="manage-sidebar">
+              <div className="sidebar-header">
+                <h3>Enrolled Students</h3>
+                <button className="close-sidebar-btn" onClick={() => setShowEnrolled(false)}>×</button>
+              </div>
+              <div className="sidebar-content">
+                <EnrolledStudents courseId={courseId} onUpdate={fetchCourse} />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-      <div className="sidebar-content">
-        <EnrolledStudents courseId={courseId} onUpdate={fetchCourse} />
-      </div>
-    </div>
-  )}
-      </div>
-    </div>
+
+      {/* Delete confirm dialog */}
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Delete File</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this file?</Typography>
+          <Typography fontWeight="bold" mt={1}>
+            {toDelete?.title || toDelete?.fileKey || 'Selected file'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={handleDelete}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 }

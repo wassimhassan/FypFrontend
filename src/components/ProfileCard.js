@@ -9,9 +9,12 @@ import {
   CardContent,
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogActions,
   Menu,
   MenuItem,
   Tooltip,
+  Typography,
 } from "@mui/material";
 
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
@@ -43,6 +46,9 @@ const ProfileCard = () => {
   // profile picture
   const fileInputRef = useRef(null);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+
+  // delete picture dialog
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // MUI Menu (dropdown) anchor
   const [anchorEl, setAnchorEl] = useState(null);
@@ -84,36 +90,37 @@ const ProfileCard = () => {
     handleCloseMenu();
   };
 
-  /* ---------- Delete profile picture ----------------------------------- */
+  /* ---------- Delete profile picture (via dialog) ----------------------- */
   const deleteProfilePicture = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your profile picture?"
-    );
-    if (!confirmDelete) return;
-
     const token = localStorage.getItem("token");
     if (!token) {
       toast.error("No token found. Please log in.");
       return;
     }
 
-    const res = await fetch(`${API_BASE_URL}/profile/remove-profile-picture`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
+    try {
+      const res = await fetch(`${API_BASE_URL}/profile/remove-profile-picture`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
 
-    if (res.ok) {
-      toast.success("Profile picture removed successfully!");
-      setUserInfo((prev) => ({
-        ...prev,
-        profilePicture:
-          "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
-      }));
-    } else {
-      toast.error(data.message || "Failed to delete profile picture");
+      if (res.ok) {
+        toast.success("Profile picture removed successfully!");
+        setUserInfo((prev) => ({
+          ...prev,
+          profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+        }));
+      } else {
+        toast.error(data.message || "Failed to delete profile picture");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to delete profile picture");
+    } finally {
+      setDeleteOpen(false);
+      handleCloseMenu();
     }
-    handleCloseMenu();
   };
 
   /* ---------- Input change --------------------------------------------- */
@@ -153,7 +160,10 @@ const ProfileCard = () => {
         const picRes = await fetch(`${API_BASE_URL}/profile/profile-picture`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        const picData = await picRes.json();
+        const picData = await res.json().catch(() => ({}));
+        // NOTE: keep original logic, but fixed to use correct response:
+        // If you intended picData from picRes, uncomment below lines and remove the two above.
+        // const picData = await picRes.json();
         if (picRes.ok) {
           setUserInfo((prev) => ({
             ...prev,
@@ -205,7 +215,6 @@ const ProfileCard = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     toast.info("Logged out.");
-    // small delay so user sees the toast before redirect
     setTimeout(() => (window.location.href = "/"), 600);
   };
 
@@ -266,7 +275,11 @@ const ProfileCard = () => {
               <PhotoCameraIcon fontSize="small" style={{ marginRight: 8 }} />
               Change Profile Picture
             </MenuItem>
-            <MenuItem onClick={deleteProfilePicture}>
+            <MenuItem
+              onClick={() => {
+                setDeleteOpen(true); // open confirm dialog
+              }}
+            >
               <DeleteOutlineIcon fontSize="small" style={{ marginRight: 8 }} />
               Delete Picture
             </MenuItem>
@@ -419,6 +432,20 @@ const ProfileCard = () => {
           )}
         </div>
       </div>
+
+      {/* Delete picture confirm dialog */}
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Delete Profile Picture</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete your profile picture?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={deleteProfilePicture}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

@@ -4,6 +4,9 @@ import TeacherCourse from '../components/TeacherCourse';
 import ViewEnrollModal from '../components/ViewEnrollModal'; // ⬅️ add this
 import axios from 'axios';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function CoursesTab() {
   const [courses, setCourses] = useState([]);
   const [open, setOpen] = useState(false);
@@ -12,46 +15,46 @@ export default function CoursesTab() {
   const [enrollError, setEnrollError] = useState("");
   const [userEnrollments, setUserEnrollments] = useState({ enrolled: [], pending: [] });
 
-const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+  const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const fetchCourses = async () => {
-  try {
-    const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/courses`);
-    setCourses(res.data);
-  } catch (error) {
-    console.error("Error fetching courses:", error);
-  }
-};
+  const fetchCourses = async () => {
+    try {
+      const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/courses`);
+      setCourses(res.data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+    }
+  };
 
-const fetchUserEnrollments = async () => {
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+  const fetchUserEnrollments = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
 
-    const [enrolledRes, pendingRes] = await Promise.all([
-      axios.get(`${API}/courses/my`, {
-        headers: { Authorization: `Bearer ${token}` },
-      }),
-      axios.get(`${API}/courses/my/pending`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-    ]);
+      const [enrolledRes, pendingRes] = await Promise.all([
+        axios.get(`${API}/courses/my`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API}/courses/my/pending`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      ]);
 
-    setUserEnrollments({
-      enrolled: enrolledRes.data.map(course => course._id),
-      pending: pendingRes.data.map(course => course._id)
-    });
-  } catch (error) {
-    console.error("Error fetching user enrollments:", error);
-  }
-};
+      setUserEnrollments({
+        enrolled: enrolledRes.data.map(course => course._id),
+        pending: pendingRes.data.map(course => course._id)
+      });
+    } catch (error) {
+      console.error("Error fetching user enrollments:", error);
+    }
+  };
 
-useEffect(() => {
-  fetchCourses();
-  fetchUserEnrollments();
-}, []);
+  useEffect(() => {
+    fetchCourses();
+    fetchUserEnrollments();
+  }, []);
 
- const openModal = (course) => {
+  const openModal = (course) => {
     setSelected(course);
     setEnrollError("");
     setOpen(true);
@@ -84,8 +87,7 @@ useEffect(() => {
 
       setEnrolling(false);
       setOpen(false);
-      // optional: toast
-      alert(`Enrollment request submitted for: ${course.title}. Waiting for teacher approval.`);
+      toast.success(`Enrollment request submitted for: ${course.title}. Waiting for teacher approval.`);
     } catch (err) {
       console.error(err);
       const msg =
@@ -100,6 +102,9 @@ useEffect(() => {
 
   return (
     <section className="tab-content">
+      {/* Toast container */}
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <h2>Available Courses</h2>
       <p>Explore our featured courses to boost your skills.</p>
       <div className="card-row">

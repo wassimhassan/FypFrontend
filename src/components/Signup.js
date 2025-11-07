@@ -3,6 +3,9 @@ import { Link, useNavigate } from "react-router-dom"
 import axios from "axios"
 import "./Signup.css"
 
+import { ToastContainer, toast } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+
 export default function Signup() {
   const navigate = useNavigate()
 
@@ -21,10 +24,12 @@ export default function Signup() {
 
     try {
       await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/auth/signup`, { username, email, password })
-      alert("Account created! Please log in.")
+      toast.success("Account created! Please log in.")
       navigate("/login")
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed. Try again.")
+      const msg = err.response?.data?.message || "Signup failed. Try again."
+      setError(msg)
+      toast.error(msg)
     }
 
     setLoading(false)
@@ -32,6 +37,8 @@ export default function Signup() {
 
   return (
     <div className="signup-container">
+      <ToastContainer position="top-right" autoClose={2000} />
+
       <div className="signup-form-box">
         <h1>Sign up</h1>
 

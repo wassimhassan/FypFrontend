@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './EnrollmentRequests.css';
+import { toast } from 'react-toastify';
 
 export default function EnrollmentRequests({ courseId, onUpdate }) {
   const [pendingStudents, setPendingStudents] = useState([]);
@@ -35,42 +36,36 @@ export default function EnrollmentRequests({ courseId, onUpdate }) {
   const handleApprove = async (studentId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API}/courses/${courseId}/approve`, 
+      await axios.post(
+        `${API}/courses/${courseId}/approve`,
         { studentId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Remove from pending list
+
       setPendingStudents(prev => prev.filter(student => student._id !== studentId));
-      
-      // Notify parent component to refresh data
       if (onUpdate) onUpdate();
-      
-      alert('Enrollment approved successfully!');
+      toast.success('Enrollment approved successfully!');
     } catch (err) {
       console.error('Error approving enrollment:', err);
-      alert(err.response?.data?.message || 'Failed to approve enrollment');
+      toast.error(err.response?.data?.message || 'Failed to approve enrollment');
     }
   };
 
   const handleReject = async (studentId) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${API}/courses/${courseId}/reject`, 
+      await axios.post(
+        `${API}/courses/${courseId}/reject`,
         { studentId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Remove from pending list
+
       setPendingStudents(prev => prev.filter(student => student._id !== studentId));
-      
-      // Notify parent component to refresh data
       if (onUpdate) onUpdate();
-      
-      alert('Enrollment rejected successfully!');
+      toast.info('Enrollment rejected successfully!');
     } catch (err) {
       console.error('Error rejecting enrollment:', err);
-      alert(err.response?.data?.message || 'Failed to reject enrollment');
+      toast.error(err.response?.data?.message || 'Failed to reject enrollment');
     }
   };
 
@@ -85,7 +80,7 @@ export default function EnrollmentRequests({ courseId, onUpdate }) {
   return (
     <div className="enrollment-requests">
       <h3>Pending Enrollment Requests ({pendingStudents.length})</h3>
-      
+
       {pendingStudents.length === 0 ? (
         <p className="no-pending">No pending enrollment requests.</p>
       ) : (
@@ -94,8 +89,8 @@ export default function EnrollmentRequests({ courseId, onUpdate }) {
             <div key={student._id} className="pending-student-card">
               <div className="student-info">
                 <div className="student-avatar">
-                  <img 
-                    src={student.profilePicture || 'https://fekra.s3.eu-north-1.amazonaws.com/default.png'} 
+                  <img
+                    src={student.profilePicture || 'https://fekra.s3.eu-north-1.amazonaws.com/default.png'}
                     alt={student.username}
                     onError={(e) => {
                       e.target.src = 'https://fekra.s3.eu-north-1.amazonaws.com/default.png';
@@ -107,15 +102,15 @@ export default function EnrollmentRequests({ courseId, onUpdate }) {
                   <p>{student.email}</p>
                 </div>
               </div>
-              
+
               <div className="student-actions">
-                <button 
+                <button
                   className="approve-btn"
                   onClick={() => handleApprove(student._id)}
                 >
                   ✓ Approve
                 </button>
-                <button 
+                <button
                   className="reject-btn"
                   onClick={() => handleReject(student._id)}
                 >
