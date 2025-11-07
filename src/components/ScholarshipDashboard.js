@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Box,
   Typography,
@@ -20,13 +20,15 @@ import {
   TextField,
   CircularProgress,
   Tooltip,
+  InputAdornment,
+  TableSortLabel,
 } from "@mui/material"
-import { Add as AddIcon } from "@mui/icons-material"
+import { Add as AddIcon, Search as SearchIcon } from "@mui/icons-material"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "./ScholarshipDashboard.css"
 
-const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api/scholarships`;
+const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api/scholarships`
 
 const ScholarshipDashboard = () => {
   const [openDialog, setOpenDialog] = useState(false)
@@ -53,6 +55,11 @@ const ScholarshipDashboard = () => {
     scholarship_description: "",
     scholarship_requirements: "",
   })
+
+  // NEW: search + sort
+  const [query, setQuery] = useState("")
+  const [orderBy, setOrderBy] = useState("createdAt") // title | value | type | applicants | createdBy | createdAt
+  const [order, setOrder] = useState("desc") // asc | desc
 
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
   const authHeader = token ? { Authorization: `Bearer ${token}` } : {}
@@ -101,9 +108,9 @@ const ScholarshipDashboard = () => {
         scholarship_title: scholarship_title.trim(),
         scholarship_value: Number(scholarship_value),
         scholarship_type: scholarship_type.trim(),
-        scholarship_CreatedBy: scholarship_CreatedBy.trim(),
+        scholarship_CreatedBy: (scholarship_CreatedBy || "").trim(),
         scholarship_description: scholarship_description.trim(),
-        scholarship_requirements: scholarship_requirements.trim(), // schema expects string
+        scholarship_requirements: scholarship_requirements.trim(),
       }
 
       const res = await fetch(API_BASE, {
@@ -178,7 +185,6 @@ const ScholarshipDashboard = () => {
     }
   }
 
-  // View applicants
   const handleViewApplicants = async (sch) => {
     try {
       const res = await fetch(`${API_BASE}/${sch._id}/applicants`, {
@@ -191,8 +197,69 @@ const ScholarshipDashboard = () => {
       setApplicants(list || [])
       setSelectedScholarshipTitle(sch.scholarship_title)
       setApplicantDialogOpen(true)
-    } catch (err) {
+    } catch {
       toast.error("Failed to load applicants")
+    }
+  }
+
+  // ------- search + sort -------
+  const displayedScholarships = useMemo(() => {
+    const q = query.trim().toLowerCase()
+
+    // filter by title/description/type/createdBy/requirements
+    const filtered = q
+      ? scholarships.filter((s) => {
+          const fields = [
+            s.scholarship_title,
+            s.scholarship_description,
+            s.scholarship_type,
+            s.scholarship_CreatedBy,
+            s.scholarship_requirements,
+          ]
+          return fields.some((f) => String(f || "").toLowerCase().includes(q))
+        })
+      : scholarships.slice()
+
+    filtered.sort((a, b) => {
+      let va, vb
+      switch (orderBy) {
+        case "title":
+          va = String(a.scholarship_title || "").toLowerCase()
+          vb = String(b.scholarship_title || "").toLowerCase()
+          break
+        case "value":
+          va = Number(a.scholarship_value ?? -Infinity)
+          vb = Number(b.scholarship_value ?? -Infinity)
+          break
+        case "type":
+          va = String(a.scholarship_type || "").toLowerCase()
+          vb = String(b.scholarship_type || "").toLowerCase()
+          break
+        case "applicants":
+          va = a.applicants?.length || 0
+          vb = b.applicants?.length || 0
+          break
+        case "createdBy":
+          va = String(a.scholarship_CreatedBy || "").toLowerCase()
+          vb = String(b.scholarship_CreatedBy || "").toLowerCase()
+          break
+        case "createdAt":
+        default:
+          va = new Date(a.createdAt || 0).getTime()
+          vb = new Date(b.createdAt || 0).getTime()
+      }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0
+      return order === "asc" ? cmp : -cmp
+    })
+
+    return filtered
+  }, [scholarships, query, orderBy, order])
+
+  const handleSort = (prop) => {
+    if (orderBy === prop) setOrder((p) => (p === "asc" ? "desc" : "asc"))
+    else {
+      setOrderBy(prop)
+      setOrder("asc")
     }
   }
 
@@ -219,10 +286,29 @@ const ScholarshipDashboard = () => {
     <Box className="scholarship-dashboard">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      {/* Header with title + search + add */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} gap={2} flexWrap="wrap">
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Scholarship Management
         </Typography>
+
+        <Box sx={{ flex: 1, minWidth: 260, maxWidth: 520 }}>
+          <TextField
+            fullWidth
+            placeholder="Search title, description, type, created by, requirements…"
+            size="small"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -234,41 +320,96 @@ const ScholarshipDashboard = () => {
       </Box>
 
       {loading ? (
-              <Box className="dashboard-overview">
-        <div className="loading-container">
-          <div className="loading-spinner" />
-          <Typography className="loading-text">Loading Scholarships…</Typography>
-        </div>
-      </Box>
+        <Box className="dashboard-overview">
+          <div className="loading-container">
+            <div className="loading-spinner" />
+            <Typography className="loading-text">Loading Scholarships…</Typography>
+          </div>
+        </Box>
       ) : (
         <TableContainer component={Paper} className="scholarship-data-table">
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Title</TableCell>
+                <TableCell sortDirection={orderBy === "title" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "title"}
+                    direction={orderBy === "title" ? order : "asc"}
+                    onClick={() => handleSort("title")}
+                  >
+                    Title
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Description</TableCell>
-                <TableCell>Value</TableCell>
-                <TableCell>Type</TableCell>
+
+                <TableCell sortDirection={orderBy === "value" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "value"}
+                    direction={orderBy === "value" ? order : "asc"}
+                    onClick={() => handleSort("value")}
+                  >
+                    Value
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "type" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "type"}
+                    direction={orderBy === "type" ? order : "asc"}
+                    onClick={() => handleSort("type")}
+                  >
+                    Type
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Requirements</TableCell>
-                <TableCell>Applicants</TableCell>
-                <TableCell>Created By</TableCell>
-                <TableCell>Created At</TableCell>
+
+                <TableCell sortDirection={orderBy === "applicants" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "applicants"}
+                    direction={orderBy === "applicants" ? order : "asc"}
+                    onClick={() => handleSort("applicants")}
+                  >
+                    Applicants
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "createdBy" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdBy"}
+                    direction={orderBy === "createdBy" ? order : "asc"}
+                    onClick={() => handleSort("createdBy")}
+                  >
+                    Created By
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {scholarships.map((sch) => {
+              {displayedScholarships.map((sch) => {
                 const reqText = sch.scholarship_requirements || ""
                 return (
                   <TableRow key={sch._id} hover className="scholarship-table-row">
                     <TableCell>
-                      <Typography variant="body2" fontWeight="bold" className="scholarship-title">
+                      <Typography variant="body2" fontWeight="bold" className="scholarship-title" noWrap>
                         {sch.scholarship_title}
                       </Typography>
                     </TableCell>
 
-                    {/* NEW: Description (2 lines + tooltip) */}
                     <TableCell sx={{ maxWidth: 350, p: 1 }}>
                       <ClampedCell text={sch.scholarship_description} lines={2} />
                     </TableCell>
@@ -279,7 +420,7 @@ const ScholarshipDashboard = () => {
                         sx={{ color: "#4CAF50", fontWeight: "bold" }}
                         className="scholarship-amount"
                       >
-                        ${Number(sch.scholarship_value).toLocaleString()}
+                        ${Number(sch.scholarship_value ?? 0).toLocaleString()}
                       </Typography>
                     </TableCell>
 
@@ -287,7 +428,6 @@ const ScholarshipDashboard = () => {
                       <Chip label={sch.scholarship_type} size="small" className="scholarship-category-chip" />
                     </TableCell>
 
-                    {/* NEW: Requirements (clamped + tooltip) */}
                     <TableCell sx={{ maxWidth: 280, p: 1 }}>
                       <ClampedCell text={reqText} lines={2} />
                     </TableCell>
@@ -312,38 +452,38 @@ const ScholarshipDashboard = () => {
                       {sch.createdAt ? new Date(sch.createdAt).toLocaleDateString() : "-"}
                     </TableCell>
 
-                        <TableCell className="actions-cell">
-              <Box display="flex" alignItems="center" gap={1} sx={{ flexWrap: "nowrap" }}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  className="scholarship-edit-btn"
-                  onClick={() => {
-                    setSelectedScholarship({
-                      ...sch,
-                      scholarship_value: sch.scholarship_value ?? "",
-                      scholarship_type: sch.scholarship_type ?? "",
-                      scholarship_description: sch.scholarship_description ?? "",
-                      scholarship_requirements: sch.scholarship_requirements ?? "",
-                    })
-                    setEditDialogOpen(true)
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  color="error"
-                  onClick={() => {
-                    setScholarshipToDelete(sch)
-                    setDeleteDialogOpen(true)
-                  }}
-                >
-                  Delete
-                </Button>
-              </Box>
-            </TableCell>
+                    <TableCell className="actions-cell">
+                      <Box display="flex" alignItems="center" gap={1} sx={{ flexWrap: "nowrap" }}>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          className="scholarship-edit-btn"
+                          onClick={() => {
+                            setSelectedScholarship({
+                              ...sch,
+                              scholarship_value: sch.scholarship_value ?? "",
+                              scholarship_type: sch.scholarship_type ?? "",
+                              scholarship_description: sch.scholarship_description ?? "",
+                              scholarship_requirements: sch.scholarship_requirements ?? "",
+                            })
+                            setEditDialogOpen(true)
+                          }}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="outlined"
+                          color="error"
+                          onClick={() => {
+                            setScholarshipToDelete(sch)
+                            setDeleteDialogOpen(true)
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 )
               })}

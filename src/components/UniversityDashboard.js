@@ -18,8 +18,10 @@ import {
   DialogActions,
   TextField,
   Tooltip,
+  InputAdornment,
+  TableSortLabel,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon, Search as SearchIcon } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./UniversityDashboard.css";
@@ -30,13 +32,13 @@ const API_BASE =
 
 // ✅ Column config aligned to your Mongoose model
 const FIELD_MAP = [
-  { key: "name", label: "Name", required: true, type: "text" },
-  { key: "location", label: "Location", required: true, type: "text" },
-  { key: "rank", label: "Rank", required: true, type: "text" }, // e.g. "#1 Lebanon"
-  { key: "acceptanceRate", label: "Acceptance Rate (%)", required: true, type: "number" },
-  { key: "numberOfStudents", label: "Students", required: true, type: "number" },
-  { key: "tuition", label: "Tuition (USD)", required: true, type: "number" },
-  { key: "website", label: "Website", required: false, type: "text" },
+  { key: "name", label: "Name", required: true, type: "text", sortable: true },
+  { key: "location", label: "Location", required: true, type: "text", sortable: true },
+  { key: "rank", label: "Rank", required: true, type: "text", sortable: true }, // e.g. "#1 Lebanon"
+  { key: "acceptanceRate", label: "Acceptance Rate (%)", required: true, type: "number", sortable: true },
+  { key: "numberOfStudents", label: "Students", required: true, type: "number", sortable: true },
+  { key: "tuition", label: "Tuition (USD)", required: true, type: "number", sortable: true },
+  { key: "website", label: "Website", required: false, type: "text", sortable: false },
 ];
 
 const toNumberOrNull = (v) => {
@@ -91,6 +93,11 @@ const UniversityDashboard = () => {
   const [selectedUniversity, setSelectedUniversity] = useState(null);
   const [universityToDelete, setUniversityToDelete] = useState(null);
 
+  // NEW: search + sort state
+  const [query, setQuery] = useState("");
+  const [orderBy, setOrderBy] = useState("createdAt"); // name | location | rank | acceptanceRate | numberOfStudents | tuition | createdAt
+  const [order, setOrder] = useState("desc"); // asc | desc
+
   // Create form state
   const emptyForm = useMemo(
     () =>
@@ -105,11 +112,11 @@ const UniversityDashboard = () => {
   const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // 🔄 Fetch all universities (safe JSON parse + clearer errors)
+  // 🔄 Fetch all universities
   const fetchUniversities = async () => {
     try {
       const res = await fetch(API_BASE, {
-        headers: { Accept: "application/json" }, // add ...authHeader if GET is protected globally
+        headers: { Accept: "application/json" },
       });
       let data = null;
       try {
@@ -132,6 +139,77 @@ const UniversityDashboard = () => {
   useEffect(() => {
     fetchUniversities();
   }, []);
+
+  // ---------- filter + sort ----------
+  const displayedUniversities = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    const filtered = q
+      ? universities.filter((u) => {
+          const fields = [
+            u.name,
+            u.location,
+            u.rank,
+            String(u.acceptanceRate ?? ""),
+            String(u.numberOfStudents ?? ""),
+            String(u.tuition ?? ""),
+            u.website,
+          ];
+          return fields.some((f) => String(f || "").toLowerCase().includes(q));
+        })
+      : universities.slice();
+
+    const parseRank = (r) => {
+      // Try to extract first number in strings like "#1 Lebanon"
+      const m = String(r || "").match(/\d+/);
+      return m ? Number(m[0]) : Number.POSITIVE_INFINITY;
+    };
+
+    filtered.sort((a, b) => {
+      let va, vb;
+
+      switch (orderBy) {
+        case "name":
+        case "location":
+          va = String(a[orderBy] || "").toLowerCase();
+          vb = String(b[orderBy] || "").toLowerCase();
+          break;
+        case "rank":
+          va = parseRank(a.rank);
+          vb = parseRank(b.rank);
+          break;
+        case "acceptanceRate":
+          va = Number(a.acceptanceRate ?? Number.NEGATIVE_INFINITY);
+          vb = Number(b.acceptanceRate ?? Number.NEGATIVE_INFINITY);
+          break;
+        case "numberOfStudents":
+          va = Number(a.numberOfStudents ?? Number.NEGATIVE_INFINITY);
+          vb = Number(b.numberOfStudents ?? Number.NEGATIVE_INFINITY);
+          break;
+        case "tuition":
+          va = Number(a.tuition ?? Number.NEGATIVE_INFINITY);
+          vb = Number(b.tuition ?? Number.NEGATIVE_INFINITY);
+          break;
+        case "createdAt":
+        default:
+          va = new Date(a.createdAt || 0).getTime();
+          vb = new Date(b.createdAt || 0).getTime();
+      }
+
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return order === "asc" ? cmp : -cmp;
+    });
+
+    return filtered;
+  }, [universities, query, orderBy, order]);
+
+  const handleSort = (prop) => {
+    if (orderBy === prop) setOrder((p) => (p === "asc" ? "desc" : "asc"));
+    else {
+      setOrderBy(prop);
+      setOrder("asc");
+    }
+  };
 
   // 📝 Create
   const handleCreateUniversity = async () => {
@@ -224,10 +302,30 @@ const UniversityDashboard = () => {
   return (
     <Box className="university-dashboard">
       <ToastContainer position="top-right" autoClose={3000} />
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+
+      {/* Header: title + search + add */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} gap={2} flexWrap="wrap">
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           University Management
         </Typography>
+
+        <Box sx={{ flex: 1, minWidth: 260, maxWidth: 520 }}>
+          <TextField
+            fullWidth
+            placeholder="Search name, location, rank, acceptance rate, students, tuition, website…"
+            size="small"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -250,16 +348,35 @@ const UniversityDashboard = () => {
           <Table>
             <TableHead>
               <TableRow>
-                {FIELD_MAP.map((col) => (
-                  <TableCell key={col.key}>{col.label}</TableCell>
-                ))}
-                <TableCell>Created At</TableCell>
+                {FIELD_MAP.map((col) => {
+                  if (!col.sortable) return <TableCell key={col.key}>{col.label}</TableCell>;
+                  return (
+                    <TableCell key={col.key} sortDirection={orderBy === col.key ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === col.key}
+                        direction={orderBy === col.key ? order : "asc"}
+                        onClick={() => handleSort(col.key)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  );
+                })}
+                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {universities.map((u) => (
+              {displayedUniversities.map((u) => (
                 <TableRow key={u._id} hover className="university-table-row">
                   {FIELD_MAP.map((col) => {
                     const value = u[col.key];
@@ -307,7 +424,7 @@ const UniversityDashboard = () => {
                       );
                     }
 
-                    // default text fields
+                    // default text/number fields
                     return (
                       <TableCell key={col.key} sx={{ maxWidth: 260 }}>
                         <Ellipsize value={value} maxWidth={260} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -21,8 +21,14 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
+  TableSortLabel,
 } from "@mui/material";
-import { Add as AddIcon, Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Visibility,
+  VisibilityOff,
+  Search as SearchIcon,
+} from "@mui/icons-material";
 import "./TeacherDashboard.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,7 +44,12 @@ const TeacherDashboard = () => {
 
   const [loading, setLoading] = useState(true);
 
-  // 🔐 temp password state for edit dialog (like UserDashboard)
+  // search + sort state
+  const [query, setQuery] = useState("");
+  const [orderBy, setOrderBy] = useState("username"); // username | email | role | createdAt
+  const [order, setOrder] = useState("asc"); // asc | desc
+
+  // temp password state for edit dialog
   const [editPassword, setEditPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
@@ -48,124 +59,196 @@ const TeacherDashboard = () => {
     password: "",
   });
 
-const fetchTeachers = async () => {
-  try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users/teachers`);
-    if (!res.ok) throw new Error("Failed to fetch teachers");
-    const data = await res.json();
-    setTeachers(data);
-  } catch (err) {
-    console.error("Error fetching teachers:", err.message);
-    toast.error("Failed to load teachers");
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const fetchTeachers = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/teachers`
+      );
+      if (!res.ok) throw new Error("Failed to fetch teachers");
+      const data = await res.json();
+      setTeachers(data);
+    } catch (err) {
+      console.error("Error fetching teachers:", err.message);
+      toast.error("Failed to load teachers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchTeachers();
   }, []);
 
-const handleDeleteUser = async () => {
-  if (!userToDelete) return;
-
-  try {
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
-      { method: "DELETE" }
-    );
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to delete user");
-
-    setTeachers((prev) => prev.filter((u) => u._id !== userToDelete._id));
-    toast.success("User deleted successfully");
-  } catch (err) {
-    console.error("Delete error:", err);
-    toast.error("Failed to delete user");
-  } finally {
-    setDeleteDialogOpen(false);
-    setUserToDelete(null);
+  // ---------- search + sort helpers ----------
+  function compare(a, b, key) {
+    const va =
+      key === "createdAt"
+        ? new Date(a.createdAt || 0).getTime()
+        : String(a[key] ?? "").toLowerCase();
+    const vb =
+      key === "createdAt"
+        ? new Date(b.createdAt || 0).getTime()
+        : String(b[key] ?? "").toLowerCase();
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
   }
-};
 
-const handleUpdateUser = async () => {
-  if (!selectedUser) return;
+  const displayedTeachers = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const filtered = q
+      ? teachers.filter((t) => {
+          const u = (t.username || "").toLowerCase();
+          const e = (t.email || "").toLowerCase();
+          const r = (t.role || "").toLowerCase();
+          return u.includes(q) || e.includes(q) || r.includes(q);
+        })
+      : teachers.slice();
 
-  try {
-    // only include password if user typed a new one
-    const payload = { ...selectedUser };
-    if (editPassword.trim()) {
-      payload.password = editPassword.trim();
-    } else {
-      delete payload.password;
-    }
-
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      }
-    );
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update user");
-
-    setTeachers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
-    toast.success("User updated successfully");
-
-    setEditDialogOpen(false);
-    setSelectedUser(null);
-    setEditPassword("");
-    setShowPassword(false);
-  } catch (err) {
-    toast.error(err.message || "Failed to update user");
-    console.error("Error updating user:", err);
-  }
-};
-
-const handleAddTeacher = async () => {
-  try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        role: "teacher", // always teacher
-      }),
+    filtered.sort((a, b) => {
+      const cmp = compare(a, b, orderBy);
+      return order === "asc" ? cmp : -cmp;
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to create teacher");
+    return filtered;
+  }, [teachers, query, orderBy, order]);
 
-    setTeachers((prev) => [
-      ...prev,
-      {
-        ...form,
-        role: "teacher",
-        _id: data.userId,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+  const handleSort = (prop) => {
+    if (orderBy === prop) {
+      setOrder((p) => (p === "asc" ? "desc" : "asc"));
+    } else {
+      setOrderBy(prop);
+      setOrder("asc");
+    }
+  };
+  // -------------------------------------------
 
-    setForm({ username: "", email: "", password: "" });
-    setOpenDialog(false);
-    toast.success("Teacher added successfully");
-  } catch (err) {
-    console.error("Backend message:", err.message);
-    toast.error(err.message || "Failed to create user");
-  }
-};
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
+        { method: "DELETE" }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to delete user");
+
+      setTeachers((prev) => prev.filter((u) => u._id !== userToDelete._id));
+      toast.success("User deleted successfully");
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error("Failed to delete user");
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (!selectedUser) return;
+
+    try {
+      const payload = { ...selectedUser };
+      if (editPassword.trim()) {
+        payload.password = editPassword.trim();
+      } else {
+        delete payload.password;
+      }
+
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update user");
+
+      setTeachers((prev) =>
+        prev.map((u) => (u._id === selectedUser._id ? data.user : u))
+      );
+      toast.success("User updated successfully");
+
+      setEditDialogOpen(false);
+      setSelectedUser(null);
+      setEditPassword("");
+      setShowPassword(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to update user");
+      console.error("Error updating user:", err);
+    }
+  };
+
+  const handleAddTeacher = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          role: "teacher",
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to create teacher");
+
+      setTeachers((prev) => [
+        ...prev,
+        {
+          ...form,
+          role: "teacher",
+          _id: data.userId,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+
+      setForm({ username: "", email: "", password: "" });
+      setOpenDialog(false);
+      toast.success("Teacher added successfully");
+    } catch (err) {
+      console.error("Backend message:", err.message);
+      toast.error(err.message || "Failed to create user");
+    }
+  };
 
   return (
     <Box className="teacher-dashboard">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      {/* Header with title + search + add */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+        gap={2}
+        flexWrap="wrap"
+      >
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Teacher Management
         </Typography>
+
+        <Box sx={{ flex: 1, minWidth: 240, maxWidth: 420 }}>
+          <TextField
+            fullWidth
+            placeholder="Search by name, email, or role…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            size="small"
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -192,16 +275,54 @@ const handleAddTeacher = async () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
+                <TableCell sortDirection={orderBy === "username" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "username"}
+                    direction={orderBy === "username" ? order : "asc"}
+                    onClick={() => handleSort("username")}
+                  >
+                    Name
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "email" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "email"}
+                    direction={orderBy === "email" ? order : "asc"}
+                    onClick={() => handleSort("email")}
+                  >
+                    Email
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sortDirection={orderBy === "role" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "role"}
+                    direction={orderBy === "role" ? order : "asc"}
+                    onClick={() => handleSort("role")}
+                  >
+                    Role
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Status</TableCell>
-                <TableCell>Join Date</TableCell>
+
+                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Join Date
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {teachers.map((teacher) => (
+              {displayedTeachers.map((teacher) => (
                 <TableRow key={teacher._id} hover className="teacher-table-row">
                   <TableCell>
                     <Typography fontWeight="bold">{teacher.username}</Typography>
@@ -218,7 +339,9 @@ const handleAddTeacher = async () => {
                     />
                   </TableCell>
                   <TableCell>
-                    {teacher.createdAt ? new Date(teacher.createdAt).toLocaleDateString() : "—"}
+                    {teacher.createdAt
+                      ? new Date(teacher.createdAt).toLocaleDateString()
+                      : "—"}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -302,7 +425,6 @@ const handleAddTeacher = async () => {
                 sx={{ mb: 2 }}
               />
 
-              {/* ✅ Optional new password with show/hide, not bound to selectedUser */}
               <TextField
                 margin="dense"
                 label="New Password (leave blank to keep current)"

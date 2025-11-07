@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -24,11 +24,17 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
+  TableSortLabel,
 } from "@mui/material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { Add as AddIcon, Visibility, VisibilityOff } from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Visibility,
+  VisibilityOff,
+  Search as SearchIcon,
+} from "@mui/icons-material";
 import "./UserDashboard.css";
 
 const UserDashboard = () => {
@@ -39,6 +45,11 @@ const UserDashboard = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // NEW: search + sorting state
+  const [query, setQuery] = useState("");
+  const [orderBy, setOrderBy] = useState("username"); // username | email | role | createdAt
+  const [order, setOrder] = useState("asc"); // asc | desc
 
   // temp password state for edit dialog
   const [editPassword, setEditPassword] = useState("");
@@ -54,120 +65,194 @@ const UserDashboard = () => {
   // Fetch users on mount
   useEffect(() => {
     const fetchUsers = async () => {
-  try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`);
-    if (!res.ok) throw new Error("Failed to fetch users");
-    const data = await res.json();
-    setUsers(data);
-  } catch (err) {
-    console.error("Error fetching users:", err);
-    toast.error("Failed to load users");
-  } finally {
-    setLoading(false);
-  }
-};
-
+      try {
+        const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`);
+        if (!res.ok) throw new Error("Failed to fetch users");
+        const data = await res.json();
+        setUsers(data);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        toast.error("Failed to load users");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchUsers();
   }, []);
 
- const handleAddUser = async () => {
-  try {
-    const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
+  // ----- helpers: search + sort -----
+  function compare(a, b, key) {
+    const va =
+      key === "createdAt"
+        ? new Date(a.createdAt || 0).getTime()
+        : String(a[key] ?? "").toLowerCase();
+    const vb =
+      key === "createdAt"
+        ? new Date(b.createdAt || 0).getTime()
+        : String(b[key] ?? "").toLowerCase();
+    if (va < vb) return -1;
+    if (va > vb) return 1;
+    return 0;
+  }
+
+  const displayedUsers = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const filtered = q
+      ? users.filter((u) => {
+          const username = (u.username || "").toLowerCase();
+          const email = (u.email || "").toLowerCase();
+          const role = (u.role || "").toLowerCase();
+          return (
+            username.includes(q) ||
+            email.includes(q) ||
+            role.includes(q)
+          );
+        })
+      : users.slice();
+
+    filtered.sort((a, b) => {
+      const cmp = compare(a, b, orderBy);
+      return order === "asc" ? cmp : -cmp;
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to create user");
+    return filtered;
+  }, [users, query, orderBy, order]);
 
-    setUsers((prev) => [
-      ...prev,
-      {
-        ...form,
-        _id: data.userId,
-        profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+  const handleSort = (property) => {
+    if (orderBy === property) {
+      setOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+    } else {
+      setOrderBy(property);
+      setOrder("asc");
+    }
+  };
 
-    toast.success("User added successfully");
-    setForm({ username: "", email: "", password: "", role: "student" });
-    setOpenDialog(false);
-  } catch (err) {
-    console.error("Backend message:", err.message);
-    toast.error(err.message || "Failed to create user");
-  }
-};
+  const handleAddUser = async () => {
+    try {
+      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to create user");
+
+      setUsers((prev) => [
+        ...prev,
+        {
+          ...form,
+          _id: data.userId,
+          profilePicture:
+            "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+
+      toast.success("User added successfully");
+      setForm({ username: "", email: "", password: "", role: "student" });
+      setOpenDialog(false);
+    } catch (err) {
+      console.error("Backend message:", err.message);
+      toast.error(err.message || "Failed to create user");
+    }
+  };
 
   const handleUpdateUser = async () => {
-  if (!selectedUser) return;
-  try {
-    // Build payload: only include password if a new one is provided
-    const payload = { ...selectedUser };
-    if (editPassword.trim()) {
-      payload.password = editPassword.trim();
-    } else {
-      delete payload.password;
-    }
-
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
-      {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+    if (!selectedUser) return;
+    try {
+      const payload = { ...selectedUser };
+      if (editPassword.trim()) {
+        payload.password = editPassword.trim();
+      } else {
+        delete payload.password;
       }
-    );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to update user");
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/${selectedUser._id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
-    setUsers((prev) => prev.map((u) => (u._id === selectedUser._id ? data.user : u)));
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to update user");
 
-    toast.success("User updated successfully");
+      setUsers((prev) =>
+        prev.map((u) => (u._id === selectedUser._id ? data.user : u))
+      );
 
-    setEditDialogOpen(false);
-    setSelectedUser(null);
-    setEditPassword(""); // clear temp password
-    setShowPassword(false);
-  } catch (err) {
-    toast.error(err.message || "Failed to update user");
-    console.error("Error updating user:", err);
-  }
-};
+      toast.success("User updated successfully");
 
+      setEditDialogOpen(false);
+      setSelectedUser(null);
+      setEditPassword("");
+      setShowPassword(false);
+    } catch (err) {
+      toast.error(err.message || "Failed to update user");
+      console.error("Error updating user:", err);
+    }
+  };
 
- const handleDeleteUser = async () => {
-  if (!userToDelete) return;
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
 
-  try {
-    const res = await fetch(
-      `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
-      { method: "DELETE" }
-    );
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/${userToDelete._id}`,
+        { method: "DELETE" }
+      );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Failed to delete user");
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to delete user");
 
-    setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id));
-    toast.success("User deleted successfully");
-  } catch (err) {
-    console.error("Delete error:", err);
-    toast.error("Failed to delete user");
-  } finally {
-    setDeleteDialogOpen(false);
-    setUserToDelete(null);
-  }
-};
+      setUsers((prev) => prev.filter((u) => u._id !== userToDelete._id));
+      toast.success("User deleted successfully");
+    } catch (err) {
+      console.error("Delete error:", err);
+      toast.error("Failed to delete user");
+    } finally {
+      setDeleteDialogOpen(false);
+      setUserToDelete(null);
+    }
+  };
 
   return (
     <Box className="user-dashboard">
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      {/* Header row with title + search + add button */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+        gap={2}
+        flexWrap="wrap"
+      >
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           User Management
         </Typography>
+
+        {/* Search box */}
+        <Box sx={{ flex: 1, minWidth: 240, maxWidth: 420 }}>
+          <TextField
+            fullWidth
+            placeholder="Search by user, email, or role…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            size="small"
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -179,7 +264,13 @@ const UserDashboard = () => {
       </Box>
 
       {loading ? (
-        <Box className="dashboard-overview" display="flex" justifyContent="center" alignItems="center" minHeight={240}>
+        <Box
+          className="dashboard-overview"
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight={240}
+        >
           <CircularProgress />
           <Typography sx={{ ml: 2 }}>Loading Users…</Typography>
         </Box>
@@ -188,16 +279,49 @@ const UserDashboard = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>User</TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Role</TableCell>
+                <TableCell sortDirection={orderBy === "username" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "username"}
+                    direction={orderBy === "username" ? order : "asc"}
+                    onClick={() => handleSort("username")}
+                  >
+                    User
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sortDirection={orderBy === "email" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "email"}
+                    direction={orderBy === "email" ? order : "asc"}
+                    onClick={() => handleSort("email")}
+                  >
+                    Email
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sortDirection={orderBy === "role" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "role"}
+                    direction={orderBy === "role" ? order : "asc"}
+                    onClick={() => handleSort("role")}
+                  >
+                    Role
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Status</TableCell>
-                <TableCell>Join Date</TableCell>
+                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Join Date
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
+
             <TableBody>
-              {users.map((user) => (
+              {displayedUsers.map((user) => (
                 <TableRow key={user._id} hover className="user-table-row">
                   <TableCell>
                     <Box display="flex" alignItems="center">
@@ -212,7 +336,11 @@ const UserDashboard = () => {
                     <Chip
                       label={user.role}
                       color={
-                        user.role === "teacher" ? "primary" : user.role === "admin" ? "secondary" : "default"
+                        user.role === "teacher"
+                          ? "primary"
+                          : user.role === "admin"
+                          ? "secondary"
+                          : "default"
                       }
                       size="small"
                     />
@@ -221,7 +349,9 @@ const UserDashboard = () => {
                     <Chip label="Active" color="success" size="small" />
                   </TableCell>
                   <TableCell>
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : "—"}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -229,7 +359,7 @@ const UserDashboard = () => {
                       variant="outlined"
                       onClick={() => {
                         setSelectedUser(user);
-                        setEditPassword(""); // reset temp password each time you open
+                        setEditPassword("");
                         setShowPassword(false);
                         setEditDialogOpen(true);
                       }}
@@ -257,10 +387,14 @@ const UserDashboard = () => {
       )}
 
       {/* Delete Dialog */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Confirm Deletion</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete <strong>{userToDelete?.username}</strong>?
+          Are you sure you want to delete{" "}
+          <strong>{userToDelete?.username}</strong>?
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
@@ -271,7 +405,16 @@ const UserDashboard = () => {
       </Dialog>
 
       {/* Edit User Dialog */}
-      <Dialog open={editDialogOpen} onClose={() => { setEditDialogOpen(false); setEditPassword(""); setShowPassword(false); }} maxWidth="sm" fullWidth>
+      <Dialog
+        open={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setEditPassword("");
+          setShowPassword(false);
+        }}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent>
           {selectedUser && (
@@ -283,7 +426,10 @@ const UserDashboard = () => {
                 variant="outlined"
                 value={selectedUser.username}
                 onChange={(e) =>
-                  setSelectedUser((prev) => ({ ...prev, username: e.target.value }))
+                  setSelectedUser((prev) => ({
+                    ...prev,
+                    username: e.target.value,
+                  }))
                 }
                 sx={{ mb: 2 }}
               />
@@ -294,7 +440,10 @@ const UserDashboard = () => {
                 variant="outlined"
                 value={selectedUser.email}
                 onChange={(e) =>
-                  setSelectedUser((prev) => ({ ...prev, email: e.target.value }))
+                  setSelectedUser((prev) => ({
+                    ...prev,
+                    email: e.target.value,
+                  }))
                 }
                 sx={{ mb: 2 }}
               />
@@ -305,12 +454,14 @@ const UserDashboard = () => {
                 variant="outlined"
                 value={selectedUser.phoneNumber || ""}
                 onChange={(e) =>
-                  setSelectedUser((prev) => ({ ...prev, phoneNumber: e.target.value }))
+                  setSelectedUser((prev) => ({
+                    ...prev,
+                    phoneNumber: e.target.value,
+                  }))
                 }
                 sx={{ mb: 2 }}
               />
 
-              {/* NEW: Optional new password field with show/hide */}
               <TextField
                 margin="dense"
                 label="New Password (leave blank to keep current)"
@@ -341,7 +492,10 @@ const UserDashboard = () => {
                   value={selectedUser.role}
                   label="Role"
                   onChange={(e) =>
-                    setSelectedUser((prev) => ({ ...prev, role: e.target.value }))
+                    setSelectedUser((prev) => ({
+                      ...prev,
+                      role: e.target.value,
+                    }))
                   }
                 >
                   <MenuItem value="student">Student</MenuItem>
@@ -353,10 +507,18 @@ const UserDashboard = () => {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setEditDialogOpen(false); setEditPassword(""); setShowPassword(false); }}>
+          <Button
+            onClick={() => {
+              setEditDialogOpen(false);
+              setEditPassword("");
+              setShowPassword(false);
+            }}
+          >
             Cancel
           </Button>
-          <Button variant="contained" onClick={handleUpdateUser}>Save</Button>
+          <Button variant="contained" onClick={handleUpdateUser}>
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
 

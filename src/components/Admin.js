@@ -27,6 +27,7 @@ import {
   Event as EventIcon,        // <-- alias it
   ExitToApp,
 } from "@mui/icons-material"
+import { Home as HomeIcon } from "@mui/icons-material";
 
 import ApartmentIcon from '@mui/icons-material/Apartment';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
@@ -148,7 +149,14 @@ const Admin = () => {
               <ExitToApp />
             </IconButton>
           )}
-
+<IconButton
+  color="inherit"
+  aria-label="go home"
+  onClick={() => navigate("/")}
+  sx={{ mr: 2 }}
+>
+  <HomeIcon />
+</IconButton>
         </Toolbar>
       </AppBar>
 
