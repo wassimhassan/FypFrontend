@@ -52,7 +52,6 @@ const ChangePassword = () => {
         confirmPassword: ''
       });
 
-      // Redirect to dashboard after 2 seconds
       setTimeout(() => {
         navigate('/gym-owner/dashboard');
       }, 2000);
@@ -62,6 +61,18 @@ const ChangePassword = () => {
       setLoading(false);
     }
   };
+
+  // ⬇️ Same loading UI classes used in the dashboard
+  if (loading) {
+    return (
+      <div className="cd-overview">
+        <div className="cd-loading-container">
+          <div className="cd-spinner" />
+          <div className="cd-loading-text">Changing password…</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="change-password">
@@ -105,11 +116,11 @@ const ChangePassword = () => {
         </div>
 
         <button type="submit" disabled={loading}>
-          {loading ? 'Changing Password...' : 'Change Password'}
+          Change Password
         </button>
       </form>
     </div>
   );
 };
 
-export default ChangePassword; 
+export default ChangePassword;

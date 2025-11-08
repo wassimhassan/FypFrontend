@@ -71,7 +71,18 @@ export default function EnrolledStudents({ courseId, onUpdate }) {
     }
   };
 
-  if (loading) return <div className="enrollment-requests-loading">Loading enrolled students...</div>;
+  // ⬇️ Same loading UI classes as the dashboard
+  if (loading) {
+    return (
+      <div className="cd-overview">
+        <div className="cd-loading-container">
+          <div className="cd-spinner" />
+          <div className="cd-loading-text">Loading enrolled students…</div>
+        </div>
+      </div>
+    );
+  }
+
   if (error)   return <div className="enrollment-requests-error">Error: {error}</div>;
 
   return (

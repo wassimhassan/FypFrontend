@@ -161,9 +161,6 @@ const ProfileCard = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const picData = await res.json().catch(() => ({}));
-        // NOTE: keep original logic, but fixed to use correct response:
-        // If you intended picData from picRes, uncomment below lines and remove the two above.
-        // const picData = await picRes.json();
         if (picRes.ok) {
           setUserInfo((prev) => ({
             ...prev,
@@ -219,7 +216,22 @@ const ProfileCard = () => {
   };
 
   /* ---------- Render ---------------------------------------------------- */
-  if (loading) return <p>Loading profile...</p>;
+  // ⬇️ Same loading UI as the dashboard
+  if (loading) {
+    return (
+      <>
+        <NavBar />
+        <ToastContainer position="top-right" autoClose={2000} />
+        <div className="cd-overview">
+          <div className="cd-loading-container">
+            <div className="cd-spinner" />
+            <div className="cd-loading-text">Loading profile…</div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   if (!userInfo) return <p>No profile data available.</p>;
 
   const fieldsToShow = ["email", "username", "phoneNumber"];
