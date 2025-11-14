@@ -48,6 +48,19 @@ const CalendarPage = () => {
       })
       .catch(err => console.error("Failed to load events:", err));
   }, []);
+  // ➤ Find events happening TODAY
+  const today = new Date();
+  const todayFormatted = today.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+  });
+
+  const todayEvents = useMemo(() => {
+    return events.filter(ev =>
+      ev.date.includes(todayFormatted.slice(4)) // matches "Nov 14"
+    );
+  }, [events]);
 
   const filtered = useMemo(() => {
     if (!selectedDate) return events;
@@ -64,9 +77,37 @@ const CalendarPage = () => {
       </header>
 
       <div className="container">
-        <Calendar selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
-        <UpcomingEvents events={filtered} />
-      </div>
+
+  {/* LEFT SIDE */}
+  <div style={{ flex: 1 }}>
+    <Calendar
+  selectedDate={selectedDate}
+  setSelectedDate={setSelectedDate}
+  events={events}
+/>
+
+    {/* ➤ NEW Today's Events Box */}
+    <div className="today-events-box card-box">
+      <h3 className="section-title">Today's Events</h3>
+
+      {todayEvents.length === 0 ? (
+        <p className="no-event">No events today.</p>
+      ) : (
+        todayEvents.map(ev => (
+          <div key={ev.id} className="today-event-item">
+            <h4 className="today-event-title">{ev.title}</h4>
+            <p className="today-event-time">{ev.time}</p>
+          </div>
+        ))
+      )}
+    </div>
+  </div>
+
+  {/* RIGHT SIDE */}
+  <UpcomingEvents events={events} selectedDate={selectedDate} />
+
+</div>
+
     </div>
   );
 };

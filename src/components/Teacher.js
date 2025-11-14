@@ -26,27 +26,26 @@ export default function Teacher() {
   const [courses, setCourses] = useState([]);
   const [showForm, setShowForm] = useState(false);
 
-  // track when we're editing an existing course
+  // Editing mode
   const [editingId, setEditingId] = useState(null);
 
   const [newCourse, setNewCourse] = useState({
     category: "",
     title: "",
-    instructor: "",        // you can auto-fill from /auth-check if you like
+    instructor: "",
     durationDays: "",
     level: "",
-    price: "",             // "Free" or "$150"
+    price: "",
     description: "",
   });
 
   const token = localStorage.getItem("token");
 
-  // delete confirm dialog state
+  // Delete dialog
   const [deleteOpen, setDeleteOpen] = useState(false);
-  const [toDelete, setToDelete] = useState(null); // store the course object
+  const [toDelete, setToDelete] = useState(null);
 
   useEffect(() => {
-    // fetch ONLY my courses
     axios
       .get(`${API}/courses/mine-created`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -60,26 +59,32 @@ export default function Teacher() {
     setNewCourse((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add or Edit (PUT if editingId exists, POST otherwise)
   const handleAdd = async (e) => {
     e.preventDefault();
-    // block submit if any field empty or duration < 1
-    const required = ["category","title","instructor","durationDays","level","price","description"];
+
+    const required = [
+      "category",
+      "title",
+      "instructor",
+      "durationDays",
+      "level",
+      "price",
+      "description",
+    ];
     for (const f of required) {
-      if (!String(newCourse[f] ?? "").trim()) {
+      if (!String(newCourse[f]).trim()) {
         toast.error(`Please fill the ${f} field.`);
         return;
       }
     }
+
     const d = Number(newCourse.durationDays);
     if (!Number.isFinite(d) || d < 1) {
-      toast.error("Duration must be a number ≥ 1 (days).");
+      toast.error("Duration must be a number ≥ 1.");
       return;
     }
-    const payload = {
-      ...newCourse,
-      durationDays: d,
-    };
+
+    const payload = { ...newCourse, durationDays: d };
 
     if (editingId) {
       // UPDATE
@@ -88,16 +93,21 @@ export default function Teacher() {
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setCourses((prev) => prev.map((c) => (c._id === editingId ? updated : c)));
+
+      setCourses((prev) =>
+        prev.map((c) => (c._id === editingId ? updated : c))
+      );
     } else {
       // CREATE
-      const { data: created } = await axios.post(`${API}/courses`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const { data: created } = await axios.post(
+        `${API}/courses`,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       setCourses((prev) => [created, ...prev]);
     }
 
-    // reset form state
+    // reset
     setShowForm(false);
     setEditingId(null);
     setNewCourse({
@@ -111,7 +121,6 @@ export default function Teacher() {
     });
   };
 
-  // open modal pre-filled for edit
   const openEdit = (course) => {
     setNewCourse({
       category: course.category || "",
@@ -126,23 +135,22 @@ export default function Teacher() {
     setShowForm(true);
   };
 
-  // open delete confirmation dialog
   const promptDelete = (course) => {
     setToDelete(course);
     setDeleteOpen(true);
   };
 
-  // confirmed delete handler
   const handleConfirmDelete = async () => {
     if (!toDelete?._id) return;
+
     try {
       await axios.delete(`${API}/courses/${toDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
       setCourses((prev) => prev.filter((c) => c._id !== toDelete._id));
       toast.success("Course deleted.");
     } catch (e) {
-      console.error(e);
       toast.error("Failed to delete course.");
     } finally {
       setDeleteOpen(false);
@@ -154,12 +162,15 @@ export default function Teacher() {
     <>
       <NavBar />
       <ToastContainer position="top-right" autoClose={2000} />
+
+      {/* =====================
+          DASHBOARD CONTENT
+      ====================== */}
       <div className="dashboard">
         <div className="top-center">
           <button
             className="add-course-btn"
             onClick={() => {
-              // ensure we're in "add" mode and clear form
               setEditingId(null);
               setNewCourse({
                 category: "",
@@ -182,98 +193,107 @@ export default function Teacher() {
             <TeacherCourse
               key={course._id}
               course={course}
-              onEdit={() => openEdit(course)} // ✅ now opens the edit form
-              onDelete={() => promptDelete(course)} // ✅ open MUI confirm dialog
+              onEdit={() => openEdit(course)}
+              onDelete={() => promptDelete(course)}
               onAction={() =>
                 navigate(`/teacherHomePage/courses/${course._id}/manage`)
-              } // ✅ go to manage page
+              }
               buttonLabel="Manage Course"
             />
           ))}
         </main>
-
-        {showForm && (
-          <div className="modal">
-            <form className="course-form" onSubmit={handleAdd}>
-              <h2>Add New Course</h2>
-
-              <input
-                name="category"
-                required
-                placeholder="Category"
-                value={newCourse.category}
-                onChange={handleChange}
-              />
-              <input
-                name="title"
-                required
-                placeholder="Title"
-                value={newCourse.title}
-                onChange={handleChange}
-              />
-              <input
-                name="instructor"
-                required
-                placeholder="Instructor"
-                value={newCourse.instructor}
-                onChange={handleChange}
-              />
-              <input
-                name="durationDays"
-                placeholder="Duration (days)"
-                type="number"
-                min="1"
-                step="1"
-                required
-                value={newCourse.durationDays}
-                onChange={handleChange}
-              />
-              <input
-                name="level"
-                required
-                placeholder="Level (Beginner/Intermediate/Advanced)"
-                value={newCourse.level}
-                onChange={handleChange}
-              />
-              <input
-                name="price"
-                required
-                placeholder="Price (Free or $...)"
-                value={newCourse.price}
-                onChange={handleChange}
-              />
-              <textarea
-                required
-                name="description"
-                placeholder="Short description"
-                value={newCourse.description}
-                onChange={handleChange}
-              />
-
-              <div className="form-buttons">
-                <button type="submit">Add</button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForm(false);
-                    setEditingId(null);
-                  }}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
       </div>
 
-      {/* Delete confirm dialog */}
+      {/* =====================
+          MODAL (OUTSIDE DASHBOARD)
+      ====================== */}
+     {showForm && (
+  <div className="teacher-modal">
+    <form className="teacher-modal-content" onSubmit={handleAdd}>
+      <h2>Add New Course</h2>
+
+      <input
+        name="category"
+        required
+        placeholder="Category"
+        value={newCourse.category}
+        onChange={handleChange}
+      />
+      <input
+        name="title"
+        required
+        placeholder="Title"
+        value={newCourse.title}
+        onChange={handleChange}
+      />
+      <input
+        name="instructor"
+        required
+        placeholder="Instructor"
+        value={newCourse.instructor}
+        onChange={handleChange}
+      />
+      <input
+        name="durationDays"
+        placeholder="Duration (days)"
+        type="number"
+        min="1"
+        step="1"
+        required
+        value={newCourse.durationDays}
+        onChange={handleChange}
+      />
+   <select
+  name="level"
+  required
+  value={newCourse.level}
+  onChange={handleChange}
+  className="select-input"
+>
+  <option value="">Select level</option>
+  <option value="Beginner">Beginner</option>
+  <option value="Intermediate">Intermediate</option>
+  <option value="Advanced">Advanced</option>
+</select>
+
+      <input
+        name="price"
+        required
+        placeholder="Price"
+        value={newCourse.price}
+        onChange={handleChange}
+      />
+
+      <textarea
+        name="description"
+        required
+        placeholder="Short description"
+        value={newCourse.description}
+        onChange={handleChange}
+      />
+
+      <div className="form-buttons">
+        <button type="submit">Add</button>
+        <button
+          type="button"
+          onClick={() => {
+            setShowForm(false);
+            setEditingId(null);
+          }}
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+)}
+
+
+      {/* DELETE dialog */}
       <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth="xs" fullWidth>
         <DialogTitle>Delete Course</DialogTitle>
         <DialogContent>
-          <Typography>
-            Are you sure you want to delete this course?
-          </Typography>
+          <Typography>Are you sure you want to delete this course?</Typography>
           {toDelete?.title && (
             <Typography fontWeight="bold" mt={1}>
               {toDelete.title}

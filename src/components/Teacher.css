@@ -3,7 +3,7 @@
   min-height: 100vh;
   background: #f4f7fb;
   font-family: 'Inter', sans-serif;
-  padding: 2rem;
+  padding: 0;  /* <-- FIXED: remove padding */
 }
 
 /* Top center wrapper for circular + button */
@@ -29,6 +29,8 @@
   justify-content: center;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   transition: background 0.3s;
+  margin-top: 30px;
+
 }
 
 .add-course-btn:hover {
@@ -41,33 +43,141 @@
   gap: 2rem;
   flex-wrap: wrap;
   justify-content: center;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 4rem; /* optional spacing below */
 }
 
+
 /* Modal overlay */
-.modal {
+/* ===== TEACHER MODAL — Fullscreen overlay ===== */
+.teacher-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.5);
+  inset: 0; /* top:0 left:0 right:0 bottom:0 */
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(3px);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 999999;
+  animation: fadeIn 0.25s ease-out;
 }
 
-/* Form inside modal */
-.course-form {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
+/* Fade animation */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ===== MODAL CARD ===== */
+.teacher-modal-content {
+  width: 480px;
+  max-width: 92%;
+  background: #ffffff;
+  padding: 2rem 2rem 1.5rem;
+  border-radius: 18px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 300px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: slideUp 0.28s ease-out;
 }
+
+/* Slide-up animation */
+@keyframes slideUp {
+  from { transform: translateY(25px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Title */
+.teacher-modal-content h2 {
+  text-align: center;
+  color: #20438e;
+  margin-bottom: 0.5rem;
+}
+
+/* Inputs */
+.teacher-modal-content input,
+.teacher-modal-content textarea {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #d0d7e2;
+  font-size: 14px;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Input focus */
+.teacher-modal-content input:focus,
+.teacher-modal-content textarea:focus {
+  border-color: #20438e;
+  box-shadow: 0 0 0 3px rgba(32, 67, 142, 0.15);
+  outline: none;
+}
+
+/* Textarea */
+.teacher-modal-content textarea {
+  resize: none;
+  height: 100px;
+}
+
+/* Buttons row */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+/* Buttons */
+.form-buttons button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  width: 48%;
+}
+
+/* Add btn */
+.form-buttons button:first-child {
+  background: #20438e;
+  color: white;
+}
+.form-buttons button:first-child:hover {
+  background: #16336f;
+}
+
+/* Cancel btn */
+.form-buttons button:last-child {
+  background: #e0e0e0;
+}
+.form-buttons button:last-child:hover {
+  background: #cacaca;
+}
+
+/* Mobile improvement */
+@media (max-width: 480px) {
+  .teacher-modal-content {
+    padding: 1.3rem;
+    border-radius: 14px;
+    width: 94%;
+  }
+
+  .teacher-modal-content input,
+  .teacher-modal-content textarea {
+    font-size: 13px;
+  }
+
+  .form-buttons button {
+    font-size: 13px;
+    padding: 9px 12px;
+  }
+}
+
+
+
 
 /* Form inputs */
 .course-form input {
@@ -102,4 +212,58 @@
 
 .form-buttons button:last-child {
   background: #ccc;
+}
+/* FIX MODAL SHIFT — remove dashboard padding only when modal is open */
+.modal ~ .dashboard,
+.dashboard:has(.modal) {
+  padding: 0 !important;
+}
+/* OVERRIDE Login.css modal styles */
+.dashboard .modal {
+  position: fixed !important;
+  inset: 0 !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: rgba(0,0,0,0.5) !important;
+  transform: none !important;
+  overflow: visible !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+}
+
+/* OVERRIDE Login.css styles for form INSIDE modal */
+.dashboard .modal form.course-form {
+  width: 420px !important;
+  max-width: 90% !important;
+  max-height: none !important;
+  overflow: visible !important;
+  background: white !important;
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+  transform: none !important;
+  position: relative !important;
+}
+.select-input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid #d6ddeb;
+  font-size: 15px;
+  background: white;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.select-input:focus {
+  border-color: #20438e;
+  box-shadow: 0 0 0 3px rgba(32, 67, 142, 0.1);
 }

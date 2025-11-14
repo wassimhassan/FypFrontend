@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./Calendar.css";
 
-const Calendar = ({ selectedDate, setSelectedDate }) => {
+const Calendar = ({ selectedDate, setSelectedDate, events }) => {
   const today = new Date();
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 7, 1));
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [flashDate, setFlashDate] = useState(null); // 🔥 new
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
   const monthNames = [
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"
@@ -20,8 +22,22 @@ const Calendar = ({ selectedDate, setSelectedDate }) => {
   for (let i = 0; i < firstDay; i++) days.push(null);
   for (let d = 1; d <= daysInMonth; d++) days.push(d);
 
+  // event dates like: "Nov 14"
+  const eventDates = new Set(
+    events.map(ev => ev.date.split(" ").slice(1).join(" "))
+  );
+
   const handleDatePress = (day) => {
     if (!day) return;
+
+    // Create faded flash highlight
+    const dateKey = `${monthNames[month].slice(0, 3)} ${day}`;
+    setFlashDate(dateKey);
+
+    // Remove highlight after 1 second
+    setTimeout(() => setFlashDate(null), 1000);
+
+    // Update selected date for scrolling
     const dateObj = new Date(year, month, day);
     const weekdayName = weekdays[dateObj.getDay()];
     setSelectedDate({
@@ -57,16 +73,29 @@ const Calendar = ({ selectedDate, setSelectedDate }) => {
 
         <div className="calendar">
           {days.map((d, i) => {
-            const isToday = d && year === today.getFullYear() && month === today.getMonth() && d === today.getDate();
+            const isToday =
+              d &&
+              year === today.getFullYear() &&
+              month === today.getMonth() &&
+              d === today.getDate();
+
+            const dateKey = d ? `${monthNames[month].slice(0, 3)} ${d}` : "";
+            const hasEvent = d && eventDates.has(dateKey);
+            const isFlash = flashDate === dateKey;
+
             return (
               <button
                 key={i}
                 onClick={() => handleDatePress(d)}
-                className={`day-box ${d ? "" : "empty"} 
-                  ${selectedDate?.date === d && selectedDate?.month === monthNames[month] && selectedDate?.year === year ? "selected" : ""} 
-                  ${isToday ? "today" : ""}`}
+                className={`day-box
+                  ${!d ? "empty" : ""}
+                  ${isToday ? "today" : ""}
+                  ${isFlash ? "flash" : ""}
+                  ${hasEvent ? "event-day" : ""}
+                `}
               >
                 {d || ""}
+              
               </button>
             );
           })}

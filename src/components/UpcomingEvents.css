@@ -2,15 +2,18 @@
 /* Upcoming Event Cards */
 .card {
   background: #fff;
-  margin-bottom: 20px;
-  padding: 20px;
+  margin-bottom: 12px;           /* smaller gap between cards */
+  padding: 16px 20px 0 20px;     /* top | right | bottom | left */
   border-radius: 12px;
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.05);
-  display: flex;              /* added */
-  flex-direction: column;     /* added */
-  justify-content: space-between; /* added: button sticks to bottom */
+  display: block;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.card:last-child {
+  margin-bottom: 0;
+}
+
 
 
 .card:hover {
@@ -43,7 +46,7 @@
 .row {
   display: flex;
   align-items: center;
-  margin-bottom: 6px;
+  margin-bottom: 2px;
   color: #374151;
   font-size: 14px;
 }
@@ -67,7 +70,11 @@
   color: #4b5563;
   font-size: 14px;
   line-height: 1.5;
+  max-height: 4.5em;   /* max 3 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 
 .button {
   background: #1e3a8a;
@@ -79,8 +86,55 @@
   cursor: pointer;
   width: 100%;
   transition: 0.2s ease;
+  margin-top: 10px;     /* space above the button */
+  /* no margin-bottom here */
 }
+
 
 .button:hover {
   background: #15316b;
+}
+.highlighted-event {
+  background: #eef4ff;               /* soft blue */
+  border: 2px solid #26459c33;       /* light navy border */
+  box-shadow: 0px 4px 12px rgba(30, 58, 138, 0.15);
+  transform: scale(1.01);
+}
+/* Force upcoming event cards to auto-size */
+.card {
+  height: auto !important;
+  min-height: 0 !important;
+  padding-bottom: 8px !important;   /* small, clean white space */
+}
+.right-column {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+/* Sticky header */
+.upcoming-header {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  padding-bottom: 10px;
+  padding-top: 5px;
+}
+
+/* Scrollable list */
+.upcoming-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+/* keep the section title fixed */
+.right-column h2,
+.right-column p {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 5;
+  padding-bottom: 10px;
 }

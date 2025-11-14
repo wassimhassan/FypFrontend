@@ -17,7 +17,6 @@ export default function TeacherCourse({
   onAction,
   buttonLabel,
 }) {
-  // ---- Safe formatting (prevents NaN / undefined showing) ----
   const durationDays =
     typeof course?.durationDays === "number"
       ? course.durationDays
@@ -47,89 +46,71 @@ export default function TeacherCourse({
       : String(priceRaw || "—");
 
   return (
-    <div className="modern-course-card">
+    <div className="course-card">
+      <div className="course-top-strip"></div>
+
       {(onEdit || onDelete) && (
-        <div className="course-hover-buttons">
+        <div className="hover-buttons">
           {onEdit && (
-            <button className="course-edit-btn" onClick={onEdit} aria-label="Edit">
+            <button className="edit-btn" onClick={onEdit}>
               <FiEdit3 />
             </button>
           )}
           {onDelete && (
-            <button className="course-delete-btn" onClick={onDelete} aria-label="Delete">
+            <button className="delete-btn" onClick={onDelete}>
               <FiTrash2 />
             </button>
           )}
         </div>
       )}
 
-      {/* Header chips */}
-      <div className="course-card-header">
-        <div className="course-category">
-          <FiBookOpen className="category-icon" />
-          {course?.category || "General"}
-        </div>
+      {/* Chips */}
+      <div className="chips-row">
+        <span className="chip category-chip">
+          <FiBookOpen /> {course?.category || "General"}
+        </span>
 
-        <div
-          className={`course-pricing ${
+        <span
+          className={`chip price-chip ${
             priceDisplay === "Free" ? "free" : "paid"
           }`}
-          title={`Price: ${priceDisplay}`}
         >
-          <FiDollarSign className="price-icon" />
-          {priceDisplay}
-        </div>
+          <FiDollarSign /> {priceDisplay}
+        </span>
       </div>
 
-      {/* Title + Instructor */}
-      <h3 className="course-card-title">{course?.title || "Untitled course"}</h3>
-      <p className="course-card-instructor">
-        by {course?.instructor || "Unknown"}
-      </p>
+      <h3 className="course-title">{course?.title || "Untitled Course"}</h3>
+      <p className="course-instructor">by {course?.instructor || "Unknown"}</p>
 
-      {/* Stats tiles (uniform height & aligned like universities) */}
-      <div className="course-card-stats">
-        <div className="stat-tile">
-          <div className="stat-ico">
-            <FiClock />
-          </div>
-          <div className="stat-text">
-            <span className="stat-label">Duration</span>
-            <span className="stat-value">{durationDays} days</span>
+      <div className="stats-container">
+        <div className="stat-block">
+          <FiClock className="stat-icon" />
+          <div>
+            <div className="stat-label">Duration</div>
+            <div className="stat-value">{durationDays} days</div>
           </div>
         </div>
 
-        <div className="stat-tile">
-          <div className="stat-ico">
-            <FiUsers />
-          </div>
-          <div className="stat-text">
-            <span className="stat-label">Students</span>
-            <span className="stat-value">{enrolled.toLocaleString()}</span>
+        <div className="stat-block">
+          <FiUsers className="stat-icon" />
+          <div>
+            <div className="stat-label">Students</div>
+            <div className="stat-value">{enrolled}</div>
           </div>
         </div>
 
-        <div className="stat-tile">
-          <div className="stat-ico">
-            <FiStar />
-          </div>
-          <div className="stat-text">
-            <span className="stat-label">Rating</span>
-            <span className="stat-value">
-              {ratingAvg}/5 ({ratingCount})
-            </span>
+        <div className="stat-block">
+          <FiStar className="stat-icon" />
+          <div>
+            <div className="stat-label">Rating</div>
+            <div className="stat-value">
+              ⭐ {ratingAvg}/5 ({ratingCount})
+            </div>
           </div>
         </div>
       </div>
 
-     
-
-      {/* CTA pinned to bottom */}
-      <button
-        className="course-card-btn"
-        onClick={() => onAction?.(course)}
-        aria-label={buttonLabel}
-      >
+      <button className="manage-btn" onClick={() => onAction?.(course)}>
         {buttonLabel}
       </button>
     </div>

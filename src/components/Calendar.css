@@ -45,6 +45,7 @@ body {
   border-radius: 16px;
   background: #fff;
   box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+  
 }
 
 /* Section Titles */
@@ -188,3 +189,151 @@ body {
 
 
 
+.today-events-box {
+  margin-top: 20px;
+  padding: 16px;
+}
+
+.today-event-item {
+  background: #f1f5ff;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 10px;
+}
+
+.today-event-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1e3a8a;
+}
+
+.today-event-time {
+  font-size: 13px;
+  color: #475569;
+}
+.right.card-box {
+  padding-bottom: 0px !important;
+}
+/* Make left & right sides equal width */
+.container > div {
+  flex: 1;
+}
+/* TODAY stays dark blue always */
+.today {
+  background: #1e3a8a !important;
+  color: white !important;
+  font-weight: 700;
+  border: 2px solid #1e3a8a !important;
+}
+
+/* TEMPORARY CLICK FLASH (1–2 seconds) */
+.flash {
+  background: #e7efff !important;
+  color: #1e3a8a !important;
+  border: 2px solid #c6d8ff !important;
+  transition: background 0.3s ease;
+}
+
+/* IMPORTANT — event days should look NORMAL unless clicked */
+.event-day {
+  background: none !important;
+}
+
+/* REMOVE THE DOT — only show it ON CLICK */
+.event-dot {
+  display: none;
+}
+/* TODAY must override ALL other styles */
+.today {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  border: 2px solid #1e3a8a !important;
+  font-weight: 700 !important;
+  z-index: 10;
+}
+.container {
+  display: flex;
+  height: calc(100vh - 150px); /* full screen minus header */
+}
+/* -------- PRETTIER CALENDAR -------- */
+
+/* Day boxes */
+.day-box {
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  color: #1e293b;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+/* Hover effect – soft modern ring */
+.day-box:hover:not(.empty):not(.today):not(.flash) {
+  background: #f1f5ff !important;
+  box-shadow: 0 3px 8px rgba(50, 70, 150, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Today – make it nicer */
+.today {
+  background: #1e3a8a !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(30, 58, 138, 0.3);
+}
+
+/* Flash for clicked date */
+.flash {
+  background: #e4ecff !important;
+  color: #1e3a8a !important;
+  border: 2px solid #c7d8ff !important;
+  animation: flashFade 1.2s ease forwards;
+}
+
+@keyframes flashFade {
+  0% { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* Weekday labels */
+.weekday {
+  font-weight: 700;
+  color: #475569;
+}
+
+/* Calendar box */
+.calendar-box {
+  padding: 20px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.06);
+}
+
+/* Header */
+.calendar-header {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+/* Arrows prettier */
+.arrow {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #1e3a8a;
+  transition: all 0.2s;
+}
+
+.arrow:hover {
+  background: #e7efff;
+  border-color: #93c5fd;
+}
