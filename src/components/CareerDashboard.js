@@ -19,8 +19,10 @@ import {
   TextField,
   Tooltip,
   Chip,
+  InputAdornment,
+  TableSortLabel,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon, Search as SearchIcon } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./CareerDashboard.css";
@@ -92,12 +94,12 @@ const ChipsList = ({ items = [], max = 3 }) => {
 };
 
 const FIELD_MAP = [
-  { key: "title", label: "Title", required: true, type: "text" },
-  { key: "field", label: "Field", required: true, type: "text" },
-  { key: "salaryRange", label: "Salary Range", required: true, type: "text" },
-  { key: "skills", label: "Skills (comma-separated)", required: true, type: "csv" },
-  { key: "industries", label: "Industries (comma-separated)", required: true, type: "csv" },
-  { key: "description", label: "Description", required: true, type: "multiline", clamped: true },
+  { key: "title", label: "Title", required: true, type: "text", sortable: true },
+  { key: "field", label: "Field", required: true, type: "text", sortable: true },
+  { key: "salaryRange", label: "Salary Range", required: true, type: "text", sortable: true },
+  { key: "skills", label: "Skills (comma-separated)", required: true, type: "csv", sortable: false },
+  { key: "industries", label: "Industries (comma-separated)", required: true, type: "csv", sortable: false },
+  { key: "description", label: "Description", required: true, type: "multiline", clamped: true, sortable: false },
 ];
 
 const CareerDashboard = () => {
@@ -110,6 +112,11 @@ const CareerDashboard = () => {
 
   const [selectedCareer, setSelectedCareer] = useState(null);
   const [careerToDelete, setCareerToDelete] = useState(null);
+
+  // NEW: search + sort state
+  const [query, setQuery] = useState("");
+  const [orderBy, setOrderBy] = useState("createdAt"); // title | field | salaryRange | createdAt
+  const [order, setOrder] = useState("desc"); // asc | desc
 
   // Form state for create
   const emptyForm = useMemo(
@@ -149,6 +156,72 @@ const CareerDashboard = () => {
   useEffect(() => {
     fetchCareers();
   }, []);
+
+  // ---------- filter + sort ----------
+  const displayedCareers = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    const filtered = q
+      ? careers.filter((c) => {
+          const fields = [
+            c.title,
+            c.field,
+            c.salaryRange,
+            Array.isArray(c.skills) ? c.skills.join(", ") : c.skills,
+            Array.isArray(c.industries) ? c.industries.join(", ") : c.industries,
+            c.description,
+          ];
+          return fields.some((f) => String(f || "").toLowerCase().includes(q));
+        })
+      : careers.slice();
+
+    const salaryToTuple = (s) => {
+      // Try to parse ranges like "$50k - $80k", "3000–4000", "80k+", "5000"
+      const str = String(s || "").replace(/[\$,]/g, "").toLowerCase();
+      const nums = str.match(/\d+(\.\d+)?/g);
+      if (!nums) return [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY];
+      const first = parseFloat(nums[0]);
+      const second = nums[1] ? parseFloat(nums[1]) : first;
+      return [first, second];
+    };
+
+    filtered.sort((a, b) => {
+      let va, vb;
+
+      switch (orderBy) {
+        case "title":
+        case "field":
+          va = String(a[orderBy] || "").toLowerCase();
+          vb = String(b[orderBy] || "").toLowerCase();
+          break;
+        case "salaryRange": {
+          const [amin, amax] = salaryToTuple(a.salaryRange);
+          const [bmin, bmax] = salaryToTuple(b.salaryRange);
+          // primary by min, secondary by max
+          va = amin; vb = bmin;
+          if (va === vb) { va = amax; vb = bmax; }
+          break;
+        }
+        case "createdAt":
+        default:
+          va = new Date(a.createdAt || 0).getTime();
+          vb = new Date(b.createdAt || 0).getTime();
+      }
+
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return order === "asc" ? cmp : -cmp;
+    });
+
+    return filtered;
+  }, [careers, query, orderBy, order]);
+
+  const handleSort = (prop) => {
+    if (orderBy === prop) setOrder((p) => (p === "asc" ? "desc" : "asc"));
+    else {
+      setOrderBy(prop);
+      setOrder("asc");
+    }
+  };
 
   // Create
   const handleCreateCareer = async () => {
@@ -241,10 +314,30 @@ const CareerDashboard = () => {
   return (
     <Box className="cd-dashboard">
       <ToastContainer position="top-right" autoClose={3000} />
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+
+      {/* Header: title + search + add */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} gap={2} flexWrap="wrap">
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Career Management
         </Typography>
+
+        <Box sx={{ flex: 1, minWidth: 260, maxWidth: 520 }}>
+          <TextField
+            fullWidth
+            placeholder="Search title, field, salary, skills, industries, description…"
+            size="small"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -267,19 +360,35 @@ const CareerDashboard = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Field</TableCell>
-                <TableCell>Salary Range</TableCell>
-                <TableCell>Skills</TableCell>
-                <TableCell>Industries</TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>Created At</TableCell>
+                {FIELD_MAP.map((col) => {
+                  if (!col.sortable) return <TableCell key={col.key}>{col.label}</TableCell>;
+                  return (
+                    <TableCell key={col.key} sortDirection={orderBy === col.key ? order : false}>
+                      <TableSortLabel
+                        active={orderBy === col.key}
+                        direction={orderBy === col.key ? order : "asc"}
+                        onClick={() => handleSort(col.key)}
+                      >
+                        {col.label}
+                      </TableSortLabel>
+                    </TableCell>
+                  );
+                })}
+                <TableCell sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {careers.map((c) => (
+              {displayedCareers.map((c) => (
                 <TableRow key={c._id} hover className="cd-row">
                   <TableCell sx={{ maxWidth: 260 }}>
                     <Ellipsize value={c.title} maxWidth={260} />

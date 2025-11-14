@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation, NavLink } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
 import "./NavBar.css";
 
 function NavBar() {
-  const navigate   = useNavigate();
-  const location   = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
 
   const goHome = () => {
-  navigate(user?.role === "teacher" ? "/teacherHomePage" : "/homepage");
-};
-
+    navigate(user?.role === "teacher" ? "/teacherHomePage" : "/homepage");
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -45,7 +44,7 @@ function NavBar() {
   const avatar =
     user?.profilePicture && user.profilePicture !== ""
       ? user.profilePicture
-      : "/default-avatar.png"; // optional fallback
+      : "/default-avatar.png";
 
   return (
     <nav className="navbar">
@@ -54,46 +53,50 @@ function NavBar() {
           src="/logo-removebg-preview.png"
           alt="Logo"
           className="navbar-logo"
-          onClick={() => navigate("/homepage")}
-          style={{ cursor: "pointer" }}
+          onClick={goHome}
+          role="button"
+          aria-label="Go to homepage"
         />
       </div>
 
       <div className="nav-links">
-        {/* Prefer Link over <a href="#"> to avoid page reloads */}
-        <Link to="/chatbot">ChatBot</Link>
-        <Link to="/WelcomePage#reviews">Reviews</Link>
-        <Link to="/about">About</Link>
-        <Link to="/resources">Resources</Link>
-        <Link to="/support">Support</Link>
+        <NavLink to="/chatbot" className="nav-item">
+          ChatBot
+        </NavLink>
+        <NavLink to="/WelcomePage#reviews" className="nav-item">
+          Reviews
+        </NavLink>
+        <NavLink to="/about" className="nav-item">
+          About
+        </NavLink>
+        <NavLink to="/resources" className="nav-item">
+          Resources
+        </NavLink>
+        <NavLink to="/support" className="nav-item">
+          Support
+        </NavLink>
+        <NavLink to="/calendar" className="nav-item">
+          Calendar
+        </NavLink>
 
         {!user ? (
           <>
-            <button className="btn-outline" onClick={() => navigate("/login")}>
+            <button className="btn btn-outline" onClick={() => navigate("/login")}>
               Sign In
             </button>
-            <button className="btn-primary" onClick={() => navigate("/signup")}>
+            <button className="btn btn-primary" onClick={() => navigate("/signup")}>
               Get Started
             </button>
           </>
         ) : (
-          // ✅ Logged-in: always show BOTH Homepage and Profile
           <>
-
-              {/* Show "Courses" only for students */}
             {user?.role === "student" && (
-            <button
-             className="btn-outline"
-             onClick={() => navigate("/courses")}
-              >
-            Courses
-          </button>
-          )}
-          
-            <button
-              className="btn-outline"
-              onClick={goHome}
-            >
+              <button className="btn btn-outline" onClick={() => navigate("/courses")}>
+                Courses
+              </button>
+            )}
+
+            <button className="btn btn-ghost" onClick={goHome}>
               Homepage
             </button>
 
@@ -103,7 +106,7 @@ function NavBar() {
               title="Your profile"
             >
               <img src={avatar} alt="Profile" className="profile-pic" />
-              <span className="username">{user.username}</span>
+              <span className="username">{user?.username}</span>
             </button>
           </>
         )}

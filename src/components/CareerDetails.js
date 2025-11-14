@@ -19,7 +19,16 @@ export default function CareerDetails() {
     fetchCareer();
   }, [id]);
 
-  if (!career) return <p className="career-loading">Loading career details...</p>;
+  // ⬇️ Same loading UI as the dashboard (cd-overview / cd-loading-container / cd-spinner / cd-loading-text)
+  if (!career)
+    return (
+      <div className="cd-overview">
+        <div className="cd-loading-container">
+          <div className="cd-spinner" />
+          <div className="cd-loading-text">Loading Career…</div>
+        </div>
+      </div>
+    );
 
   return (
     <div className="career-details-container">

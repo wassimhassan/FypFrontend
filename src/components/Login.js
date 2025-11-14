@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import "./Login.css";
+import eyeOpen from "../assets/eye.png";
+import eyeClosed from "../assets/eyebrow.png";
 
 export default function Login({ setIsLoggingIn = () => {} }) {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ export default function Login({ setIsLoggingIn = () => {} }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
 
   // Forgot password modal
   const [showForgot, setShowForgot] = useState(false);
@@ -109,13 +112,25 @@ const handleLogin = async (e) => {
             required
           />
 
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+<div className="password-wrapper">
+  <input
+    type={showPassword ? "text" : "password"}
+    placeholder="Password"
+    value={password}
+    onChange={(e) => setPassword(e.target.value)}
+    required
+  />
+
+  <img
+    src={showPassword ? eyeOpen : eyeClosed}
+    alt="Toggle visibility"
+    className="toggle-eye-img"
+    onClick={() => setShowPassword(!showPassword)}
+  />
+</div>
+
+
+
 
           {error && <p className="error-message">{error}</p>}
 

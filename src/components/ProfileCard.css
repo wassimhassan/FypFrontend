@@ -1,4 +1,4 @@
-/* Profile Card Container */
+/* Base */
 body {
   background-size: cover;
   background-position: center;
@@ -6,233 +6,147 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: 'Poppins', Arial, sans-serif;
   overflow-y: auto;
 }
 
+/* Container */
 .profile-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 24px;
-  background-position: center;
-  background-repeat: no-repeat;
   background: linear-gradient(to right, #F8FAFC, #EFF6FF, #FFFFFF);
-  font-family: 'Poppins', sans-serif;
 }
 
-  
-  
-  /* Profile Image */
-  .profile-img-wrapper {
-    position: relative;
-    cursor: pointer; /* Ensure it's clickable */
-    display: inline-block;
+/* Avatar + Menu */
+.profile-img-wrapper {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 6px;
 }
 
-.profile-img-wrapper img {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    border: 4px solid #1009eb;
-    box-shadow: 0px 4px 8px rgba(35, 3, 177, 0.5);
-    transition: transform 0.3s ease-in-out;
+/* Card */
+.profile-card {
+  margin-top: 24px;
+  width: 360px;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0px 8px 24px rgba(2, 6, 23, 0.08);
+  border-radius: 14px !important; /* MUI Card has its own radius */
+  transition: transform 0.2s ease-in-out;
 }
 
-/* Profile Dropdown */
-.profile-dropdown {
-    position: absolute;
-    top: 110%; /* Adjust to be right below the profile image */
-    left: 50%;
-    transform: translateX(-50%);
-    background: white;
-    border-radius: 6px;
-    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.2);
-    padding: 6px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 100;
-    min-width: 120px;
+.profile-card:hover {
+  transform: translateY(-2px);
 }
 
-.profile-dropdown button {
-    background: transparent;
-    border: none;
-    padding: 6px 10px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: left;
-    width: 100%;
-    color: black;
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
 }
 
-.profile-dropdown button:hover {
-    background: rgba(0, 0, 0, 0.1);
+.profile-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
 }
 
-  /* Profile Card */
-  .profile-card {
-    margin-top: 24px;
-    width: 350px;
-    background: white;
-    color:black;
-    backdrop-filter: none;
-    box-shadow: 0px 4px 10px rgba(48, 52, 176, 0.3);
-    border-radius: 12px;
-    padding: 20px;
-    transition: transform 0.3s ease-in-out;
-  }
-
-  
-  /* Profile Header */
-  .profile-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-    padding-bottom: 8px;
-  }
-  
-  .profile-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-  
-  /* Profile Details */
-  .profile-details {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .profile-item {
-    background: rgba(0, 0, 0, 0.05); /* Light gray background */
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(0, 0, 0, 0.2); /* Subtle border */
-    text-align: left;
-    font-size: 0.95rem;
-    transition: background 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+/* Details */
+.profile-details {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-  /* Editable Input Fields */
-  .profile-input {
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid white;
-    color:rgb(32, 28, 28);
-    font-size: 0.95rem;
-    padding: 4px;
-    outline: none;
-    width: 100%;
-  }
-  
-  .profile-input:focus {
-    border-bottom: 2px solid #00ff99;
-  }
-  
-  /* Buttons */
-  .profile-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    gap: 12px;
-  }
-  
-  .profile-edit-btn, .profile-save-btn, .profile-logout-btn {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s ease-in-out;
-  }
-  
-  .profile-edit-btn {
-    background: #007bff;
-    color: white;
-  }
-  
-  .profile-edit-btn:hover {
-    background: #0056b3;
-  }
-  
-  .profile-save-btn {
-    background: #00ff99;
-    color: black;
-  }
-  
-  .profile-save-btn:hover {
-    background: #00cc77;
-  }
-  
-  .profile-logout-btn {
-    background: #ff4444;
-    color: white;
-  }
-  
-  .profile-logout-btn:hover {
-    background: #cc0000;
-  }
+.profile-item {
+  background: #f8fafc;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+  font-size: 0.97rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
-  /* Membership Status */
-  .profile-status {
-    margin-top: 16px;
-    font-size: 1rem;
-    font-weight: bold;
-    padding: 6px 12px;
-    border-radius: 6px;
-    text-transform: uppercase;
-  }
-  
-  .profile-status.active {
-    color: #00ff99;
-    border: 2px solid #00ff99;
-    background: rgba(0, 255, 153, 0.2);
-    text-shadow: 0px 0px 8px rgba(0, 255, 153, 0.8);
-  }
-  
-  .image-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 600px;
-    height: 600px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .modal-content {
-    position: relative;
-    max-width: 80%;
-    max-height: 80%;
-  }
-  
-  .modal-content img {
-    width: 100%;
-    height: auto;
-    border-radius: 10px;
-  }
-  
-  .close-modal {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 30px;
-    color: white;
-    cursor: pointer;
-    background: rgba(0, 0, 0, 0.5); /* Adds a slight background to make it visible */
-    padding: 5px 10px;
-    border-radius: 50%;
-    transition: 0.3s ease;
-  }
+.profile-item strong {
+  color: #111827;
+  margin-right: 8px;
+}
 
-  .registered-courses {
-  max-width: 960px;
+/* Editable input */
+.profile-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid #cbd5e1;
+  color: #1f2937;
+  font-size: 0.95rem;
+  padding: 4px 2px;
+  outline: none;
+  width: 60%;
+  transition: border-color 0.15s ease;
+}
+
+.profile-input:focus {
+  border-bottom: 2px solid #3b82f6;
+}
+
+/* Actions */
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  gap: 12px;
+}
+
+/* Keep class hooks for buttons (MUI handles visuals) */
+.edit-btn, .save-btn, .logout-btn {}
+
+/* Image Dialog (we switched to MUI Dialog; keep these only if you reuse the old modal) */
+.image-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 80%;
+  max-height: 80%;
+}
+
+.modal-content img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 30px;
+  color: white;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 50%;
+  transition: 0.3s ease;
+}
+
+/* Registered Courses */
+.registered-courses {
+  max-width: 1040px;
   margin: 24px auto 0;
   background: #fff;
   border-radius: 16px;
@@ -266,20 +180,21 @@ body {
   color: #64748b;
 }
 
+/* Grid */
 .rc-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
 }
 
-/* responsive fallbacks */
 @media (max-width: 980px){
-  .rc-grid{ grid-template-columns: repeat(2, 1fr); }
+  .rc-grid { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 640px){
-  .rc-grid{ grid-template-columns: 1fr; }
+  .rc-grid { grid-template-columns: 1fr; }
 }
 
+/* Course Card */
 .rc-card {
   border: 1px solid #e5e7eb;
   border-radius: 14px;
@@ -306,6 +221,7 @@ body {
   font-size: 1rem;
   margin: 0;
   line-height: 1.2;
+  color: #0f172a;
 }
 
 .rc-badge {
@@ -330,9 +246,10 @@ body {
   color: #475569;
   font-size: 0.92rem;
   margin: 8px 0 12px;
-  min-height: 44px; /* keeps cards even-ish */
+  min-height: 44px; /* keeps cards aligned */
 }
 
+/* Meta row */
 .rc-meta {
   display: flex;
   justify-content: space-between;
@@ -340,38 +257,50 @@ body {
   color: #64748b;
 }
 
-/* new bits for enriched card */
-.rc-type{
+/* Extra bits */
+.rc-type {
   font-size: 0.78rem;
   padding: 3px 8px;
   border-radius: 999px;
   background: #eef2ff;
-  color:#3730a3;
+  color: #3730a3;
   border: 1px solid #e5e7eb;
 }
 
-.rc-instructor{
-  color:#475569;
+.rc-instructor {
+  color: #475569;
   font-size: .9rem;
   margin: 2px 0 6px;
 }
 
-.rc-info{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:.9rem;
-  color:#475569;
+/* Icon chips row */
+.rc-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: .9rem;
+  color: #475569;
   margin: 6px 0 8px;
 }
 
-.rc-level{
-  display:inline-block;
+.rc-info-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* Level pill */
+.rc-level {
+  display: inline-block;
   font-size: .78rem;
   padding: 3px 8px;
   border-radius: 8px;
-  background:#f1f5f9;
-  color:#0f172a;
-  border:1px solid #e2e8f0;
+  background: #f8fafc;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
   margin-bottom: 6px;
 }

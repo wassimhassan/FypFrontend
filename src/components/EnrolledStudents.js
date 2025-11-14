@@ -1,11 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './EnrolledStudents.css';
+import { toast } from 'react-toastify';
+
+// MUI dialog bits
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Typography,
+  Button,
+} from '@mui/material';
 
 export default function EnrolledStudents({ courseId, onUpdate }) {
   const [enrolled, setEnrolled]   = useState([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
+
+  // delete dialog state
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [toRemove, setToRemove] = useState(null);
 
   const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -30,23 +45,44 @@ export default function EnrolledStudents({ courseId, onUpdate }) {
     if (courseId) fetchEnrolled();
   }, [courseId]);
 
-  const handleRemove = async (studentId) => {
-    if (!window.confirm('Remove this student from the course?')) return;
+  const handleRemove = (studentId) => {
+    const student = enrolled.find((s) => s._id === studentId);
+    setToRemove(student || { _id: studentId });
+    setDeleteOpen(true);
+  };
+
+  // confirmed removal
+  const confirmRemove = async () => {
+    if (!toRemove?._id) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API}/courses/${courseId}/enrolled/${studentId}`, {
+      await axios.delete(`${API}/courses/${courseId}/enrolled/${toRemove._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setEnrolled(prev => prev.filter(s => s._id !== studentId));
+      setEnrolled(prev => prev.filter(s => s._id !== toRemove._id));
       if (onUpdate) onUpdate();
-      alert('Student removed.');
+      toast.success('Student removed.');
     } catch (err) {
       console.error('Error removing student:', err);
-      alert(err.response?.data?.message || 'Failed to remove student');
+      toast.error(err.response?.data?.message || 'Failed to remove student');
+    } finally {
+      setDeleteOpen(false);
+      setToRemove(null);
     }
   };
 
-  if (loading) return <div className="enrollment-requests-loading">Loading enrolled students...</div>;
+  // ⬇️ Same loading UI classes as the dashboard
+  if (loading) {
+    return (
+      <div className="cd-overview">
+        <div className="cd-loading-container">
+          <div className="cd-spinner" />
+          <div className="cd-loading-text">Loading enrolled students…</div>
+        </div>
+      </div>
+    );
+  }
+
   if (error)   return <div className="enrollment-requests-error">Error: {error}</div>;
 
   return (
@@ -82,6 +118,23 @@ export default function EnrolledStudents({ courseId, onUpdate }) {
           ))}
         </div>
       )}
+
+      {/* Delete confirm dialog */}
+      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth="xs" fullWidth>
+        <DialogTitle>Remove Student</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to remove this student from the course?</Typography>
+          <Typography fontWeight="bold" mt={1}>
+            {toRemove?.username || toRemove?.email || 'Selected student'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
+          <Button variant="contained" color="error" onClick={confirmRemove}>
+            Remove
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

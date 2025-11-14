@@ -18,8 +18,10 @@ import {
   DialogActions,
   TextField,
   Tooltip,
+  InputAdornment,
+  TableSortLabel,
 } from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
+import { Add as AddIcon, Search as SearchIcon } from "@mui/icons-material";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./EventDashboard.css";
@@ -27,12 +29,17 @@ import "./EventDashboard.css";
 // API base (env override supported)
 const API_BASE = `${process.env.REACT_APP_BACKEND_URL}/api/events`;
 
-// Ellipsize + Tooltip helper (same as Career)
+// Ellipsize + Tooltip helper
 const Ellipsize = ({ value, lines = 1, maxWidth = 260 }) => {
   const text = value ?? "";
   const isMulti = lines > 1;
   return (
-    <Tooltip title={text || ""} arrow placement="top" disableHoverListener={!text}>
+    <Tooltip
+      title={text || ""}
+      arrow
+      placement="top"
+      disableHoverListener={!text}
+    >
       <span
         style={
           isMulti
@@ -89,17 +96,33 @@ const formatLocalInput = (d) => {
   return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
 };
 
-// Fields (kept simple like Career; dates use native pickers)
+// Fields
 const FIELD_MAP = [
   { key: "title", label: "Title", required: true, type: "text" },
-  { key: "mode", label: "Mode (Online/In-Person/Hybrid)", required: true, type: "text" },
+  {
+    key: "mode",
+    label: "Mode (Online/In-Person/Hybrid)",
+    required: true,
+    type: "text",
+  },
   { key: "tag", label: "Tag", required: false, type: "text" },
-    { key: "type", label: "Type", required: false, type: "text" },
+  { key: "type", label: "Type", required: false, type: "text" },
   { key: "location", label: "Location", required: false, type: "text" },
   { key: "link", label: "Link (URL)", required: false, type: "text" },
-  { key: "startsAt", label: "Starts At", required: true, type: "datetime-local" },
+  {
+    key: "startsAt",
+    label: "Starts At",
+    required: true,
+    type: "datetime-local",
+  },
   { key: "endsAt", label: "Ends At", required: false, type: "datetime-local" },
-  { key: "description", label: "Description", required: false, type: "multiline", clamped: true },
+  {
+    key: "description",
+    label: "Description",
+    required: false,
+    type: "multiline",
+    clamped: true,
+  },
 ];
 
 const EventDashboard = () => {
@@ -113,6 +136,11 @@ const EventDashboard = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventToDelete, setEventToDelete] = useState(null);
 
+  // NEW: search + sort state
+  const [query, setQuery] = useState("");
+  const [orderBy, setOrderBy] = useState("createdAt"); // title | mode | startsAt | createdAt
+  const [order, setOrder] = useState("desc"); // asc | desc
+
   // Form state (create)
   const emptyForm = useMemo(
     () =>
@@ -125,23 +153,30 @@ const EventDashboard = () => {
   const [newEvent, setNewEvent] = useState(emptyForm);
 
   // Auth header (admin endpoints)
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const authHeader = token ? { Authorization: `Bearer ${token}` } : {};
 
-  // Fetch events (supports both array and {items} shapes)
+  // Fetch events
   const fetchEvents = async () => {
     try {
       setLoading(true);
-      const res = await fetch(API_BASE, { headers: { Accept: "application/json" } });
+      const res = await fetch(API_BASE, {
+        headers: { Accept: "application/json" },
+      });
       let data = null;
       try {
         data = await res.json();
       } catch {
         data = null;
       }
-      if (!res.ok) throw new Error(data?.message || `Failed to fetch (${res.status})`);
-
-      const list = Array.isArray(data) ? data : Array.isArray(data?.items) ? data.items : [];
+      if (!res.ok)
+        throw new Error(data?.message || `Failed to fetch (${res.status})`);
+      const list = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.items)
+        ? data.items
+        : [];
       setEvents(list);
     } catch (err) {
       console.error(err);
@@ -154,6 +189,58 @@ const EventDashboard = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  // ------- filter + sort (client) -------
+  const displayedEvents = useMemo(() => {
+    const q = query.trim().toLowerCase();
+
+    const filtered = q
+      ? events.filter((e) => {
+          const fields = [
+            e.title,
+            e.mode,
+            e.tag,
+            e.type,
+            locationToText(e.location),
+            e.description,
+          ];
+          return fields.some((f) =>
+            String(f || "")
+              .toLowerCase()
+              .includes(q)
+          );
+        })
+      : events.slice();
+
+    filtered.sort((a, b) => {
+      const val = (x) => {
+        switch (orderBy) {
+          case "title":
+          case "mode":
+            return String(x?.[orderBy] || "").toLowerCase();
+          case "startsAt":
+            return new Date(x?.startsAt || 0).getTime();
+          case "createdAt":
+          default:
+            return new Date(x?.createdAt || 0).getTime();
+        }
+      };
+      const va = val(a);
+      const vb = val(b);
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0;
+      return order === "asc" ? cmp : -cmp;
+    });
+
+    return filtered;
+  }, [events, query, orderBy, order]);
+
+  const handleSort = (prop) => {
+    if (orderBy === prop) setOrder((p) => (p === "asc" ? "desc" : "asc"));
+    else {
+      setOrderBy(prop);
+      setOrder("asc");
+    }
+  };
 
   // Create
   const handleCreateEvent = async () => {
@@ -171,12 +258,12 @@ const EventDashboard = () => {
         if (typeof payload[k] === "string") payload[k] = payload[k].trim();
       });
 
-      // Parse location JSON if admin pasted an object
       if (payload.location?.trim?.().startsWith("{")) {
-        try { payload.location = JSON.parse(payload.location); } catch {}
+        try {
+          payload.location = JSON.parse(payload.location);
+        } catch {}
       }
 
-      // Convert date-time picker strings to ISO for API
       payload.startsAt = toISOStringOrNull(payload.startsAt);
       payload.endsAt = toISOStringOrNull(payload.endsAt);
 
@@ -206,12 +293,12 @@ const EventDashboard = () => {
         if (typeof payload[k] === "string") payload[k] = payload[k].trim();
       });
 
-      // Parse location JSON if admin pasted an object
       if (payload.location?.trim?.().startsWith("{")) {
-        try { payload.location = JSON.parse(payload.location); } catch {}
+        try {
+          payload.location = JSON.parse(payload.location);
+        } catch {}
       }
 
-      // Convert date-time picker strings to ISO for API
       payload.startsAt = toISOStringOrNull(payload.startsAt);
       payload.endsAt = toISOStringOrNull(payload.endsAt);
 
@@ -257,10 +344,36 @@ const EventDashboard = () => {
     <Box className="cd-dashboard">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      {/* Header: title + search + add */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+        gap={2}
+        flexWrap="wrap"
+      >
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Event Management
         </Typography>
+
+        <Box sx={{ flex: 1, minWidth: 260, maxWidth: 520 }}>
+          <TextField
+            fullWidth
+            placeholder="Search title, mode, tag, type, location, description…"
+            size="small"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -283,21 +396,57 @@ const EventDashboard = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Mode</TableCell>
+                <TableCell sortDirection={orderBy === "title" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "title"}
+                    direction={orderBy === "title" ? order : "asc"}
+                    onClick={() => handleSort("title")}
+                  >
+                    Title
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sortDirection={orderBy === "mode" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "mode"}
+                    direction={orderBy === "mode" ? order : "asc"}
+                    onClick={() => handleSort("mode")}
+                  >
+                    Mode
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Tag</TableCell>
                 <TableCell>Type</TableCell>
-                <TableCell>Starts At</TableCell>
+                <TableCell
+                  sortDirection={orderBy === "startsAt" ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === "startsAt"}
+                    direction={orderBy === "startsAt" ? order : "asc"}
+                    onClick={() => handleSort("startsAt")}
+                  >
+                    Starts At
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Ends At</TableCell>
                 <TableCell>Location</TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell>Created At</TableCell>
+                <TableCell
+                  sortDirection={orderBy === "createdAt" ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {events.map((e) => (
+              {displayedEvents.map((e) => (
                 <TableRow key={e._id} hover className="cd-row">
                   <TableCell sx={{ maxWidth: 260 }}>
                     <Ellipsize value={e.title} maxWidth={260} />
@@ -308,31 +457,41 @@ const EventDashboard = () => {
                   <TableCell sx={{ maxWidth: 160 }}>
                     <Ellipsize value={e.tag} maxWidth={160} />
                   </TableCell>
-                    <TableCell sx={{ maxWidth: 160 }}>
-                    <Ellipsize value={e.type} maxWidth={120} />
+                  <TableCell sx={{ maxWidth: 160 }}>
+                    <Ellipsize value={e.type} maxWidth={160} />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200 }}>
                     <Ellipsize
-                      value={e.startsAt ? new Date(e.startsAt).toLocaleString() : "-"}
+                      value={
+                        e.startsAt ? new Date(e.startsAt).toLocaleString() : "-"
+                      }
                       maxWidth={200}
                     />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200 }}>
                     <Ellipsize
-                      value={e.endsAt ? new Date(e.endsAt).toLocaleString() : "-"}
+                      value={
+                        e.endsAt ? new Date(e.endsAt).toLocaleString() : "-"
+                      }
                       maxWidth={200}
                     />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 220 }}>
-                    {/* stringify object locations for safe render */}
-                    <Ellipsize value={locationToText(e.location)} maxWidth={220} />
+                    <Ellipsize
+                      value={locationToText(e.location)}
+                      maxWidth={220}
+                    />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 380 }}>
                     <Ellipsize value={e.description} lines={2} maxWidth={380} />
                   </TableCell>
                   <TableCell sx={{ maxWidth: 160 }}>
                     <Ellipsize
-                      value={e.createdAt ? new Date(e.createdAt).toLocaleDateString() : "-"}
+                      value={
+                        e.createdAt
+                          ? new Date(e.createdAt).toLocaleDateString()
+                          : "-"
+                      }
                       maxWidth={160}
                     />
                   </TableCell>
@@ -344,7 +503,6 @@ const EventDashboard = () => {
                       onClick={() => {
                         const shaped = {
                           ...e,
-                          // prepare values for edit inputs
                           startsAt: formatLocalInput(e.startsAt),
                           endsAt: formatLocalInput(e.endsAt),
                           location: locationToText(e.location),
@@ -399,7 +557,9 @@ const EventDashboard = () => {
               onChange={(e) =>
                 setNewEvent((prev) => ({ ...prev, [f.key]: e.target.value }))
               }
-              InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
+              InputLabelProps={
+                f.type === "datetime-local" ? { shrink: true } : undefined
+              }
               sx={{ mb: 2 }}
             />
           ))}
@@ -438,7 +598,9 @@ const EventDashboard = () => {
                     prev ? { ...prev, [f.key]: e.target.value } : prev
                   )
                 }
-                InputLabelProps={f.type === "datetime-local" ? { shrink: true } : undefined}
+                InputLabelProps={
+                  f.type === "datetime-local" ? { shrink: true } : undefined
+                }
                 sx={{ mb: 2 }}
               />
             ))}

@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import {
   Box,
   Typography,
@@ -22,14 +22,21 @@ import {
   Select,
   FormControl,
   InputLabel,
+  InputAdornment,
+  IconButton,
+  TableSortLabel,
+  Tooltip,
 } from "@mui/material"
-import { Add as AddIcon, StarRounded as StarIcon } from "@mui/icons-material"
+import {
+  Add as AddIcon,
+  StarRounded as StarIcon,
+  Search as SearchIcon,
+} from "@mui/icons-material"
 import { toast, ToastContainer } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import "./CourseDashboard.css"
-import { Tooltip } from "@mui/material"
 
-const API_BASE = process.env.REACT_APP_BACKEND_URL;
+const API_BASE = process.env.REACT_APP_BACKEND_URL
 const LEVELS = ["Beginner", "Intermediate", "Advanced"]
 
 const CourseDashboard = () => {
@@ -47,13 +54,18 @@ const CourseDashboard = () => {
   const [selectedCourseTitle, setSelectedCourseTitle] = useState("")
   const [loading, setLoading] = useState(true)
 
-  // NEW: state includes the new fields
+  // NEW: search + sort state
+  const [query, setQuery] = useState("")
+  const [orderBy, setOrderBy] = useState("createdAt") // title | price | rating | durationDays | enrolled | createdAt
+  const [order, setOrder] = useState("desc") // asc | desc
+
+  // form state
   const [newCourse, setNewCourse] = useState({
     title: "",
     description: "",
     price: "",
-    instructor: "",      // string (teacher name)
-    durationDays: "",    // number
+    instructor: "",
+    durationDays: "",
     level: "Beginner",
     category: "",
   })
@@ -90,6 +102,7 @@ const CourseDashboard = () => {
 
   // ---------- Helpers ----------
   const getToken = () => localStorage.getItem("token")
+
   const priceChip = (price) => {
     const p = String(price ?? "")
     const isFree = p.toLowerCase() === "free"
@@ -100,6 +113,78 @@ const CourseDashboard = () => {
         size="small"
       />
     )
+  }
+
+  // parse helpers for sorting
+  const parsePrice = (p) => {
+    if (p == null) return Number.POSITIVE_INFINITY
+    const s = String(p).trim().toLowerCase()
+    if (s === "free") return 0
+    // extract digits like "150$" -> 150
+    const m = s.match(/[\d.]+/)
+    return m ? Number(m[0]) : Number.POSITIVE_INFINITY
+  }
+  const num = (v) => (v == null || v === "" ? -Infinity : Number(v))
+
+  // ---------- Search + Sort ----------
+  const displayedCourses = useMemo(() => {
+    const q = query.trim().toLowerCase()
+
+    const filtered = q
+      ? courses.filter((c) => {
+          const fields = [
+            c.title,
+            c.description,
+            c.instructor,
+            c.category,
+            c.level,
+          ]
+          return fields.some((f) => String(f || "").toLowerCase().includes(q))
+        })
+      : courses.slice()
+
+    filtered.sort((a, b) => {
+      let va, vb
+      switch (orderBy) {
+        case "title":
+          va = String(a.title || "").toLowerCase()
+          vb = String(b.title || "").toLowerCase()
+          break
+        case "price":
+          va = parsePrice(a.price)
+          vb = parsePrice(b.price)
+          break
+        case "rating":
+          va = Number(a.ratingAvg || 0)
+          vb = Number(b.ratingAvg || 0)
+          break
+        case "durationDays":
+          va = num(a.durationDays)
+          vb = num(b.durationDays)
+          break
+        case "enrolled":
+          va = (a.enrolledStudents?.length || 0)
+          vb = (b.enrolledStudents?.length || 0)
+          break
+        case "createdAt":
+        default:
+          va = new Date(a.createdAt || 0).getTime()
+          vb = new Date(b.createdAt || 0).getTime()
+      }
+      const cmp = va < vb ? -1 : va > vb ? 1 : 0
+      return order === "asc" ? cmp : -cmp
+    })
+
+    return filtered
+  }, [courses, query, orderBy, order])
+
+  const handleSort = (prop) => {
+    if (orderBy === prop) {
+      setOrder((p) => (p === "asc" ? "desc" : "asc"))
+    } else {
+      setOrderBy(prop)
+      setOrder("asc")
+    }
   }
 
   // ---------- CRUD ----------
@@ -203,7 +288,6 @@ const CourseDashboard = () => {
     }
   }
 
-  // ---------- Enrolled Students ----------
   const handleViewEnrolledStudents = async (course) => {
     try {
       const token = getToken()
@@ -226,10 +310,30 @@ const CourseDashboard = () => {
     <Box className="course-dashboard">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      {/* Header with title + search + add */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} gap={2} flexWrap="wrap">
         <Typography variant="h4" sx={{ color: "#20438E", fontWeight: "bold" }}>
           Course Management
         </Typography>
+
+        {/* Search */}
+        <Box sx={{ flex: 1, minWidth: 260, maxWidth: 480 }}>
+          <TextField
+            fullWidth
+            placeholder="Search title, description, instructor, category…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+        </Box>
+
         <Button
           variant="contained"
           startIcon={<AddIcon />}
@@ -252,29 +356,79 @@ const CourseDashboard = () => {
           <Table sx={{ tableLayout: "fixed" }}>
             <TableHead>
               <TableRow>
-                <TableCell sx={{ width: 200 }}>Title</TableCell>
-                <TableCell sx={{ width: 440 }}>Description</TableCell>
-                <TableCell sx={{ width: 100 }}>Price</TableCell>
-                <TableCell sx={{ width: 120 }}>Rating</TableCell>
-                <TableCell sx={{ width: 120 }}>Duration</TableCell>
-                <TableCell
-                  sx={{
-                    width: 90,
-                    textAlign: "center",
-                    fontWeight: 700,
-                  }}
-                >
-                  Enrolled
+                <TableCell sx={{ width: 200 }} sortDirection={orderBy === "title" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "title"}
+                    direction={orderBy === "title" ? order : "asc"}
+                    onClick={() => handleSort("title")}
+                  >
+                    Title
+                  </TableSortLabel>
                 </TableCell>
-                <TableCell sx={{ width: 130 }}>Created At</TableCell>
+
+                <TableCell sx={{ width: 440 }}>Description</TableCell>
+
+                <TableCell sx={{ width: 100 }} sortDirection={orderBy === "price" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "price"}
+                    direction={orderBy === "price" ? order : "asc"}
+                    onClick={() => handleSort("price")}
+                  >
+                    Price
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sx={{ width: 120 }} sortDirection={orderBy === "rating" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "rating"}
+                    direction={orderBy === "rating" ? order : "asc"}
+                    onClick={() => handleSort("rating")}
+                  >
+                    Rating
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sx={{ width: 120 }} sortDirection={orderBy === "durationDays" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "durationDays"}
+                    direction={orderBy === "durationDays" ? order : "asc"}
+                    onClick={() => handleSort("durationDays")}
+                  >
+                    Duration
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell
+                  sx={{ width: 90, textAlign: "center", fontWeight: 700 }}
+                  sortDirection={orderBy === "enrolled" ? order : false}
+                >
+                  <TableSortLabel
+                    active={orderBy === "enrolled"}
+                    direction={orderBy === "enrolled" ? order : "asc"}
+                    onClick={() => handleSort("enrolled")}
+                  >
+                    Enrolled
+                  </TableSortLabel>
+                </TableCell>
+
+                <TableCell sx={{ width: 130 }} sortDirection={orderBy === "createdAt" ? order : false}>
+                  <TableSortLabel
+                    active={orderBy === "createdAt"}
+                    direction={orderBy === "createdAt" ? order : "asc"}
+                    onClick={() => handleSort("createdAt")}
+                  >
+                    Created At
+                  </TableSortLabel>
+                </TableCell>
+
                 <TableCell sx={{ width: 160 }}>Actions</TableCell>
               </TableRow>
             </TableHead>
 
             <TableBody>
-              {courses.map((course) => (
+              {displayedCourses.map((course) => (
                 <TableRow key={course._id} hover className="course-table-row">
-                  {/* Title: 1-line ellipsis + tooltip */}
+                  {/* Title */}
                   <TableCell sx={{ p: 1 }}>
                     <Tooltip title={course.title} arrow placement="top">
                       <span
@@ -291,7 +445,7 @@ const CourseDashboard = () => {
                     </Tooltip>
                   </TableCell>
 
-                  {/* Description: 2-line clamp + tooltip */}
+                  {/* Description */}
                   <TableCell sx={{ p: 1 }}>
                     <Tooltip title={course.description} arrow placement="top">
                       <span
@@ -315,7 +469,7 @@ const CourseDashboard = () => {
                     {priceChip(course.price)}
                   </TableCell>
 
-                  {/* Rating: star + avg + (count) */}
+                  {/* Rating */}
                   <TableCell sx={{ whiteSpace: "nowrap" }}>
                     <Box display="flex" alignItems="center" gap={0.5}>
                       <StarIcon sx={{ fontSize: 18, color: "#fbc02d" }} />
@@ -335,7 +489,7 @@ const CourseDashboard = () => {
                     {course.durationDays ? `${course.durationDays} days` : "—"}
                   </TableCell>
 
-                  {/* Enrolled (narrow + yellow + clickable) */}
+                  {/* Enrolled */}
                   <TableCell
                     sx={{
                       width: 90,
@@ -362,7 +516,6 @@ const CourseDashboard = () => {
                       size="small"
                       variant="outlined"
                       onClick={() => {
-                        // prefill all fields for editing
                         const safe = {
                           title: "",
                           description: "",

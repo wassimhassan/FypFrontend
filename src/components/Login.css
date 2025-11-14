@@ -291,3 +291,24 @@ body {
 
   .Login-data { flex-direction: column; gap: 10px; }
 }
+/* Password input wrapper */
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.toggle-eye-img {
+  position: absolute;
+  right: 14px;
+  top: 35%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.toggle-eye-img:hover {
+  opacity: 1;
+}
