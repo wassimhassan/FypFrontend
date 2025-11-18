@@ -42,8 +42,8 @@
   font-size:12px;
   font-weight:700;
   color:#92400e;
-  background:linear-gradient(135deg,#fef3c7,#fde68a);
-  border:1px solid #f59e0b;
+  background:linear-gradient(135deg,#deca7d,#deca7d);
+  border:1px solid #f8f7f5;
 }
 .rank-icon{ font-size:12px; }
 
@@ -127,7 +127,7 @@
   gap:12px;
   padding:14px;
   border-radius:12px;
-  border:2px solid #2563eb;
+  border:2px solid #f7f8f9;
   background:#eaf5ff;
   margin-bottom:10px;
 }

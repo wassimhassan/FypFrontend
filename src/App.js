@@ -50,7 +50,8 @@ function App() {
         <Route path="/courses/:courseId" element={<CourseView />} />
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/careers" element={<CareersTab />} />
-        <Route path="/careers/:id" element={<CareerDetails />} />
+   <Route path="/career-details" element={<CareerDetails />} />
+
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}/>
         

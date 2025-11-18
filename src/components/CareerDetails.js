@@ -1,58 +1,51 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
+import React from "react";
 import "./CareerDetails.css";
 
-export default function CareerDetails() {
-  const { id } = useParams();
-  const [career, setCareer] = useState(null);
-
-  useEffect(() => {
-    const fetchCareer = async () => {
-      try {
-        const res = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/careers/${id}`);
-        setCareer(res.data);
-      } catch (err) {
-        console.error("Error fetching career details:", err);
-      }
-    };
-    fetchCareer();
-  }, [id]);
-
-  // ⬇️ Same loading UI as the dashboard (cd-overview / cd-loading-container / cd-spinner / cd-loading-text)
-  if (!career)
-    return (
-      <div className="cd-overview">
-        <div className="cd-loading-container">
-          <div className="cd-spinner" />
-          <div className="cd-loading-text">Loading Career…</div>
-        </div>
-      </div>
-    );
+export default function CareerDetails({ career, onClose }) {
+  if (!career) return null;
 
   return (
-    <div className="career-details-container">
-      <h2 className="career-details-title">{career.title}</h2>
-      <p className="career-details-field"><strong>Field:</strong> {career.field}</p>
-      <p className="career-details-salary"><strong>Salary Range:</strong> {career.salaryRange}</p>
-      <p className="career-details-desc">{career.description}</p>
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-content career-details-container"
+        onClick={(e) => e.stopPropagation()} // prevent closing on inner click
+      >
+        <button className="close-btn" onClick={onClose}>
+          &times;
+        </button>
 
-      <div className="career-details-section">
-        <h4>Key Skills</h4>
-        <ul>
-          {career.skills?.map((skill, index) => (
-            <li key={index}>{skill}</li>
-          ))}
-        </ul>
-      </div>
+        <h2 className="career-details-title">{career.jobTitle}</h2>
 
-      <div className="career-details-section">
-        <h4>Industries</h4>
-        <ul>
-          {career.industries?.map((ind, index) => (
-            <li key={index}>{ind}</li>
-          ))}
-        </ul>
+        <p className="career-details-field">
+          <strong>Field:</strong> {career.major}
+        </p>
+
+        <p className="career-details-salary">
+          <strong>Salary Range:</strong> {career.salary}
+        </p>
+
+        <div className="career-details-section">
+          <h4>Description</h4>
+          <p className="career-details-desc">{career.description || "No description available."}</p>
+        </div>
+
+        <div className="career-details-section">
+          <h4>Key Skills</h4>
+          <ul>
+            {career.skills?.length > 0
+              ? career.skills.map((skill, index) => <li key={index}>{skill}</li>)
+              : <li>No skills listed</li>}
+          </ul>
+        </div>
+
+        <div className="career-details-section">
+          <h4>Industries</h4>
+          <ul>
+            {career.industries?.length > 0
+              ? career.industries.map((ind, index) => <li key={index}>{ind}</li>)
+              : <li>No industries listed</li>}
+          </ul>
+        </div>
       </div>
     </div>
   );

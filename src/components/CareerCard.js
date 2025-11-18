@@ -1,15 +1,30 @@
 import { FiTrendingUp, FiBriefcase, FiDollarSign, FiStar } from "react-icons/fi";
 import "./CareerCard.css";
-import { useNavigate } from "react-router-dom";
 
-const CareerCard = ({ _id, major, jobTitle, salary, skills = [], industries = [], badge }) => {
+const CareerCard = ({
+  _id,
+  major,
+  jobTitle,
+  salary,
+  skills = [],
+  industries = [],
+  badge,
+  onLearnMore, // added this prop
+}) => {
   const primarySkills = skills.slice(0, 3);
   const extraSkills = skills.slice(3);
   const fullSkillsText = skills.join(", ");
-  const navigate = useNavigate();
 
   const handleLearnMore = () => {
-    navigate(`/careers/${_id}`);
+    // Instead of navigating, call the callback passed from parent
+    onLearnMore({
+      _id,
+      major,
+      jobTitle,
+      salary,
+      skills,
+      industries,
+    });
   };
 
   return (
@@ -38,7 +53,6 @@ const CareerCard = ({ _id, major, jobTitle, salary, skills = [], industries = []
         </div>
       </div>
 
-      {/* Key Skills – 2-line clamp + “+N more” with hover tooltip */}
       <div className="career-tile">
         <div className="tile-ico skills-ico">
           <FiStar />
@@ -76,9 +90,8 @@ const CareerCard = ({ _id, major, jobTitle, salary, skills = [], industries = []
       </div>
 
       <button className="career-learn-btn" onClick={handleLearnMore}>
-  Learn More
-</button>
-
+        Learn More
+      </button>
     </div>
   );
 };

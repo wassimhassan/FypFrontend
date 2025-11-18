@@ -1,194 +1,116 @@
+/* Card Container */
 .career-card {
   position: relative;
   width: 100%;
   height: 420px;
-  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-  border-radius: 16px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 24px rgba(32, 67, 142, 0.1);
-  border: 1px solid #e2e8f0;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  border: 1px solid rgba(32, 67, 142, 0.1);
+  box-shadow: 0 6px 20px rgba(32, 67, 142, 0.12);
+  transition: all 0.25s ease;
   overflow: hidden;
 }
 
 .career-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(32, 67, 142, 0.18);
-  border-color: #20438e;
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(32, 67, 142, 0.2);
+  border-color: rgba(32, 67, 142, 0.3);
 }
 
-/* Badge */
-.career-badge {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #fef3c7, #fde68a);
-  color: #92400e;
-  border: 1px solid #fbbf24;
+/* Title */
+.career-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 0 0 12px 0;
+  line-height: 1.25;
+  text-align: left;
 }
-.badge-icon { font-size: 12px; }
 
-/* Major chip */
+/* Major tag */
+/* Major tag */
 .career-major {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
   padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #e0f2fe, #b3e5fc);
-  color: #0277bd;
-  border: 1px solid #29b6f6;
-}
-.major-icon { font-size: 14px; }
-
-/* Title */
-.career-title {
-  font-size: 18px;
-  font-weight: 800;
-  color: #20438e;
-  margin: 0 0 12px 0;
-  line-height: 1.25;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+  border-radius: 10px;
+  background: rgba(254, 215, 100, 0.25); /* Faded light yellow */
+  color: #8a5a09; /* warm but softer text */
+  font-weight: 600;
+  font-size: 14px;
+  width: fit-content;
+  margin-bottom: 14px;
+  border: 1px solid rgba(254, 215, 100, 0.3); /* subtle yellow border */
 }
 
-/* Info tiles */
+
+
+/* Info Section */
 .career-tile {
-  display: grid;
-  grid-template-columns: 44px 1fr;
+  display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px;
-  min-height: 64px;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
-  margin-bottom: 10px;
+  border: 1px solid rgba(32, 67, 142, 0.1);
+  margin-bottom: 12px;
+  box-shadow: 0 2px 8px rgba(32, 67, 142, 0.03);
 }
 
 .tile-ico {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  background: #eef2ff;
-  color: #1e3a8a;
-  font-size: 18px;
+  font-size: 20px;
+  color: #1e40af;
+  margin-right: 12px;
 }
-.salary-ico { color: #059669; background: #dcfce7; }
-.skills-ico { color: #1e40af; background: #e0f2fe; }
-.industries-ico { color: #7c2d12; background: #fef3c7; }
 
-.tile-text {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
 .tile-label {
   font-size: 12px;
   font-weight: 600;
   color: #6b7280;
 }
+
 .tile-value {
   font-size: 14px;
-  font-weight: 800;
-  color: #0f172a;
+  font-weight: 700;
+  color: #1e293b;
 }
 
-/* CTA */
+/* Learn More Button */
 .career-learn-btn {
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 20px;
-  padding: 12px 16px;
+  margin-top: auto;
+  padding: 12px;
   border: none;
   border-radius: 12px;
-  font-weight: 800;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, #20438e, #1e40af);
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(32, 67, 142, 0.25);
-  transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  width: 100%;
+  transition: all 0.2s ease;
 }
+
 .career-learn-btn:hover {
-  transform: translateY(-1px);
-  filter: brightness(1.03);
-  box-shadow: 0 6px 16px rgba(32, 67, 142, 0.35);
-}
-/* container for the clamped text + badge */
-.skills-line {
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
+  background: linear-gradient(135deg, #1e40af, #1e3a8a);
+  box-shadow: 0 4px 15px rgba(30, 58, 138, 0.3);
+  transform: translateY(-2px);
 }
 
-/* clamp Key Skills to exactly 2 lines */
-.skills-clamp {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;          /* two lines only */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  max-height: calc(1.25em * 2);   /* keeps height tidy across browsers */
-  line-height: 1.25em;
-}
-
-/* "+N more" badge with tooltip on hover */
-.skills-more-badge {
-  flex-shrink: 0;
-  padding: 2px 6px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 800;
-  color: #1e40af;
-  background: #e0e7ff;
-  border: 1px solid #c7d2fe;
-  cursor: default;
-  position: relative;
-}
-
-/* Tooltip */
-.skills-more-badge:hover::after {
-  content: attr(data-tooltip);
+/* Badge — optional, if needed */
+.career-badge {
   position: absolute;
-  top: 125%;
-  left: 0;
-  width: 260px;
-  padding: 10px 12px;
+  top: 20px;
+  right: 20px;
+  padding: 4px 10px;
   border-radius: 10px;
-  background: #0f172a;
-  color: #fff;
-  box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
-  white-space: normal;
-  line-height: 1.35;
-  font-size: 12px;
-  font-weight: 500;
-  z-index: 10;
-}
-
-/* optional small arrow */
-.skills-more-badge:hover::before {
-  content: "";
-  position: absolute;
-  top: 118%;
-  left: 10px;
-  border: 6px solid transparent;
-  border-bottom-color: #0f172a;
+  font-size: 11px;
+  background: #fde68a;
+  color: #92400e;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }

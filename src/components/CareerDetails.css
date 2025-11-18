@@ -1,47 +1,89 @@
-.career-details-container {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 30px;
-  background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(32, 67, 142, 0.1);
-  border: 1px solid #e2e8f0;
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
 }
 
+/* Modal Container */
+.modal-content {
+  background: #ffffff;
+  padding: 32px 28px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 650px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow-y: auto;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Close Button */
+.close-btn {
+  border: none;
+  background: none;
+  font-size: 28px;
+  font-weight: bold;
+  position: absolute;
+  right: 18px;
+  top: 12px;
+  cursor: pointer;
+  color: #334155;
+  transition: color 0.2s ease;
+}
+.close-btn:hover {
+  color: #1e3a8a;
+}
+
+/* Title */
 .career-details-title {
   color: #20438e;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 800;
   margin-bottom: 12px;
+  padding-right: 28px; /* to keep from bumping close button */
 }
 
+/* Meta Info */
 .career-details-field,
 .career-details-salary {
-  font-size: 16px;
+  font-size: 15px;
   color: #475569;
   margin-bottom: 6px;
 }
 
-.career-details-desc {
-  margin: 20px 0;
-  font-size: 15px;
-  color: #334155;
-  line-height: 1.6;
-}
-
+/* Section */
 .career-details-section {
   margin-top: 20px;
 }
 
 .career-details-section h4 {
   color: #1e3a8a;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   margin-bottom: 8px;
 }
 
+/* Paragraph & List */
+.career-details-desc,
 .career-details-section ul {
-  list-style: disc;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #334155;
+}
+
+.career-details-section ul {
   margin-left: 20px;
-  color: #475569;
+  list-style-type: disc;
+}
+
+.career-details-section ul li {
+  margin-bottom: 6px;
 }
