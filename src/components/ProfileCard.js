@@ -128,53 +128,59 @@ const ProfileCard = () => {
     setUpdatedInfo({ ...updatedInfo, [e.target.name]: e.target.value });
 
   /* ---------- Fetch profile on mount ----------------------------------- */
-  useEffect(() => {
-    (async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return setLoading(false);
-
-        const coursesRes = await fetch(`${API_BASE_URL}/courses/my`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (coursesRes.ok) {
-          const list = await coursesRes.json();
-          setMyCourses(list);
-        }
-
-        const res = await fetch(`${API_BASE_URL}/profile/profile`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await res.json();
-
-        if (res.ok) {
-          setUserInfo(data);
-          setUpdatedInfo({
-            username: data.username || "",
-            phoneNumber: data.phoneNumber || "",
-          });
-        } else {
-          console.error(data.message);
-        }
-
-        const picRes = await fetch(`${API_BASE_URL}/profile/profile-picture`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const picData = await res.json().catch(() => ({}));
-        if (picRes.ok) {
-          setUserInfo((prev) => ({
-            ...prev,
-            profilePicture: picData.profilePicture,
-          }));
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load profile.");
-      } finally {
+ useEffect(() => {
+  (async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
         setLoading(false);
+        return;
       }
-    })();
-  }, []);
+
+      // 1) My courses
+      const coursesRes = await fetch(`${API_BASE_URL}/courses/my`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (coursesRes.ok) {
+        const list = await coursesRes.json();
+        setMyCourses(list);
+      }
+
+      // 2) Profile (make sure we pull profilePicture from here)
+      const res = await fetch(`${API_BASE_URL}/profile/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        // some backends return { user: {...} }, some return the user directly
+        const user = data.user || data;
+
+        const finalUser = {
+          ...user,
+          profilePicture:
+            user.profilePicture ||
+            "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+        };
+
+        setUserInfo(finalUser);
+        setUpdatedInfo({
+          username: finalUser.username || "",
+          phoneNumber: finalUser.phoneNumber || "",
+        });
+      } else {
+        console.error(data.message);
+      }
+
+      // 🔥 we don’t need the extra /profile-picture fetch anymore
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to load profile.");
+    } finally {
+      setLoading(false);
+    }
+  })();
+}, []);
 
   /* ---------- Save edits ----------------------------------------------- */
   const handleSave = async () => {
