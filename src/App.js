@@ -29,6 +29,7 @@ import ProtectedRoute from "./components/ProtectedRoutes.js";
 import ScholarshipDetailsModal from "./components/ScholarshipDetailsModal.js";
 import CareerDetails from "./components/CareerDetails.js";
 import EventDashboard from "./components/EventDashboard.js";
+import AboutPage from "./components/AboutPage";
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
         <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/careers" element={<CareersTab />} />
    <Route path="/career-details" element={<CareerDetails />} />
+<Route path="/about" element={<AboutPage />} />
 
         {/* Admin layout + nested dashboards */}. . 
         <Route path="/admin/*" element={<Admin />}/>

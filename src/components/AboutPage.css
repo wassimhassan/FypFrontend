@@ -1,0 +1,212 @@
+/* =============================
+   FEKRA Elegant White + Blue Style
+   + Smooth Animations
+   ============================= */
+
+.about-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f5f7fb;
+  padding-bottom: 60px;
+  font-family: "Inter", sans-serif;
+  overflow-x: hidden;
+}
+
+/* ANIMATIONS */
+.fade-in {
+  animation: fadeIn 0.9s ease forwards;
+  opacity: 0;
+}
+
+.fade-up {
+  animation: fadeUp 1s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* CARD HOVER */
+.hover-pop {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-pop:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 0 14px 32px rgba(32, 67, 142, 0.22);
+}
+
+
+/* HERO SECTION */
+.about-hero {
+  text-align: center;
+  padding: 80px 20px 40px;
+  background: linear-gradient(135deg, #20438e, #335bb5);
+  color: white;
+  border-radius: 0 0 40px 40px;
+}
+
+.about-hero h1 {
+  font-size: 42px;
+  font-weight: 900;
+  margin-bottom: 10px;
+  letter-spacing: -0.5px;
+}
+
+.about-hero p {
+  max-width: 700px;
+  margin: auto;
+  font-size: 18px;
+  opacity: 0.95;
+}
+
+
+/* MAIN SECTION */
+.about-section {
+  max-width: 1100px;
+  margin: 60px auto;
+  padding: 0 20px;
+}
+
+.about-section h2 {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1f2a5a;
+  margin-bottom: 12px;
+}
+
+.about-paragraph {
+  font-size: 17px;
+  color: #4a5568;
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+
+/* CARDS */
+.about-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-top: 30px;
+}
+
+.about-card {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(32, 67, 142, 0.08);
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.about-icon {
+  font-size: 38px;
+  color: #20438e;
+  margin-bottom: 12px;
+}
+
+.about-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #1f2a5a;
+}
+
+.about-card p {
+  font-size: 14px;
+  color: #4a5568;
+}
+
+
+/* VALUES BOX */
+.values-list {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 20px rgba(32, 67, 142, 0.07);
+  list-style: none;
+  font-size: 16px;
+  color: #2d3748;
+  line-height: 1.7;
+}
+
+.values-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.values-list li:last-child {
+  border-bottom: none;
+}
+
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .about-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .about-cards {
+    grid-template-columns: 1fr;
+  }
+}
+/* =============================
+   COLLABORATIONS SECTION
+   ============================= */
+
+.collab-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-top: 25px;
+}
+
+.collab-card {
+  background: #ffffff;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1f2a5a;
+  box-shadow: 0 6px 16px rgba(32, 67, 142, 0.07);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.collab-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 28px rgba(32, 67, 142, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .collab-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .collab-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 450px) {
+  .collab-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -69,12 +69,7 @@ function NavBar() {
         <NavLink to="/about" className="nav-item">
           About
         </NavLink>
-        <NavLink to="/resources" className="nav-item">
-          Resources
-        </NavLink>
-        <NavLink to="/support" className="nav-item">
-          Support
-        </NavLink>
+        
         <NavLink to="/calendar" className="nav-item">
           Calendar
         </NavLink>
