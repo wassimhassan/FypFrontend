@@ -5,6 +5,8 @@ import UpcomingEvents from "./UpcomingEvents";
 import "./Calendar.css";
 import "./UpcomingEvents.css";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { FaArrowLeft } from "react-icons/fa";
 
 function fmtDateRange(startsAt, endsAt) {
   const s = new Date(startsAt);
@@ -22,6 +24,8 @@ function fmtDateRange(startsAt, endsAt) {
 }
 
 const CalendarPage = () => {
+  const navigate = useNavigate();
+
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
 
@@ -30,7 +34,7 @@ const CalendarPage = () => {
 
     axios.get(API)
       .then(res => {
-        const items = res.data.items || res.data; // depends on your controller return
+        const items = res.data.items || res.data;
         const mapped = items.map(ev => {
           const { dateStr, timeStr } = fmtDateRange(ev.startsAt, ev.endsAt);
           return {
@@ -48,7 +52,7 @@ const CalendarPage = () => {
       })
       .catch(err => console.error("Failed to load events:", err));
   }, []);
-  // ➤ Find events happening TODAY
+
   const today = new Date();
   const todayFormatted = today.toLocaleDateString(undefined, {
     weekday: "short",
@@ -58,7 +62,7 @@ const CalendarPage = () => {
 
   const todayEvents = useMemo(() => {
     return events.filter(ev =>
-      ev.date.includes(todayFormatted.slice(4)) // matches "Nov 14"
+      ev.date.includes(todayFormatted.slice(4))
     );
   }, [events]);
 
@@ -71,6 +75,12 @@ const CalendarPage = () => {
 
   return (
     <div className="page">
+
+      {/* 🔵 BACK ARROW BUTTON */}
+      <button className="back-arrow" onClick={() => navigate("/homepage")}>
+        <FaArrowLeft />
+      </button>
+
       <header className="page-header">
         <h1>Educational Events & Calendar</h1>
         <p>Stay updated with upcoming educational events, deadlines, and opportunities.</p>
@@ -78,36 +88,34 @@ const CalendarPage = () => {
 
       <div className="container">
 
-  {/* LEFT SIDE */}
-  <div style={{ flex: 1 }}>
-    <Calendar
-  selectedDate={selectedDate}
-  setSelectedDate={setSelectedDate}
-  events={events}
-/>
+        {/* LEFT SIDE */}
+        <div style={{ flex: 1 }}>
+          <Calendar
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
+            events={events}
+          />
 
-    {/* ➤ NEW Today's Events Box */}
-    <div className="today-events-box card-box">
-      <h3 className="section-title">Today's Events</h3>
+          <div className="today-events-box card-box">
+            <h3 className="section-title">Today's Events</h3>
 
-      {todayEvents.length === 0 ? (
-        <p className="no-event">No events today.</p>
-      ) : (
-        todayEvents.map(ev => (
-          <div key={ev.id} className="today-event-item">
-            <h4 className="today-event-title">{ev.title}</h4>
-            <p className="today-event-time">{ev.time}</p>
+            {todayEvents.length === 0 ? (
+              <p className="no-event">No events today.</p>
+            ) : (
+              todayEvents.map(ev => (
+                <div key={ev.id} className="today-event-item">
+                  <h4 className="today-event-title">{ev.title}</h4>
+                  <p className="today-event-time">{ev.time}</p>
+                </div>
+              ))
+            )}
           </div>
-        ))
-      )}
-    </div>
-  </div>
+        </div>
 
-  {/* RIGHT SIDE */}
-  <UpcomingEvents events={events} selectedDate={selectedDate} />
+        {/* RIGHT SIDE */}
+        <UpcomingEvents events={events} selectedDate={selectedDate} />
 
-</div>
-
+      </div>
     </div>
   );
 };
