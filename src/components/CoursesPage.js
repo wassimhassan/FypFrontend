@@ -34,108 +34,107 @@ export default function CoursesPage() {
   }, []);
 
   return (
-  <>
-    <NavBar />
-    {/* Toasts */}
-    <ToastContainer position="top-right" autoClose={2000} />
+    <>
+      <NavBar />
+      {/* Toasts */}
+      <ToastContainer position="top-right" autoClose={2000} />
 
-    <div className="courses-page">
-      <div className="courses-inner">
-        {/* -------- My Courses -------- */}
-        <section className="courses-section">
-          <h2>My Courses</h2>
+      <div className="cp-page">
+        <div className="cp-inner">
+          {/* -------- My Courses -------- */}
+          <section className="cp-section">
+            <h2>My Courses</h2>
 
-          {courses.length === 0 ? (
-            <div className="empty-card">
-              <p>You haven’t registered for any course yet.</p>
-            </div>
-          ) : (
-            <ul className="card-grid">
-              {courses.map((course) => (
-                <li
-                  key={course._id}
-                  className="course-card enrolled-card"
-                  onClick={() => navigate(`/courses/${course._id}`)}
-                >
-                  <div className="course-card-top">
-                    <span className="badge enrolled">Enrolled</span>
-                  </div>
+            {courses.length === 0 ? (
+              <div className="cp-empty-card">
+                <p>You haven’t registered for any course yet.</p>
+              </div>
+            ) : (
+              <ul className="cp-card-grid">
+                {courses.map((course) => (
+                  <li
+                    key={course._id}
+                    className="cp-card cp-card--enrolled"
+                    onClick={() => navigate(`/courses/${course._id}`)}
+                  >
+                    <div className="cp-card-top">
+                      <span className="cp-badge cp-badge--enrolled">Enrolled</span>
+                    </div>
 
-                  <h3 className="course-title">{course.title}</h3>
-                  <p className="course-subtitle">Click to view course details</p>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+                    <h3 className="cp-card-title">{course.title}</h3>
+                    <p className="cp-card-subtitle">Click to view course details</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-        {/* -------- Pending Requests -------- */}
-        <section className="courses-section">
-          <h2>Pending Requests</h2>
+          {/* -------- Pending Requests -------- */}
+          <section className="cp-section">
+            <h2>Pending Requests</h2>
 
-          {pending.length === 0 ? (
-            <div className="empty-card">
-              <p>No pending requests.</p>
-            </div>
-          ) : (
-            <ul className="card-grid">
-              {pending.map((course) => (
-                <li key={course._id} className="course-card pending-card">
-                  <div className="course-card-top">
-                    <span className="badge pending">Pending Approval</span>
-                  </div>
+            {pending.length === 0 ? (
+              <div className="cp-empty-card">
+                <p>No pending requests.</p>
+              </div>
+            ) : (
+              <ul className="cp-card-grid">
+                {pending.map((course) => (
+                  <li key={course._id} className="cp-card cp-card--pending">
+                    <div className="cp-card-top">
+                      <span className="cp-badge cp-badge--pending">Pending Approval</span>
+                    </div>
 
-                  <h3 className="course-title">{course.title}</h3>
-                  <p className="course-subtitle">
-                    Waiting for instructor or admin approval.
-                  </p>
+                    <h3 className="cp-card-title">{course.title}</h3>
+                    <p className="cp-card-subtitle">
+                      Waiting for instructor or admin approval.
+                    </p>
 
-                  <div className="pending-row">
-                    <button
-                      className="btn-cancel btn-danger"
-                      onClick={async () => {
-                        try {
-                          setPending((prev) =>
-                            prev.map((c) =>
-                              c._id === course._id
-                                ? { ...c, __loading: true }
-                                : c
-                            )
-                          );
-                          const token = localStorage.getItem("token");
-                          await axios.delete(
-                            `${API}/courses/${course._id}/pending`,
-                            { headers: { Authorization: `Bearer ${token}` } }
-                          );
-                          setPending((prev) =>
-                            prev.filter((c) => c._id !== course._id)
-                          );
-                          toast.success("Request cancelled.");
-                        } catch (e) {
-                          console.error(e);
-                          setPending((prev) =>
-                            prev.map((c) =>
-                              c._id === course._id
-                                ? { ...c, __loading: false }
-                                : c
-                            )
-                          );
-                          toast.error("Failed to cancel. Try again.");
-                        }
-                      }}
-                      disabled={course.__loading}
-                    >
-                      {course.__loading ? "Cancelling..." : "Cancel request"}
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
+                    <div className="cp-pending-row">
+                      <button
+                        className="cp-btn-cancel cp-btn-danger"
+                        onClick={async () => {
+                          try {
+                            setPending((prev) =>
+                              prev.map((c) =>
+                                c._id === course._id
+                                  ? { ...c, __loading: true }
+                                  : c
+                              )
+                            );
+                            const token = localStorage.getItem("token");
+                            await axios.delete(
+                              `${API}/courses/${course._id}/pending`,
+                              { headers: { Authorization: `Bearer ${token}` } }
+                            );
+                            setPending((prev) =>
+                              prev.filter((c) => c._id !== course._id)
+                            );
+                            toast.success("Request cancelled.");
+                          } catch (e) {
+                            console.error(e);
+                            setPending((prev) =>
+                              prev.map((c) =>
+                                c._id === course._id
+                                  ? { ...c, __loading: false }
+                                  : c
+                              )
+                            );
+                            toast.error("Failed to cancel. Try again.");
+                          }
+                        }}
+                        disabled={course.__loading}
+                      >
+                        {course.__loading ? "Cancelling..." : "Cancel request"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
-  </>
-);
-
+    </>
+  );
 }

@@ -1,38 +1,39 @@
-.courses-page {
+.cp-page {
   min-height: 100vh;
   padding: 24px;
   background: #f3f4f6; /* light gray background */
 }
 
-.courses-inner {
+.cp-inner {
   max-width: 1100px;
   margin: 0 auto;
 }
 
 /* section titles */
-.courses-section {
+.cp-section {
   margin-bottom: 40px;
 }
 
-.courses-section h2 {
+.cp-section h2 {
   font-size: 26px;
   font-weight: 800;
   margin-bottom: 16px;
   color: #111827;
 }
 
-/* grid for cards */
-.card-grid {
+.cp-card-grid {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  /* each card between 260–380px, never full-width */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 380px));
   gap: 20px;
+  justify-content: flex-start; /* keep them aligned left */
 }
 
 /* ------------ WHITE COURSE CARD ------------ */
-.course-card {
+.cp-card {
   background: #ffffff;                  /* white card */
   color: #111827;                       /* almost black text */
   border-radius: 16px;
@@ -53,7 +54,7 @@
   overflow: hidden;
 }
 
-.course-card::before {
+.cp-card::before {
   content: "";
   position: absolute;
   inset: -40%;
@@ -63,7 +64,7 @@
   pointer-events: none;
 }
 
-.course-card:hover {
+.cp-card:hover {
   transform: translateY(-3px);
   box-shadow:
     0 18px 40px rgba(15, 23, 42, 0.15);
@@ -71,27 +72,27 @@
   background: #ffffff;
 }
 
-.course-card:hover::before {
+.cp-card:hover::before {
   opacity: 1;
 }
 
-/* enrolled vs pending variants (just subtle border accents) */
-.enrolled-card {
+/* enrolled vs pending variants (subtle accent) */
+.cp-card--enrolled {
   border-left: 4px solid rgba(34, 197, 94, 0.8);   /* green accent */
 }
 
-.pending-card {
+.cp-card--pending {
   border-left: 4px solid rgba(59, 130, 246, 0.8);  /* blue accent */
 }
 
 /* top row inside card */
-.course-card-top {
+.cp-card-top {
   display: flex;
   justify-content: flex-end;
 }
 
 /* badge */
-.badge {
+.cp-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -103,34 +104,34 @@
   letter-spacing: 0.03em;
 }
 
-.badge.enrolled {
+.cp-badge--enrolled {
   background: rgba(22, 163, 74, 0.08);
   border-color: rgba(22, 163, 74, 0.4);
   color: #166534;
 }
 
-.badge.pending {
+.cp-badge--pending {
   background: rgba(59, 130, 246, 0.08);
   border-color: rgba(59, 130, 246, 0.4);
   color: #1d4ed8;
 }
 
 /* title & subtitle */
-.course-title {
+.cp-card-title {
   font-size: 18px;
   font-weight: 700;
   margin: 2px 0 0;
   color: #111827;
 }
 
-.course-subtitle {
+.cp-card-subtitle {
   font-size: 13px;
   color: #4b5563; /* gray text */
   margin: 0;
 }
 
 /* empty state card – also white */
-.empty-card {
+.cp-empty-card {
   border-radius: 16px;
   padding: 32px 18px;
   background: #ffffff;
@@ -140,26 +141,24 @@
   max-width: 600px;
 }
 
-.empty-card p {
+.cp-empty-card p {
   margin: 0;
   text-align: center;
 }
 
 /* pending row with cancel button */
-.pending-row {
+.cp-pending-row {
   display: flex;
   justify-content: flex-end;
   margin-top: 14px;
 }
 
-/* keep your existing btn-cancel / btn-danger from before */
-
 /* cancel button (base) */
-.btn-cancel {
+.cp-btn-cancel {
   appearance: none;
   border: 1px solid rgba(91, 140, 255, 0.35);
   background: rgba(91, 140, 255, 0.12);
-  color: #bcd3ff;
+  color: #1d4ed8;
   font-weight: 700;
   font-size: 12px;
   padding: 6px 12px;
@@ -173,28 +172,28 @@
     color .2s ease;
 }
 
-/* red version */
-.btn-danger {
+/* red version specifically for cancel */
+.cp-btn-danger {
   border: 1px solid rgba(239, 68, 68, 0.7);
-  background: rgba(190, 18, 60, 0.9);
-  color: #ffe4e6;
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
 }
 
-.btn-danger:hover {
-  background: rgba(220, 38, 38, 0.9);
-  border-color: rgba(248, 113, 113, 0.9);
+.cp-btn-danger:hover {
+  background: rgba(248, 113, 113, 0.25);
+  border-color: rgba(239, 68, 68, 0.85);
   transform: translateY(-1px) scale(1.02);
   box-shadow:
-    0 10px 24px rgba(248, 113, 113, 0.35),
+    0 10px 24px rgba(248, 113, 113, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.btn-danger:active {
+.cp-btn-danger:active {
   transform: translateY(0) scale(0.98);
   box-shadow: 0 6px 14px rgba(239, 68, 68, 0.28);
 }
 
-.btn-danger:disabled {
+.cp-btn-danger:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
@@ -203,11 +202,11 @@
 
 /* small responsive tweak */
 @media (max-width: 640px) {
-  .courses-page {
+  .cp-page {
     padding: 16px;
   }
 
-  .courses-section h2 {
+  .cp-section h2 {
     font-size: 22px;
   }
 }
