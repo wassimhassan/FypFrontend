@@ -35,7 +35,7 @@ export default function ViewEnrollModal({ open, course, onClose, onEnroll, loadi
           <span className="enroll-tag">{course.category || "Academic"}</span>
 
           <h1>{course.title || "Course Title"}</h1>
-          <p className="enroll-subtitle">{course.profName || "by Prof. David Lee"}</p>
+          <p className="enroll-subtitle">{course.instructor}</p>
 
           <div className="enroll-info-section">
             <div className="icon-wrapper"><UserIcon /></div>
