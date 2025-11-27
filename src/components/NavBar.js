@@ -90,6 +90,11 @@ function NavBar() {
                 Courses
               </button>
             )}
+{user?.role === "admin" && (
+  <button className="btn btn-outline" onClick={() => navigate("/admin")}>
+    Admin Dashboard
+  </button>
+)}
 
             <button className="btn btn-ghost" onClick={goHome}>
               Homepage
