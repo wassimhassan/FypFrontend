@@ -14,18 +14,18 @@ const ThirdSection = () => {
       <div className="profile-card-container">
         <ProfileCardWelcomepage
           icon="/FekraLogo.png"
-          name="Dr. Sarah Johnson"
-          description="Mathematics & SAT Prep specialist with 10+ years of experience helping students excel in standardized tests."
+          name="Ibrahim Mohammad"
+          description="Nursing Student at BAU."
         />
         <ProfileCardWelcomepage
           icon="/FekraLogo.png"
-          name="Prof. Ahmed Hassan"
-          description="Career counselor and university admissions expert, guiding students through their educational journey."
+          name="Aljalilah"
+          description="Physics Master at EMU."
         />
         <ProfileCardWelcomepage
           icon="/FekraLogo.png"
-          name="Ms. Emily Chen"
-          description="Scholarship advisor and academic mentor, helping students find and secure funding opportunities."
+          name="Asmaa Shreih"
+          description="Computer Science Bachelor AUB."
         />
       </div>
     </section>
