@@ -1,133 +1,168 @@
-.courses-page {
+.cp-page {
   min-height: 100vh;
-  padding: 20px;
-  background: #e8e6e6;
+  padding: 24px;
+  background: #f3f4f6; /* light gray background */
 }
 
-.courses-page h2 {
-  font-size: 28px;
-  font-weight: 800;
-  margin-left: 3px;
+.cp-inner {
   max-width: 1100px;
+  margin: 0 auto;
 }
 
-.courses-page ul {
+/* section titles */
+.cp-section {
+  margin-bottom: 40px;
+}
+
+.cp-section h2 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+.cp-card-grid {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
+  display: grid;
+  /* each card between 260–380px, never full-width */
+  grid-template-columns: repeat(auto-fit, minmax(260px, 380px));
   gap: 20px;
-  flex-wrap: wrap;
+  justify-content: flex-start; /* keep them aligned left */
 }
 
-.courses-page li {
-  background: white;
-  color: black;
-  font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-  padding: 16px;
+/* ------------ WHITE COURSE CARD ------------ */
+.cp-card {
+  background: #ffffff;                  /* white card */
+  color: #111827;                       /* almost black text */
+  border-radius: 16px;
+  padding: 16px 18px 18px;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08); /* soft shadow */
+  border: 1px solid rgba(148, 163, 184, 0.4);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.3s ease;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-  flex: 0 1 400px; 
+  position: relative;
+  overflow: hidden;
 }
 
-.courses-page li:hover {
-  transform: translateY(-1px);
-  
-  border-color: rgba(91,140,255,0.5);
+.cp-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
-.course-title {
-  font-weight: 700;
-  font-size: 18px;
+.cp-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.15);
+  border-color: rgba(59, 130, 246, 0.6); /* blue border on hover */
+  background: #ffffff;
 }
 
-.Empty-State {
-  text-align: center;
-  color: black;
-  padding: 40px 10px;
-  border: 1px dashed rgba(255,255,255,0.08);
-  border-radius: 14px;
-  background: white !important;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
+.cp-card:hover::before {
+  opacity: 1;
 }
 
-.Empty-State:hover {
-  transform: translateY(-1px);
+/* enrolled vs pending variants (subtle accent) */
+.cp-card--enrolled {
+  border-left: 4px solid rgba(34, 197, 94, 0.8);   /* green accent */
 }
 
-.badge.enrolled {
-  background: rgba(34,197,94,0.15);
-  border-color: rgba(34,197,94,0.35);
-  color: #9ae6b4;
+.cp-card--pending {
+  border-left: 4px solid rgba(59, 130, 246, 0.8);  /* blue accent */
 }
 
-.badge .pending {
-  background: rgba(91,140,255,0.12);
-  border-color: rgba(91,140,255,0.45);
-  color: #bcd3ff;
-}
-
-/* empty states */
-.empty-state,
-.courses-page > p {
-  text-align: center;
-  color: #9fb0d0;
-  padding: 40px 10px;
-  border: 1px dashed rgba(255,255,255,0.08);
-  border-radius: 14px;
-  background: white !important;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-  max-width: 1100px;
-  margin: 0 0 24px 0;
-}
-
-.courses-page > p:hover{
-  transform: translateY(-1px);
-}
-
-/* pending row with action */
-.pending-item { position: relative; }
-.pending-row {
+/* top row inside card */
+.cp-card-top {
   display: flex;
+  justify-content: flex-end;
+}
+
+/* badge */
+.cp-badge {
+  display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 8px;
-}
-
-/* cancel button */
-.btn-cancel {
-  appearance: none;
-  border: 1px solid rgba(91,140,255,0.35);
-  background: rgba(91,140,255,0.12);
-  color: #bcd3ff;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 700;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.btn-cancel:hover { filter: brightness(1.05); }
-.btn-cancel:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  border: 1px solid transparent;
+  letter-spacing: 0.03em;
 }
 
-/* --- Red cancel button with hover animation --- */
-.btn-danger {
+.cp-badge--enrolled {
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.4);
+  color: #166534;
+}
+
+.cp-badge--pending {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #1d4ed8;
+}
+
+/* title & subtitle */
+.cp-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 2px 0 0;
+  color: #111827;
+}
+
+.cp-card-subtitle {
+  font-size: 13px;
+  color: #4b5563; /* gray text */
+  margin: 0;
+}
+
+/* empty state card – also white */
+.cp-empty-card {
+  border-radius: 16px;
+  padding: 32px 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08);
+  color: #4b5563;
+  max-width: 600px;
+}
+
+.cp-empty-card p {
+  margin: 0;
+  text-align: center;
+}
+
+/* pending row with cancel button */
+.cp-pending-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+/* cancel button (base) */
+.cp-btn-cancel {
   appearance: none;
-  border: 1px solid rgba(239, 68, 68, 0.55);          /* red-500 */
-  background: rgb(165, 4, 4);
-  color: #fecaca;                                      /* red-200 text */
+  border: 1px solid rgba(91, 140, 255, 0.35);
+  background: rgba(91, 140, 255, 0.12);
+  color: #1d4ed8;
   font-weight: 700;
   font-size: 12px;
   padding: 6px 12px;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
   transition:
     transform .14s ease,
@@ -137,24 +172,41 @@
     color .2s ease;
 }
 
-.btn-danger:hover {
-  background: rgb(165, 4, 4);
+/* red version specifically for cancel */
+.cp-btn-danger {
+  border: 1px solid rgba(239, 68, 68, 0.7);
+  background: rgba(248, 113, 113, 0.15);
+  color: #b91c1c;
+}
+
+.cp-btn-danger:hover {
+  background: rgba(248, 113, 113, 0.25);
   border-color: rgba(239, 68, 68, 0.85);
-  color: #ffe4e6;                                      /* a bit brighter */
   transform: translateY(-1px) scale(1.02);
   box-shadow:
-    0 10px 24px rgba(239, 68, 68, 0.25),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+    0 10px 24px rgba(248, 113, 113, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.btn-danger:active {
-  transform: translateY(0) scale(0.99);
-  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+.cp-btn-danger:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.28);
 }
 
-.btn-danger:disabled {
+.cp-btn-danger:disabled {
   opacity: 0.65;
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* small responsive tweak */
+@media (max-width: 640px) {
+  .cp-page {
+    padding: 16px;
+  }
+
+  .cp-section h2 {
+    font-size: 22px;
+  }
 }
