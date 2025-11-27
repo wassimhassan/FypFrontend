@@ -1,10 +1,18 @@
 import React from "react";
 import "./AboutPage.css";
-import { FaUsers, FaBookOpen, FaGlobe, FaHandsHelping } from "react-icons/fa";
+import { FaUsers, FaBookOpen, FaGlobe, FaHandsHelping, FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export default function AboutPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="about-container">
+
+      {/* 🔵 BACK BUTTON */}
+      <button className="back-arrow" onClick={() => navigate("/homepage")}>
+        <FaArrowLeft />
+      </button>
       
       {/* HEADER */}
       <section className="about-hero fade-in">
@@ -61,7 +69,8 @@ export default function AboutPage() {
           <li>💙 Support — Guiding every student toward a brighter future</li>
         </ul>
       </section>
-            {/* COLLABORATIONS SECTION */}
+
+      {/* COLLABORATIONS SECTION */}
       <section className="about-section fade-up">
         <h2>Our Collaborations</h2>
         <p className="about-paragraph">
