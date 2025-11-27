@@ -99,17 +99,21 @@ const ProfileCard = () => {
     }
 
     try {
-      const res = await fetch(`${API_BASE_URL}/profile/remove-profile-picture`, {
-        method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `${API_BASE_URL}/profile/remove-profile-picture`,
+        {
+          method: "DELETE",
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
 
       if (res.ok) {
         toast.success("Profile picture removed successfully!");
         setUserInfo((prev) => ({
           ...prev,
-          profilePicture: "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+          profilePicture:
+            "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
         }));
       } else {
         toast.error(data.message || "Failed to delete profile picture");
@@ -128,59 +132,59 @@ const ProfileCard = () => {
     setUpdatedInfo({ ...updatedInfo, [e.target.name]: e.target.value });
 
   /* ---------- Fetch profile on mount ----------------------------------- */
- useEffect(() => {
-  (async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setLoading(false);
-        return;
-      }
+  useEffect(() => {
+    (async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setLoading(false);
+          return;
+        }
 
-      // 1) My courses
-      const coursesRes = await fetch(`${API_BASE_URL}/courses/my`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (coursesRes.ok) {
-        const list = await coursesRes.json();
-        setMyCourses(list);
-      }
-
-      // 2) Profile (make sure we pull profilePicture from here)
-      const res = await fetch(`${API_BASE_URL}/profile/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-
-      if (res.ok) {
-        // some backends return { user: {...} }, some return the user directly
-        const user = data.user || data;
-
-        const finalUser = {
-          ...user,
-          profilePicture:
-            user.profilePicture ||
-            "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
-        };
-
-        setUserInfo(finalUser);
-        setUpdatedInfo({
-          username: finalUser.username || "",
-          phoneNumber: finalUser.phoneNumber || "",
+        // 1) My courses
+        const coursesRes = await fetch(`${API_BASE_URL}/courses/my`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-      } else {
-        console.error(data.message);
-      }
+        if (coursesRes.ok) {
+          const list = await coursesRes.json();
+          setMyCourses(list);
+        }
 
-      // 🔥 we don’t need the extra /profile-picture fetch anymore
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load profile.");
-    } finally {
-      setLoading(false);
-    }
-  })();
-}, []);
+        // 2) Profile (make sure we pull profilePicture from here)
+        const res = await fetch(`${API_BASE_URL}/profile/profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          // some backends return { user: {...} }, some return the user directly
+          const user = data.user || data;
+
+          const finalUser = {
+            ...user,
+            profilePicture:
+              user.profilePicture ||
+              "https://fekra.s3.eu-north-1.amazonaws.com/default.png",
+          };
+
+          setUserInfo(finalUser);
+          setUpdatedInfo({
+            username: finalUser.username || "",
+            phoneNumber: finalUser.phoneNumber || "",
+          });
+        } else {
+          console.error(data.message);
+        }
+
+        // 🔥 we don’t need the extra /profile-picture fetch anymore
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load profile.");
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
 
   /* ---------- Save edits ----------------------------------------------- */
   const handleSave = async () => {
@@ -286,7 +290,10 @@ const ProfileCard = () => {
                 openImageModal();
               }}
             >
-              <VisibilityOutlinedIcon fontSize="small" style={{ marginRight: 8 }} />
+              <VisibilityOutlinedIcon
+                fontSize="small"
+                style={{ marginRight: 8 }}
+              />
               View Profile
             </MenuItem>
             <MenuItem onClick={() => fileInputRef.current?.click()}>
@@ -303,7 +310,12 @@ const ProfileCard = () => {
             </MenuItem>
           </Menu>
 
-          <Dialog open={imageModalOpen} onClose={closeImageModal} maxWidth="sm" fullWidth>
+          <Dialog
+            open={imageModalOpen}
+            onClose={closeImageModal}
+            maxWidth="sm"
+            fullWidth
+          >
             <DialogContent sx={{ display: "flex", justifyContent: "center" }}>
               <img
                 src={userInfo.profilePicture}
@@ -341,7 +353,9 @@ const ProfileCard = () => {
                       className="profile-input"
                     />
                   ) : (
-                    <span>{userInfo[field] ? " " + userInfo[field] : " Not set"}</span>
+                    <span>
+                      {userInfo[field] ? " " + userInfo[field] : " Not set"}
+                    </span>
                   )}
                 </div>
               ))}
@@ -383,83 +397,101 @@ const ProfileCard = () => {
           </CardContent>
         </Card>
 
-        {/* ---------- Registered Courses ---------- */}
-        <div className="registered-courses">
-          <div className="rc-header">
-            <h3>Registered Courses</h3>
-            {myCourses?.length ? (
-              <span className="rc-count">{myCourses.length}</span>
-            ) : null}
-          </div>
-
-          {!myCourses?.length ? (
-            <p className="rc-empty">You haven’t registered for any course yet.</p>
-          ) : (
-            <div className="rc-grid">
-              {myCourses.map((c) => (
-                <article key={c._id} className="rc-card">
-                  <div className="rc-card-top">
-                    <span className="rc-type">{c.category}</span>
-                    <span
-                      className={`rc-badge ${
-                        c.price?.toLowerCase() === "free" ? "free" : "paid"
-                      }`}
-                    >
-                      {c.price}
-                    </span>
-                  </div>
-
-                  <h4 className="rc-title">{c.title}</h4>
-                  <p className="rc-instructor">by {c.instructor}</p>
-
-                  <div className="rc-info">
-                    <span className="rc-info-chip" title={`${c.durationDays} days`}>
-                      <AccessTimeIcon fontSize="small" /> {c.durationDays} d
-                    </span>
-                    <span className="rc-info-chip">
-                      <GroupIcon fontSize="small" /> {c.enrolledStudents?.length ?? 0}
-                    </span>
-                    <span className="rc-info-chip">
-                      <StarIcon fontSize="small" /> {c.ratingAvg ?? 0}/5 (
-                      {c?.ratingCount ?? 0})
-                    </span>
-                  </div>
-
-                  <span className="rc-level">{c.level}</span>
-
-                  <p className="rc-desc" title={c.description}>
-                    {c.description?.length > 110
-                      ? c.description.slice(0, 110) + "…"
-                      : c.description}
-                  </p>
-
-                  <div className="rc-meta">
-                    <span
-                      className="rc-date"
-                      title={new Date(c.createdAt).toLocaleString()}
-                    >
-                      Joined: {new Date(c.createdAt).toLocaleDateString()}
-                    </span>
-                    <span className="rc-enrolled">
-                      {c.enrolledStudents?.length ?? 0} enrolled
-                    </span>
-                  </div>
-                </article>
-              ))}
+        {userInfo.role === "student" && (
+          <div className="registered-courses">
+            <div className="rc-header">
+              <h3>Registered Courses</h3>
+              {myCourses?.length ? (
+                <span className="rc-count">{myCourses.length}</span>
+              ) : null}
             </div>
-          )}
-        </div>
+
+            {!myCourses?.length ? (
+              <p className="rc-empty">
+                You haven’t registered for any course yet.
+              </p>
+            ) : (
+              <div className="rc-grid">
+                {myCourses.map((c) => (
+                  <article key={c._id} className="rc-card">
+                    <div className="rc-card-top">
+                      <span className="rc-type">{c.category}</span>
+                      <span
+                        className={`rc-badge ${
+                          c.price?.toLowerCase() === "free" ? "free" : "paid"
+                        }`}
+                      >
+                        {c.price}
+                      </span>
+                    </div>
+
+                    <h4 className="rc-title">{c.title}</h4>
+                    <p className="rc-instructor">by {c.instructor}</p>
+
+                    <div className="rc-info">
+                      <span
+                        className="rc-info-chip"
+                        title={`${c.durationDays} days`}
+                      >
+                        <AccessTimeIcon fontSize="small" /> {c.durationDays} d
+                      </span>
+                      <span className="rc-info-chip">
+                        <GroupIcon fontSize="small" />{" "}
+                        {c.enrolledStudents?.length ?? 0}
+                      </span>
+                      <span className="rc-info-chip">
+                        <StarIcon fontSize="small" /> {c.ratingAvg ?? 0}/5 (
+                        {c?.ratingCount ?? 0})
+                      </span>
+                    </div>
+
+                    <span className="rc-level">{c.level}</span>
+
+                    <p className="rc-desc" title={c.description}>
+                      {c.description?.length > 110
+                        ? c.description.slice(0, 110) + "…"
+                        : c.description}
+                    </p>
+
+                    <div className="rc-meta">
+                      <span
+                        className="rc-date"
+                        title={new Date(c.createdAt).toLocaleString()}
+                      >
+                        Joined: {new Date(c.createdAt).toLocaleDateString()}
+                      </span>
+                      <span className="rc-enrolled">
+                        {c.enrolledStudents?.length ?? 0} enrolled
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Delete picture confirm dialog */}
-      <Dialog open={deleteOpen} onClose={() => setDeleteOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Delete Profile Picture</DialogTitle>
         <DialogContent>
-          <Typography>Are you sure you want to delete your profile picture?</Typography>
+          <Typography>
+            Are you sure you want to delete your profile picture?
+          </Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setDeleteOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="error" onClick={deleteProfilePicture}>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={deleteProfilePicture}
+          >
             Delete
           </Button>
         </DialogActions>

@@ -12,6 +12,15 @@
 .scholarship-data-table .MuiTableHead-root {
   background: linear-gradient(135deg, #20438e, #1a3a7a) !important;
 }
+.scholarship-data-table {
+  max-width: 100%;
+  overflow-x: auto;   /* 🔥 enables horizontal scroll */
+}
+
+/* Optional: force table to be wider than screen so scroll actually appears */
+.scholarship-data-table table {
+  min-width: 1200px;  /* adjust as you like */
+}
 
 .scholarship-data-table .MuiTableHead-root .MuiTableCell-root {
   color: white !important;
