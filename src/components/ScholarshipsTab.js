@@ -48,6 +48,9 @@ const ScholarshipsTab = () => {
             title={sch.scholarship_title}
             description={sch.scholarship_description}
             requirements={sch.scholarship_requirements}
+            link={sch.scholarship_link}
+            deadline={sch.scholarship_deadline}
+            benefits={sch.scholarship_benefits}
             onViewDetails={() => handleViewDetails(sch)} // 🆕 pass selected scholarship
           />
         ))}

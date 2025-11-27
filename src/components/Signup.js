@@ -6,17 +6,20 @@ import "./Signup.css"
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 
+import eyeOpen from "../assets/eye.png"
+import eyeClosed from "../assets/eyebrow.png"
+
 export default function Signup() {
   const navigate = useNavigate()
 
-  // ── form state ───────────────────────────────────────────────
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
 
-  // ── submit handler ───────────────────────────────────────────
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
@@ -51,15 +54,31 @@ export default function Signup() {
             required
           />
 
-          <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-
           <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
+
+          {/* PASSWORD FIELD WITH TOGGLE */}
+          <div className="input-group">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <img
+              src={showPassword ? eyeClosed : eyeOpen}
+              alt="toggle password"
+              className="password-eye"
+              onClick={() => setShowPassword(!showPassword)}
+            />
+          </div>
 
           {error && <p className="error-message">{error}</p>}
 
