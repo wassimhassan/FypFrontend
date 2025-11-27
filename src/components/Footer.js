@@ -37,9 +37,15 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="footer-copy">
-        © 2025 FEKRA. All rights reserved.
-      </div>
+<hr />
+
+<div className="footer-bottom">
+  <span>© 2025 FEKRA. All rights reserved.</span>
+  <span className="footer-team">
+    Developed by Asmaa Shreih, Jean EL Houwayek, Wassim Hassan
+  </span>
+</div>
+
     </footer>
   );
 }
