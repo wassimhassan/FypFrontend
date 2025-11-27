@@ -34,81 +34,108 @@ export default function CoursesPage() {
   }, []);
 
   return (
-    <>
-      <NavBar />
-      {/* Toasts */}
-      <ToastContainer position="top-right" autoClose={2000} />
+  <>
+    <NavBar />
+    {/* Toasts */}
+    <ToastContainer position="top-right" autoClose={2000} />
 
-      <div className="courses-page">
-        <h2>My Courses</h2>
-        {courses.length === 0 ? (
-          <p>No registered courses yet.</p>
-        ) : (
-          <ul>
-            {courses.map((course) => (
-              <li
-                key={course._id}
-                onClick={() => navigate(`/courses/${course._id}`)}
-              >
-                {course.title}
-              </li>
-            ))}
-          </ul>
-        )}
-        <h2 style={{ marginTop: "40px" }}>Pending Requests</h2>
-        {pending.length === 0 ? (
-          <p className="Empty-State">No pending requests.</p>
-        ) : (
-          <ul>
-            {pending.map((course) => (
-              <li key={course._id}>
-                <div>{course.title}</div>
-                <div className="pending-row">
-                  <span className="badge">Pending Approval</span>
-                  <button
-                    className="btn-cancel btn-danger"
-                    onClick={async () => {
-                      try {
-                        // optimistic UI: mark as loading
-                        setPending((prev) =>
-                          prev.map((c) =>
-                            c._id === course._id
-                              ? { ...c, __loading: true }
-                              : c
-                          )
-                        );
-                        const token = localStorage.getItem("token");
-                        await axios.delete(
-                          `${API}/courses/${course._id}/pending`,
-                          { headers: { Authorization: `Bearer ${token}` } }
-                        );
-                        // remove from list
-                        setPending((prev) =>
-                          prev.filter((c) => c._id !== course._id)
-                        );
-                      } catch (e) {
-                        console.error(e);
-                        // revert loading state
-                        setPending((prev) =>
-                          prev.map((c) =>
-                            c._id === course._id
-                              ? { ...c, __loading: false }
-                              : c
-                          )
-                        );
-                        toast.error("Failed to cancel. Try again.");
-                      }
-                    }}
-                    disabled={course.__loading}
-                  >
-                    {course.__loading ? "Cancelling..." : "Cancel request"}
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+    <div className="courses-page">
+      <div className="courses-inner">
+        {/* -------- My Courses -------- */}
+        <section className="courses-section">
+          <h2>My Courses</h2>
+
+          {courses.length === 0 ? (
+            <div className="empty-card">
+              <p>You haven’t registered for any course yet.</p>
+            </div>
+          ) : (
+            <ul className="card-grid">
+              {courses.map((course) => (
+                <li
+                  key={course._id}
+                  className="course-card enrolled-card"
+                  onClick={() => navigate(`/courses/${course._id}`)}
+                >
+                  <div className="course-card-top">
+                    <span className="badge enrolled">Enrolled</span>
+                  </div>
+
+                  <h3 className="course-title">{course.title}</h3>
+                  <p className="course-subtitle">Click to view course details</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        {/* -------- Pending Requests -------- */}
+        <section className="courses-section">
+          <h2>Pending Requests</h2>
+
+          {pending.length === 0 ? (
+            <div className="empty-card">
+              <p>No pending requests.</p>
+            </div>
+          ) : (
+            <ul className="card-grid">
+              {pending.map((course) => (
+                <li key={course._id} className="course-card pending-card">
+                  <div className="course-card-top">
+                    <span className="badge pending">Pending Approval</span>
+                  </div>
+
+                  <h3 className="course-title">{course.title}</h3>
+                  <p className="course-subtitle">
+                    Waiting for instructor or admin approval.
+                  </p>
+
+                  <div className="pending-row">
+                    <button
+                      className="btn-cancel btn-danger"
+                      onClick={async () => {
+                        try {
+                          setPending((prev) =>
+                            prev.map((c) =>
+                              c._id === course._id
+                                ? { ...c, __loading: true }
+                                : c
+                            )
+                          );
+                          const token = localStorage.getItem("token");
+                          await axios.delete(
+                            `${API}/courses/${course._id}/pending`,
+                            { headers: { Authorization: `Bearer ${token}` } }
+                          );
+                          setPending((prev) =>
+                            prev.filter((c) => c._id !== course._id)
+                          );
+                          toast.success("Request cancelled.");
+                        } catch (e) {
+                          console.error(e);
+                          setPending((prev) =>
+                            prev.map((c) =>
+                              c._id === course._id
+                                ? { ...c, __loading: false }
+                                : c
+                            )
+                          );
+                          toast.error("Failed to cancel. Try again.");
+                        }
+                      }}
+                      disabled={course.__loading}
+                    >
+                      {course.__loading ? "Cancelling..." : "Cancel request"}
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
       </div>
-    </>
-  );
+    </div>
+  </>
+);
+
 }

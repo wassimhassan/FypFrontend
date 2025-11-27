@@ -1,133 +1,169 @@
 .courses-page {
   min-height: 100vh;
-  padding: 20px;
-  background: #e8e6e6;
+  padding: 24px;
+  background: #f3f4f6; /* light gray background */
 }
 
-.courses-page h2 {
-  font-size: 28px;
-  font-weight: 800;
-  margin-left: 3px;
+.courses-inner {
   max-width: 1100px;
+  margin: 0 auto;
 }
 
-.courses-page ul {
+/* section titles */
+.courses-section {
+  margin-bottom: 40px;
+}
+
+.courses-section h2 {
+  font-size: 26px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  color: #111827;
+}
+
+/* grid for cards */
+.card-grid {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
-  flex-wrap: wrap;
 }
 
-.courses-page li {
-  background: white;
-  color: black;
-  font-weight: 500;
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 14px;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-  padding: 16px;
+/* ------------ WHITE COURSE CARD ------------ */
+.course-card {
+  background: #ffffff;                  /* white card */
+  color: #111827;                       /* almost black text */
+  border-radius: 16px;
+  padding: 16px 18px 18px;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08); /* soft shadow */
+  border: 1px solid rgba(148, 163, 184, 0.4);
   display: flex;
   flex-direction: column;
   gap: 10px;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease,
+    background 0.3s ease;
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
-  flex: 0 1 400px; 
+  position: relative;
+  overflow: hidden;
 }
 
-.courses-page li:hover {
-  transform: translateY(-1px);
-  
-  border-color: rgba(91,140,255,0.5);
+.course-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 55%);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
 }
 
-.course-title {
+.course-card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.15);
+  border-color: rgba(59, 130, 246, 0.6); /* blue border on hover */
+  background: #ffffff;
+}
+
+.course-card:hover::before {
+  opacity: 1;
+}
+
+/* enrolled vs pending variants (just subtle border accents) */
+.enrolled-card {
+  border-left: 4px solid rgba(34, 197, 94, 0.8);   /* green accent */
+}
+
+.pending-card {
+  border-left: 4px solid rgba(59, 130, 246, 0.8);  /* blue accent */
+}
+
+/* top row inside card */
+.course-card-top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* badge */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 700;
-  font-size: 18px;
-}
-
-.Empty-State {
-  text-align: center;
-  color: black;
-  padding: 40px 10px;
-  border: 1px dashed rgba(255,255,255,0.08);
-  border-radius: 14px;
-  background: white !important;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.Empty-State:hover {
-  transform: translateY(-1px);
+  border: 1px solid transparent;
+  letter-spacing: 0.03em;
 }
 
 .badge.enrolled {
-  background: rgba(34,197,94,0.15);
-  border-color: rgba(34,197,94,0.35);
-  color: #9ae6b4;
+  background: rgba(22, 163, 74, 0.08);
+  border-color: rgba(22, 163, 74, 0.4);
+  color: #166534;
 }
 
-.badge .pending {
-  background: rgba(91,140,255,0.12);
-  border-color: rgba(91,140,255,0.45);
-  color: #bcd3ff;
+.badge.pending {
+  background: rgba(59, 130, 246, 0.08);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #1d4ed8;
 }
 
-/* empty states */
-.empty-state,
-.courses-page > p {
+/* title & subtitle */
+.course-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 2px 0 0;
+  color: #111827;
+}
+
+.course-subtitle {
+  font-size: 13px;
+  color: #4b5563; /* gray text */
+  margin: 0;
+}
+
+/* empty state card – also white */
+.empty-card {
+  border-radius: 16px;
+  padding: 32px 18px;
+  background: #ffffff;
+  box-shadow:
+    0 10px 25px rgba(15, 23, 42, 0.08);
+  color: #4b5563;
+  max-width: 600px;
+}
+
+.empty-card p {
+  margin: 0;
   text-align: center;
-  color: #9fb0d0;
-  padding: 40px 10px;
-  border: 1px dashed rgba(255,255,255,0.08);
-  border-radius: 14px;
-  background: white !important;
-  box-shadow: 0 6px 10px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.03);
-  max-width: 1100px;
-  margin: 0 0 24px 0;
 }
 
-.courses-page > p:hover{
-  transform: translateY(-1px);
-}
-
-/* pending row with action */
-.pending-item { position: relative; }
+/* pending row with cancel button */
 .pending-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 8px;
+  justify-content: flex-end;
+  margin-top: 14px;
 }
 
-/* cancel button */
+/* keep your existing btn-cancel / btn-danger from before */
+
+/* cancel button (base) */
 .btn-cancel {
   appearance: none;
-  border: 1px solid rgba(91,140,255,0.35);
-  background: rgba(91,140,255,0.12);
+  border: 1px solid rgba(91, 140, 255, 0.35);
+  background: rgba(91, 140, 255, 0.12);
   color: #bcd3ff;
-  font-weight: 700;
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  cursor: pointer;
-}
-.btn-cancel:hover { filter: brightness(1.05); }
-.btn-cancel:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* --- Red cancel button with hover animation --- */
-.btn-danger {
-  appearance: none;
-  border: 1px solid rgba(239, 68, 68, 0.55);          /* red-500 */
-  background: rgb(165, 4, 4);
-  color: #fecaca;                                      /* red-200 text */
   font-weight: 700;
   font-size: 12px;
   padding: 6px 12px;
-  border-radius: 10px;
+  border-radius: 999px;
   cursor: pointer;
   transition:
     transform .14s ease,
@@ -137,19 +173,25 @@
     color .2s ease;
 }
 
+/* red version */
+.btn-danger {
+  border: 1px solid rgba(239, 68, 68, 0.7);
+  background: rgba(190, 18, 60, 0.9);
+  color: #ffe4e6;
+}
+
 .btn-danger:hover {
-  background: rgb(165, 4, 4);
-  border-color: rgba(239, 68, 68, 0.85);
-  color: #ffe4e6;                                      /* a bit brighter */
+  background: rgba(220, 38, 38, 0.9);
+  border-color: rgba(248, 113, 113, 0.9);
   transform: translateY(-1px) scale(1.02);
   box-shadow:
-    0 10px 24px rgba(239, 68, 68, 0.25),
-    inset 0 1px 0 rgba(255,255,255,0.08);
+    0 10px 24px rgba(248, 113, 113, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .btn-danger:active {
-  transform: translateY(0) scale(0.99);
-  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.22);
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 6px 14px rgba(239, 68, 68, 0.28);
 }
 
 .btn-danger:disabled {
@@ -157,4 +199,15 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+/* small responsive tweak */
+@media (max-width: 640px) {
+  .courses-page {
+    padding: 16px;
+  }
+
+  .courses-section h2 {
+    font-size: 22px;
+  }
 }
