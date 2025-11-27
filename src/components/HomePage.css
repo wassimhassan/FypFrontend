@@ -8,7 +8,6 @@ body {
     color: #1f2f56;
 }
 
-
 /* Hero Section */
 .hero {
     text-align: center;
@@ -16,18 +15,18 @@ body {
     padding: 60px 10px 40px;
     margin-top: 0;
 }
+
 .hero-content-background {
-  /*background-image: url('./background.png');*/
-  background-image: url('../assets/background.png');
-  background-size: cover;
-  background-position:center;
-  background-repeat: no-repeat;
-  padding: 80px 20px;
-  border-radius: 16px;
-  color: #fff; 
-  text-align: center;
-  max-width: 100%;
-  margin: 0 auto;
+    background-image: url('../assets/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 80px 20px;
+    border-radius: 16px;
+    color: #fff; 
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 .hero h1 {
@@ -51,6 +50,7 @@ body {
     margin-bottom: 60px;
 }
 
+/* Learn More button only */
 .btn-learnmore {
     border: 1px solid #20438E;
     color: #20438E;
@@ -59,34 +59,18 @@ body {
     border-radius: 5px;
     cursor: pointer;
     font-size: 18px;
+    transition: 0.25s ease;
 }
 
-.search-btn {
-    background-color: #20438E;
+.btn-learnmore:hover {
+    background: #20438E;
     color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 18px;
-    border: none;
-    cursor: pointer;
-    width: 85px;
-    height: 44px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
-
-.search-icon {
-    width: 20px;
-    height: 20px;
-}
-
 
 /* Tabs */
 .hero-tab-wrapper {
     padding-top: 80px;
 }
-
 
 .tab-menu {
     display: flex;
@@ -126,7 +110,6 @@ body {
     font-size: 18px;
 }
 
-
 /* Stats Section */
 .stats {
     background-color: #ffffff;
@@ -148,4 +131,3 @@ body {
     color: #555;
     margin-top: 4px;
 }
-
